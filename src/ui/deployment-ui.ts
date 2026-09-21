@@ -1,19 +1,20 @@
-import type { UnitDef, Faction } from '../data/types';
+import type { DeploymentCard, Faction } from '../data/types';
+import { UNIT_ROSTER } from '../data/units';
 
 export class DeploymentUI {
-  private dockElement: HTMLElement | null;
-  private statusElement: HTMLElement | null;
+  private panel: HTMLElement | null;
+  private container: HTMLElement | null;
   private startBtn: HTMLButtonElement | null;
   private autoBtn: HTMLButtonElement | null;
 
-  public selectedRosterIndex: number | null = null;
-  public onSelectRosterUnit?: (index: number) => void;
+  public selectedCardKey: string | null = null;
+  public onSelectCard?: (cardKey: string) => void;
   public onAutoDeploy?: () => void;
   public onStartBattle?: () => void;
 
   constructor() {
-    this.dockElement = document.getElementById('deployment-dock');
-    this.statusElement = document.getElementById('deployment-status');
+    this.panel = document.getElementById('deployment-panel');
+    this.container = document.getElementById('deploy-cards-container');
     this.startBtn = document.getElementById('btn-start-battle') as HTMLButtonElement;
     this.autoBtn = document.getElementById('btn-auto-deploy') as HTMLButtonElement;
 
@@ -31,53 +32,58 @@ export class DeploymentUI {
   }
 
   public show(show: boolean): void {
-    const container = document.getElementById('deployment-panel');
-    if (container) {
-      container.style.display = show ? 'flex' : 'none';
+    if (this.panel) {
+      this.panel.style.display = show ? 'flex' : 'none';
     }
   }
 
-  public renderRoster(roster: UnitDef[], deployedFlags: boolean[], faction: Faction | undefined): void {
-    if (!this.dockElement) return;
-    this.dockElement.innerHTML = '';
+  public renderRoster(roster: DeploymentCard[], selectedKey: string | null = null): void {
+    if (!this.container) return;
+    this.selectedCardKey = selectedKey;
+    this.container.innerHTML = '';
 
-    const remainingCount = deployedFlags.filter(d => !d).length;
-    if (this.statusElement) {
-      this.statusElement.textContent = `Deploying: ${roster.length - remainingCount}/${roster.length} Deployed`;
-    }
-
+    const allPlaced = roster.length > 0 && roster.every(c => c.placed);
     if (this.startBtn) {
-      this.startBtn.disabled = remainingCount > 0;
-      this.startBtn.classList.toggle('btn-primary-glow', remainingCount === 0);
+      this.startBtn.disabled = !allPlaced;
     }
 
-    roster.forEach((unitDef, idx) => {
-      const card = document.createElement('div');
-      const isDeployed = deployedFlags[idx];
-      const isSelected = this.selectedRosterIndex === idx;
+    const factionIcons: Record<string, string> = {
+      hero: '👑',
+      infantry: '🛡️',
+      fast: '⚡',
+      heavy: '💥',
+      vehicle: '🤖',
+      monster: '👾'
+    };
 
-      card.className = `roster-card ${isDeployed ? 'card-deployed' : ''} ${isSelected ? 'card-selected' : ''}`;
-      card.innerHTML = `
-        <div class="roster-card-role">${unitDef.role.toUpperCase()}</div>
-        <div class="roster-card-name">${unitDef.name}</div>
-        <div class="roster-card-stats">
-          <span>W${unitDef.wounds}</span> • <span>T${unitDef.toughness}</span> • <span>${unitDef.armorSave}+</span>
-        </div>
-        ${isDeployed ? '<div class="deployed-tag">DEPLOYED</div>' : ''}
+    roster.forEach(card => {
+      const uDef = UNIT_ROSTER[card.type];
+      const role = uDef?.role || 'infantry';
+      const icon = factionIcons[role] || '⚔️';
+
+      const cardEl = document.createElement('div');
+      cardEl.className = `deploy-card ${card.placed ? 'placed' : ''} ${card.key === this.selectedCardKey ? 'selected' : ''}`;
+      cardEl.setAttribute('data-key', card.key);
+
+      cardEl.innerHTML = `
+        <div class="deploy-card-icon">${icon}</div>
+        <div class="deploy-card-name">${card.name}</div>
+        <div class="deploy-card-role">${role.toUpperCase()}</div>
+        <div class="deploy-card-status">${card.placed ? '✓ DEPLOYED' : 'UNPLACED'}</div>
       `;
 
-      card.addEventListener('click', () => {
-        if (isDeployed) return;
-        this.selectedRosterIndex = idx;
-        if (this.onSelectRosterUnit) this.onSelectRosterUnit(idx);
-        this.renderRoster(roster, deployedFlags, faction);
+      cardEl.addEventListener('click', () => {
+        this.selectedCardKey = card.key;
+        if (this.onSelectCard) this.onSelectCard(card.key);
+        this.renderRoster(roster, this.selectedCardKey);
       });
 
-      this.dockElement!.appendChild(card);
+      this.container!.appendChild(cardEl);
     });
   }
 
   public clearSelection(): void {
-    this.selectedRosterIndex = null;
+    this.selectedCardKey = null;
   }
 }
+

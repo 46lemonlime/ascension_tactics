@@ -1,15 +1,26 @@
 import type { Unit, UnitDef } from '../data/types';
+import { FACTIONS } from '../data/factions';
 
 export class DatasheetUI {
   private panel: HTMLElement | null;
+  private iconEl: HTMLElement | null;
+  private modelsBadgeEl: HTMLElement | null;
+  private nameEl: HTMLElement | null;
+  private factionEl: HTMLElement | null;
+  private statsEl: HTMLElement | null;
 
   constructor() {
-    this.panel = document.getElementById('unit-datasheet');
+    this.panel = document.getElementById('datasheet');
+    this.iconEl = document.getElementById('ds-icon');
+    this.modelsBadgeEl = document.getElementById('ds-models-badge');
+    this.nameEl = document.getElementById('ds-name');
+    this.factionEl = document.getElementById('ds-faction');
+    this.statsEl = document.getElementById('ds-stats');
   }
 
-  public showUnit(unit: Unit, unitDef: UnitDef, onAction?: (action: string) => void): void {
+  public showUnit(unit: Unit, unitDef: UnitDef): void {
     if (!this.panel) return;
-    this.panel.style.display = 'block';
+    this.panel.style.display = 'flex';
 
     const curHp = unit.wounds !== undefined ? unit.wounds : (unit.hp || 5);
     const maxHp = unit.maxWounds !== undefined ? unit.maxWounds : (unit.maxhp || 5);
@@ -17,88 +28,50 @@ export class DatasheetUI {
 
     const curMorale = typeof unit.morale === 'object' ? unit.morale.current : (unit.morale || 7);
     const maxMorale = typeof unit.morale === 'object' ? unit.morale.max : (unit.maxMorale || 7);
-    const moralePercent = Math.max(0, Math.min(100, (curMorale / maxMorale) * 100));
-
-    let moraleBadgeClass = 'badge-steady';
-    if (unit.moraleState === 'shaken') moraleBadgeClass = 'badge-shaken';
-    if (unit.moraleState === 'broken') moraleBadgeClass = 'badge-broken';
 
     const squadSize = unit.squadSize || unitDef.squadSize || 1;
-    const squadInfo = squadSize > 1 ? `Squad: ${unit.squadCasualties?.filter(c => !c).length || squadSize} / ${squadSize} Operatives` : 'Single Model';
+    const casualtiesCount = unit.squadCasualties?.filter(c => c).length || 0;
+    const activeModels = Math.max(1, squadSize - casualtiesCount);
 
-    this.panel.innerHTML = `
-      <div class="datasheet-header">
-        <div class="datasheet-title-group">
-          <div class="datasheet-unit-name">${unitDef.name}</div>
-          <div class="datasheet-subtitle">${(unitDef.role || 'Operative').toUpperCase()} • ${squadInfo}</div>
-        </div>
-        <div class="datasheet-morale-badge ${moraleBadgeClass}">${(unit.moraleState || 'steady').toUpperCase()}</div>
-      </div>
+    if (this.nameEl) this.nameEl.textContent = unit.name || unitDef.name;
 
-      <div class="datasheet-stats-grid">
-        <div class="stat-box">
-          <span class="stat-label">MOVE</span>
-          <span class="stat-val">${unitDef.movement || unitDef.m || 6}"</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">TOUGHNESS</span>
-          <span class="stat-val">T${unitDef.toughness || unitDef.t || 4}</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">SAVE</span>
-          <span class="stat-val">${unitDef.armorSave || unitDef.sv || 3}+</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">WOUNDS</span>
-          <span class="stat-val">${curHp}/${maxHp}</span>
-        </div>
-      </div>
+    const factionName = (unit as any).factionId || (unit.player === 1 ? 'Strike Force' : 'Enemy Host');
+    if (this.factionEl) this.factionEl.textContent = factionName.toUpperCase();
 
-      <div class="datasheet-bars">
-        <div class="bar-container">
-          <div class="bar-label"><span>Integrity</span><span>${curHp}/${maxHp}</span></div>
-          <div class="bar-track"><div class="bar-fill hp-fill" style="width: ${hpPercent}%"></div></div>
-        </div>
-        <div class="bar-container">
-          <div class="bar-label"><span>Morale</span><span>${curMorale}/${maxMorale}</span></div>
-          <div class="bar-track"><div class="bar-fill morale-fill" style="width: ${moralePercent}%"></div></div>
-        </div>
-      </div>
+    if (this.modelsBadgeEl) {
+      this.modelsBadgeEl.textContent = `${activeModels}x`;
+    }
 
-      <div class="datasheet-weapons">
-        <div class="weapons-header">WEAPONRY</div>
-        ${(unitDef.weapons || []).map(w => `
-          <div class="weapon-row">
-            <span class="w-name">${w.name}</span>
-            <span class="w-spec">${w.range > 1 ? `${w.range}"` : 'Melee'} | A${w.attacks} S${w.strength} AP${w.ap} D${w.damage}</span>
+    if (this.iconEl) {
+      this.iconEl.textContent = unit.player === 1 ? '🛡️' : '💀';
+    }
+
+    if (this.statsEl) {
+      const move = unitDef.movement || unitDef.m || 6;
+      const toughness = unitDef.toughness || unitDef.t || 4;
+      const save = unitDef.armorSave || unitDef.sv || 3;
+      const weaponList = (unitDef.weapons || []).map(w => `${w.name} (${w.range > 1 ? `${w.range}"` : 'Melee'})`).join(', ');
+
+      this.statsEl.innerHTML = `
+        <div class="stat-badge">M: <b>${move}"</b></div>
+        <div class="stat-badge">T: <b>T${toughness}</b></div>
+        <div class="stat-badge">Sv: <b>${save}+</b></div>
+        <div class="stat-badge">
+          W: <b>${curHp}/${maxHp}</b>
+          <div class="hp-bar-bg">
+            <div class="hp-bar-fill ${unit.player === 2 ? 'enemy' : ''}" style="width:${hpPercent}%;"></div>
           </div>
-        `).join('')}
-      </div>
-
-      <div class="datasheet-actions">
-        ${(unit.player === 1 || unit.team === 'player') && !unit.hasMoved ? `<button class="btn btn-action" data-act="move">MOVE</button>` : ''}
-        ${(unit.player === 1 || unit.team === 'player') && !unit.hasAttacked ? `<button class="btn btn-action" data-act="shoot">FIRE / ATTACK</button>` : ''}
-        ${(unit.player === 1 || unit.team === 'player') && unit.moraleState !== 'steady' ? `<button class="btn btn-action btn-rally" data-act="rally">RALLY</button>` : ''}
-      </div>
-    `;
-
-    // Hook up buttons
-    if (onAction) {
-      const btns = this.panel.querySelectorAll<HTMLButtonElement>('.btn-action');
-      btns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const act = btn.getAttribute('data-act');
-          if (act) onAction(act);
-        });
-      });
+        </div>
+        <div class="stat-badge">Morale: <b>${curMorale}/${maxMorale} (${(unit.moraleState || 'steady').toUpperCase()})</b></div>
+        ${weaponList ? `<div class="stat-badge" style="font-size:11px;">Weapons: <b>${weaponList}</b></div>` : ''}
+      `;
     }
   }
 
   public hide(): void {
     if (this.panel) {
       this.panel.style.display = 'none';
-      this.panel.innerHTML = '';
     }
   }
 }
+

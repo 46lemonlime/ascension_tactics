@@ -1,13 +1,14 @@
 import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld } from '../data/constants';
 import { FACTIONS } from '../data/factions';
 import { UNIT_ROSTER } from '../data/units';
+import { buildFactionRosters } from '../data/rosters';
 import { updateFogOfWar, hasLineOfSight } from './awareness';
 import { resolveAttack } from './combat';
 import { rallyUnit } from './morale';
 import { pathTo } from './pathfinding';
 import { PhysicsEngine } from './physics';
 import { sfx } from '../audio/synth';
-import type { GameState, Unit, UnitDef, MissionType } from '../data/types';
+import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem } from '../data/types';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
 import type { DatasheetUI } from '../ui/datasheet-ui';
@@ -67,68 +68,177 @@ export class GameEngine {
       p1Deployed: [],
       p2Deployed: [],
       escortTargetC: Math.floor(GRID_COLS / 2),
-      escortTargetR: 4
+      escortTargetR: 4,
+      rosterPlayer: [],
+      rosterEnemy: []
     };
   }
 
-  public startNewGame(p1Faction: string, p2Faction: string, theme: string, mission: MissionType): void {
+  public startNewGame(
+    p1Faction: string,
+    p2Faction: string,
+    theme: string,
+    mission: MissionType,
+    p1EscortRole: 'escort' | 'attack' = 'escort',
+    p2EscortRole: 'escort' | 'attack' = 'attack'
+  ): void {
     this.state = this.createInitialState();
     this.state.theme = theme;
     this.state.mission = mission;
+    this.state.escortRole = p1EscortRole;
 
-    const f1 = FACTIONS[p1Faction] || FACTIONS.space_marines;
-    const f2 = FACTIONS[p2Faction] || FACTIONS.chaos_marines;
+    // Clear old unit meshes
+    this.scene.clearHighlights();
+    this.state.units.forEach(u => this.scene.removeUnitMesh(u.id));
+    this.state.units = [];
 
-    this.state.p1Roster = [...f1.roster];
-    this.state.p2Roster = [...f2.roster];
-    this.state.p1Deployed = new Array(f1.roster.length).fill(false);
-    this.state.p2Deployed = new Array(f2.roster.length).fill(false);
-
+    // Initialize board terrain
     this.scene.initBoard(theme);
+
+    // Build authoritative faction rosters
+    const { rosterPlayer, rosterEnemy } = buildFactionRosters(p1Faction, p2Faction);
+    this.state.rosterPlayer = rosterPlayer;
+    this.state.rosterEnemy = rosterEnemy;
 
     // Domination Objectives
     if (mission === 'domination') {
       this.state.objectives = [
-        { id: 1, c: 10, r: 28, radius: 2, controlledBy: 0, points: 0 },
-        { id: 2, c: 20, r: 28, radius: 2, controlledBy: 0, points: 0 },
-        { id: 3, c: 30, r: 28, radius: 2, controlledBy: 0, points: 0 }
+        { id: 1, c: 8, r: 28, radius: 3, controlledBy: 0, points: 0 },
+        { id: 2, c: 20, r: 28, radius: 3, controlledBy: 0, points: 0 },
+        { id: 3, c: 32, r: 28, radius: 3, controlledBy: 0, points: 0 }
       ];
     }
 
-    // Deploy Enemy (AI) automatically
-    this.autoDeployPlayer(2, f2.roster);
+    // Deploy Enemy units immediately to the board
+    const enemyFaction = FACTIONS[p2Faction] || FACTIONS.chaos;
+    rosterEnemy.forEach(item => {
+      const uDef = UNIT_ROSTER[item.type] || UNIT_ROSTER.c_legion || UNIT_ROSTER.sm_tactical;
+      const unit = this.deployUnitOnBoard(uDef, 2, item.x, item.z, false, item.name, enemyFaction);
+      item.unitRef = unit;
+    });
 
-    // Escort VIP spawning
+    // Escort VIP setup
     if (mission === 'escort') {
-      const vipDef = UNIT_ROSTER.vip_courier;
-      this.deployUnitOnBoard(vipDef, 1, 20, 50, true);
+      const vipDef: UnitDef = UNIT_ROSTER.vip_courier || UNIT_ROSTER.sm_captain;
+
+      if (p1EscortRole === 'escort') {
+        this.state.escortTargetC = 20;
+        this.state.escortTargetR = 4;
+        this.deployUnitOnBoard(vipDef, 1, 20, 52, true, 'Sacred Relic Courier');
+      } else {
+        this.state.escortTargetC = 20;
+        this.state.escortTargetR = 52;
+        this.deployUnitOnBoard(vipDef, 2, 20, 4, true, 'Sacred Relic Courier', enemyFaction);
+      }
     }
 
+    this.state.phase = 'deployment';
     this.scene.cameraController.frameDeploymentZone();
-    this.log.log(`Battle initialized on ${theme.toUpperCase()} biome. Mission: ${mission.toUpperCase()}`, 'info');
+    updateFogOfWar(this.state);
+    this.scene.fowManager.updateVisibility(this.state.fow);
+
+    const p1Name = (FACTIONS[p1Faction] || FACTIONS.marines).name;
+    const p2Name = (FACTIONS[p2Faction] || FACTIONS.chaos).name;
+    this.dom.updateMissionHud(mission, `${p1Name} vs ${p2Name}`);
+    this.log.log(`Warzone initialized: ${theme.toUpperCase()} theater. Mission: ${mission.toUpperCase()}. Deploy your strike force.`, 'info');
   }
 
-  public autoDeployPlayer(player: number, roster: UnitDef[]): void {
-    const zone = player === 1 ? DEPLOYMENT_ZONES.player1 : DEPLOYMENT_ZONES.player2;
-    let placed = 0;
+  public deployPlayerCard(cardKey: string, c: number, r: number): Unit | null {
+    const card = this.state.rosterPlayer?.find(cd => cd.key === cardKey);
+    if (!card) return null;
 
-    for (let r = zone.minR; r <= zone.maxR; r += 2) {
-      for (let c = zone.minC + 2; c <= zone.maxC - 2; c += 3) {
-        if (placed >= roster.length) break;
-        if (!this.state.units.some(u => u.c === c && u.r === r)) {
-          this.deployUnitOnBoard(roster[placed], player, c, r);
-          if (player === 1) this.state.p1Deployed[placed] = true;
-          if (player === 2) this.state.p2Deployed[placed] = true;
-          placed++;
+    const z = DEPLOYMENT_ZONES.player1;
+    if (c < z.minC || c > z.maxC || r < z.minR || r > z.maxR) {
+      this.log.log('Deployment tile must be inside the southern zone (Rows 48–55)!', 'alert');
+      return null;
+    }
+
+    if (this.state.units.some(u => u.c === c && u.r === r && u.id !== card.unitRef?.id)) {
+      this.log.log('Deployment tile is already occupied!', 'alert');
+      return null;
+    }
+
+    // If already deployed, remove previous mesh
+    if (card.unitRef) {
+      this.scene.removeUnitMesh(card.unitRef.id);
+      this.state.units = this.state.units.filter(u => u.id !== card.unitRef!.id);
+    }
+
+    const uDef = UNIT_ROSTER[card.type] || UNIT_ROSTER.sm_tactical;
+    const unit = this.deployUnitOnBoard(uDef, 1, c, r, card.isVip, card.name);
+    card.placed = true;
+    card.x = c;
+    card.z = r;
+    card.unitRef = unit;
+
+    sfx('footsteps');
+    return unit;
+  }
+
+  public undeployPlayerCard(cardKey: string): void {
+    const card = this.state.rosterPlayer?.find(cd => cd.key === cardKey);
+    if (card && card.unitRef) {
+      this.scene.removeUnitMesh(card.unitRef.id);
+      this.state.units = this.state.units.filter(u => u.id !== card.unitRef!.id);
+      card.placed = false;
+      card.x = null;
+      card.z = null;
+      card.unitRef = null;
+      sfx('footsteps');
+    }
+  }
+
+  public autoDeployPlayer(): void {
+    if (!this.state.rosterPlayer) return;
+    const zone = DEPLOYMENT_ZONES.player1;
+    const defaultPositions = [
+      { c: 20, r: 52 },
+      { c: 14, r: 50 },
+      { c: 26, r: 50 },
+      { c: 8, r: 53 },
+      { c: 32, r: 53 },
+      { c: 20, r: 49 }
+    ];
+
+    let posIdx = 0;
+    this.state.rosterPlayer.forEach(card => {
+      if (!card.placed) {
+        let placed = false;
+        while (posIdx < defaultPositions.length) {
+          const p = defaultPositions[posIdx++];
+          if (!this.state.units.some(u => u.c === p.c && u.r === p.r)) {
+            this.deployPlayerCard(card.key, p.c, p.r);
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          // fallback scan
+          for (let r = zone.minR; r <= zone.maxR; r += 2) {
+            for (let c = zone.minC + 4; c <= zone.maxC - 4; c += 3) {
+              if (!this.state.units.some(u => u.c === c && u.r === r)) {
+                this.deployPlayerCard(card.key, c, r);
+                placed = true;
+                break;
+              }
+            }
+            if (placed) break;
+          }
         }
       }
-      if (placed >= roster.length) break;
-    }
+    });
   }
 
-  public deployUnitOnBoard(unitDef: UnitDef, player: number, c: number, r: number, isVip: boolean = false): Unit {
+  public deployUnitOnBoard(
+    unitDef: UnitDef,
+    player: number,
+    c: number,
+    r: number,
+    isVip: boolean = false,
+    customName?: string,
+    faction?: any
+  ): Unit {
     const worldPos = gridToWorld(c, r);
-    const faction = Object.values(FACTIONS).find(f => f.roster?.some(u => u.id === unitDef.id || u.type === unitDef.type));
 
     const unit: Unit = {
       id: this.nextUnitId++,
@@ -136,7 +246,7 @@ export class GameEngine {
       type: unitDef.type || unitDef.id,
       player,
       team: player === 1 ? 'player' : 'enemy',
-      name: unitDef.name,
+      name: customName || unitDef.name,
       def: unitDef,
       c,
       r,
@@ -183,11 +293,16 @@ export class GameEngine {
     this.state.phase = 'battle';
     this.state.turn = 1;
     this.state.round = 1;
+
+    // Show gameplay cockpit
+    const cockpit = document.getElementById('gameplay-cockpit');
+    if (cockpit) cockpit.style.display = 'flex';
+
     updateFogOfWar(this.state);
     this.scene.fowManager.updateVisibility(this.state.fow);
     this.dom.updateTurnBanner(1, 1, 'battle');
     sfx('horn');
-    this.log.log('Deployment complete! Combat begins.', 'alert');
+    this.log.log('Deployment complete! Combat commences.', 'alert');
   }
 
   public selectUnit(unitId: number | null): void {
@@ -211,11 +326,16 @@ export class GameEngine {
           if (ring) ring.visible = true;
         }
 
-        this.datasheet.showUnit(unit, unitDef, (action) => {
-          if (action === 'move') this.enterMoveMode();
-          if (action === 'shoot') this.enterShootMode();
-          if (action === 'rally') this.handleRally(unit);
-        });
+        this.datasheet.showUnit(unit, unitDef);
+
+        // If player unit and can act, highlight range
+        if (unit.player === 1 && !unit.isVip) {
+          if (!unit.hasMoved) {
+            this.enterMoveMode();
+          } else if (!unit.hasAttacked) {
+            this.enterShootMode();
+          }
+        }
         return;
       }
     }
@@ -226,7 +346,7 @@ export class GameEngine {
   public enterMoveMode(): void {
     if (this.selectedUnitId === null) return;
     const unit = this.state.units.find(u => u.id === this.selectedUnitId);
-    if (!unit || unit.hasMoved) return;
+    if (!unit || unit.hasMoved || unit.isVip) return;
 
     this.actionMode = 'move';
     const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
@@ -239,7 +359,9 @@ export class GameEngine {
         const nr = unit.r + dr;
         if (nc >= 0 && nc < GRID_COLS && nr >= 0 && nr < GRID_ROWS) {
           if (chebyshevDist(unit.c, unit.r, nc, nr) <= moveRange) {
-            reachTiles.push({ c: nc, r: nr });
+            if (!this.state.units.some(u => u.c === nc && u.r === nr && u.id !== unit.id)) {
+              reachTiles.push({ c: nc, r: nr });
+            }
           }
         }
       }
@@ -247,13 +369,13 @@ export class GameEngine {
 
     this.scene.clearHighlights();
     this.scene.highlightTiles(reachTiles, 0x00f3ff, 0.4);
-    this.log.log(`Select destination for ${unitDef.name}`, 'info');
+    this.log.log(`[TACTICAL] Select destination tile for ${unitDef.name} (${moveRange}" movement).`, 'info');
   }
 
   public enterShootMode(): void {
     if (this.selectedUnitId === null) return;
     const unit = this.state.units.find(u => u.id === this.selectedUnitId);
-    if (!unit || unit.hasAttacked) return;
+    if (!unit || unit.hasAttacked || unit.isVip) return;
 
     this.actionMode = 'shoot';
     const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
@@ -261,7 +383,7 @@ export class GameEngine {
 
     const targetTiles: Array<{ c: number; r: number }> = [];
     this.state.units.forEach(enemy => {
-      if (enemy.player !== unit.player) {
+      if (enemy.player !== unit.player && !enemy.dead) {
         const dist = chebyshevDist(unit.c, unit.r, enemy.c, enemy.r);
         if (dist <= maxRange && hasLineOfSight(unit.c, unit.r, enemy.c, enemy.r, this.state.theme)) {
           targetTiles.push({ c: enemy.c, r: enemy.r });
@@ -270,21 +392,21 @@ export class GameEngine {
     });
 
     this.scene.clearHighlights();
-    this.scene.highlightTiles(targetTiles, 0xff2a6d, 0.5);
-    this.log.log(`Select hostile target in Line of Sight for ${unitDef.name}`, 'info');
+    if (targetTiles.length > 0) {
+      this.scene.highlightTiles(targetTiles, 0xff2a6d, 0.5);
+      this.log.log(`[TARGETING] Hostiles in Line of Sight for ${unitDef.name}. Click red target to fire.`, 'combat');
+    } else {
+      this.log.log(`No valid hostiles in weapon range/Line of Sight for ${unitDef.name}.`, 'info');
+    }
   }
 
   public handleTileClick(c: number, r: number): void {
-    if (this.state.phase === 'deployment') {
-      return;
-    }
-
+    if (this.state.phase === 'deployment') return;
     if (this.state.turn !== 1 || this.isExecutingAiTurn) return;
 
-    // Check if clicked an existing unit
-    const clickedUnit = this.state.units.find(u => u.c === c && u.r === r);
+    const clickedUnit = this.state.units.find(u => u.c === c && u.r === r && !u.dead);
 
-    if (this.actionMode === 'move' && this.selectedUnitId !== null) {
+    if (this.actionMode === 'move' && this.selectedUnitId !== null && !clickedUnit) {
       this.executeMove(this.selectedUnitId, c, r);
       return;
     }
@@ -338,7 +460,12 @@ export class GameEngine {
     updateFogOfWar(this.state);
     this.scene.fowManager.updateVisibility(this.state.fow);
     this.selectUnit(unit.id);
-    this.log.log(`${unitDef.name} repositioned.`, 'info');
+    this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
+
+    // Automatically transition to shoot mode if targets exist
+    if (!unit.hasAttacked) {
+      this.enterShootMode();
+    }
   }
 
   public executeAttack(attackerId: number, defenderId: number): void {
@@ -361,7 +488,7 @@ export class GameEngine {
     const result = resolveAttack(attacker, defender);
     attacker.hasAttacked = true;
 
-    this.log.log(`[COMBAT] ${attackerDef.name} attacks ${defenderDef.name}: ${result.totalDamage} Damage dealt! (${result.casualties} casualties)`, 'combat');
+    this.log.log(`[COMBAT] ${attackerDef.name} opened fire on ${defenderDef.name}: ${result.totalDamage} Damage dealt! (${result.casualties} casualties)`, 'combat');
 
     if (defender.wounds <= 0 || defender.hp <= 0) {
       this.eliminateUnit(defender);
@@ -384,7 +511,7 @@ export class GameEngine {
 
   public eliminateUnit(unit: Unit): void {
     const uDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
-    this.log.log(`[CASUALTY] ${uDef.name} was destroyed!`, 'morale');
+    this.log.log(`[DESTROYED] ${uDef.name} was eliminated from the sector!`, 'morale');
     sfx('explosion');
     unit.alive = false;
     unit.dead = true;
@@ -420,15 +547,15 @@ export class GameEngine {
   private async startAiTurn(): Promise<void> {
     this.isExecutingAiTurn = true;
     this.selectUnit(null);
-    this.log.log('--- Enemy Turn Begins ---', 'alert');
+    this.log.log('--- Enemy Overseer Turn Begins ---', 'alert');
 
-    const enemyUnits = this.state.units.filter(u => u.player === 2);
+    const enemyUnits = this.state.units.filter(u => u.player === 2 && !u.dead);
 
     for (const unit of enemyUnits) {
       await new Promise(r => setTimeout(r, 600));
       if (unit.wounds <= 0 || unit.dead) continue;
 
-      // Find closest player unit
+      // Find closest visible player unit (AI cannot target units in FoW)
       let closestTarget: Unit | null = null;
       let minDist = 999;
 
@@ -449,22 +576,24 @@ export class GameEngine {
         if (minDist <= maxRange && hasLineOfSight(unit.c, unit.r, closestTarget.c, closestTarget.r, this.state.theme)) {
           this.executeAttack(unit.id, closestTarget.id);
         } else {
-          // Move towards target
+          // Advance towards target
           const dc = Math.sign(closestTarget.c - unit.c);
           const dr = Math.sign(closestTarget.r - unit.r);
           const targetC = Math.max(0, Math.min(GRID_COLS - 1, unit.c + dc * 2));
           const targetR = Math.max(0, Math.min(GRID_ROWS - 1, unit.r + dr * 2));
-          
-          unit.c = targetC;
-          unit.r = targetR;
-          const worldPos = gridToWorld(targetC, targetR);
-          unit.x = worldPos.x;
-          unit.z = worldPos.z;
-          unit.anchor = { x: worldPos.x, z: worldPos.z };
 
-          const mesh = this.scene.unitMeshes.get(unit.id);
-          if (mesh) {
-            mesh.position.set(worldPos.x, 0, worldPos.z);
+          if (!this.state.units.some(u => u.c === targetC && u.r === targetR && u.id !== unit.id)) {
+            unit.c = targetC;
+            unit.r = targetR;
+            const worldPos = gridToWorld(targetC, targetR);
+            unit.x = worldPos.x;
+            unit.z = worldPos.z;
+            unit.anchor = { x: worldPos.x, z: worldPos.z };
+
+            const mesh = this.scene.unitMeshes.get(unit.id);
+            if (mesh) {
+              mesh.position.set(worldPos.x, 0, worldPos.z);
+            }
           }
         }
       }
@@ -481,7 +610,7 @@ export class GameEngine {
         let p2Near = 0;
 
         this.state.units.forEach(u => {
-          if (chebyshevDist(u.c, u.r, obj.c, obj.r) <= obj.radius) {
+          if (!u.dead && chebyshevDist(u.c, u.r, obj.c, obj.r) <= obj.radius) {
             if (u.player === 1) p1Near++;
             if (u.player === 2) p2Near++;
           }
@@ -494,7 +623,10 @@ export class GameEngine {
         if (obj.controlledBy === 2) this.state.p2Score += 10;
       });
 
-      this.dom.updateMissionScore(`Domination Points: Player [${this.state.p1Score}] - Enemy [${this.state.p2Score}]`);
+      this.dom.updateMissionHud(
+        'Domination',
+        `Score: 🟦 ${this.state.p1Score} VP vs 🟨 ${this.state.p2Score} VP`
+      );
     }
   }
 
@@ -505,33 +637,34 @@ export class GameEngine {
 
     if (this.state.mission === 'escort') {
       if (vip && (vip.wounds <= 0 || vip.dead)) {
-        this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => this.dom.showScreen('lobby'));
+        this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => this.dom.showHomeScreen());
         return;
       }
       if (vip && chebyshevDist(vip.c, vip.r, this.state.escortTargetC, this.state.escortTargetR) <= 2) {
-        this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship!', () => this.dom.showScreen('lobby'));
+        this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship!', () => this.dom.showHomeScreen());
         return;
       }
     }
 
     if (p2Alive.length === 0) {
-      this.dom.showGameOver(1, 'All hostile enemy forces were completely purged!', () => this.dom.showScreen('lobby'));
+      this.dom.showGameOver(1, 'All hostile enemy forces were completely purged!', () => this.dom.showHomeScreen());
       return;
     }
 
     if (p1Alive.length === 0) {
-      this.dom.showGameOver(2, 'Your strike force suffered total annihilation.', () => this.dom.showScreen('lobby'));
+      this.dom.showGameOver(2, 'Your strike force suffered total annihilation.', () => this.dom.showHomeScreen());
       return;
     }
 
-    if (this.state.round > 6) {
+    if (this.state.round > 8) {
       if (this.state.mission === 'domination') {
         const winner = this.state.p1Score >= this.state.p2Score ? 1 : 2;
-        this.dom.showGameOver(winner, `Match concluded after 6 rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score}`, () => this.dom.showScreen('lobby'));
+        this.dom.showGameOver(winner, `Match concluded after 8 rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score}`, () => this.dom.showHomeScreen());
       } else {
         const winner = p1Alive.length >= p2Alive.length ? 1 : 2;
-        this.dom.showGameOver(winner, `Match limit reached. Majority units standing: ${p1Alive.length} vs ${p2Alive.length}`, () => this.dom.showScreen('lobby'));
+        this.dom.showGameOver(winner, `Match round limit reached. Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}`, () => this.dom.showHomeScreen());
       }
     }
   }
 }
+

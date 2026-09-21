@@ -1,154 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASCENSION TACTICS 3D — Warhammer 40k Tabletop Skirmish</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMDARK TACTICS 3D — Warhammer 40k Tabletop Skirmish</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- 3D Three.js WebGL Canvas Mount -->
+
   <div id="canvas-container"></div>
 
-  <!-- Screen 1: Home / Main Menu -->
-  <div id="home-screen" class="full-screen-menu">
-    <div class="menu-hero">
-      <div class="logo-sub">TACTICAL SKIRMISH ENGINE</div>
-      <h1 class="logo-title">ASCENSION TACTICS</h1>
-      <div class="logo-divider"></div>
-      
-      <div class="menu-actions">
-        <button id="btn-single-player" class="btn btn-primary-glow btn-lg">
-          <span class="btn-icon">⚔</span>
-          <span class="btn-text">SINGLE PLAYER</span>
+  <!-- HOME / TITLE SCREEN -->
+  <div id="home-screen">
+    <div class="home-dialog interactive">
+      <div>
+        <div class="modal-game-banner" style="font-size:32px; letter-spacing:8px;">&#9876; ASCENSION TACTICS &#9876;</div>
+        <div class="home-tagline">GRIMDARK TABLETOP SKIRMISH WARFARE</div>
+      </div>
+
+      <div class="home-menu-list">
+        <!-- 1. SINGLE PLAYER (CLICKABLE -> OPENS RACE SELECT) -->
+        <button id="btn-start-singleplayer" class="home-btn active-btn">
+          <span>⚔️ SINGLE PLAYER</span>
+          <span class="home-btn-sub">Warzone Skirmish vs AI Overseer</span>
         </button>
-        <button id="btn-multiplayer" class="btn btn-secondary btn-lg btn-disabled" title="Multiplayer Protocol Offline">
-          <span class="btn-icon">🌐</span>
-          <span class="btn-text">MULTIPLAYER (COMING SOON)</span>
+
+        <!-- 2. MULTIPLAYER (UNCLICKABLE / COMING SOON) -->
+        <button class="home-btn disabled-btn" disabled>
+          <span>🌐 MULTIPLAYER</span>
+          <span class="home-btn-sub">Live PvP & Matchmaking</span>
+          <span class="home-badge-lock">COMING SOON</span>
         </button>
-        <button id="btn-learn-more" class="btn btn-tertiary btn-lg">
-          <span class="btn-icon">📜</span>
-          <span class="btn-text">LEARN MORE & RULES</span>
+
+        <!-- 3. LEARN MORE (UNCLICKABLE / COMING SOON) -->
+        <button class="home-btn disabled-btn" disabled>
+          <span>📖 LEARN MORE</span>
+          <span class="home-btn-sub">Rules, Datasheets & Tactics Lore</span>
+          <span class="home-badge-lock">COMING SOON</span>
         </button>
       </div>
+
+      <div class="home-version">ASCENSION EDITION • 3D TACTICAL WARFARE</div>
     </div>
   </div>
 
-  <!-- Screen 2: Match Setup / Lobby -->
-  <div id="lobby-screen" class="full-screen-menu" style="display: none;">
-    <div class="lobby-header">
-      <h2 class="section-title">MISSION PARAMETERS & FORCES</h2>
-      <div class="section-desc">Select Strike Forces, Theater of War, and Mission Objective</div>
-    </div>
-
-    <div class="lobby-content">
-      <!-- Player 1 Strike Force -->
-      <div class="carousel-group">
-        <div class="group-title">1. COMMANDING FORCE (PLAYER 1)</div>
-        <div id="p1-factions-carousel" class="carousel-track"></div>
+  <!-- RACE & MAP SELECTION SCREEN -->
+  <div id="race-modal" style="display:none;">
+    <div class="race-dialog interactive">
+      <div class="race-dialog-header">
+        <div class="modal-game-banner">&#9876; GRIMDARK TACTICS 3D &#9876;</div>
+        <div class="modal-game-tagline">TABLETOP SKIRMISH WARFARE</div>
+        <h2>MISSION BRIEFING & WARZONE SETUP</h2>
+        <p>Select your strike faction, configure the AI opponent, and choose your tactical theater of war.</p>
       </div>
 
-      <!-- Player 2 Adversary -->
-      <div class="carousel-group">
-        <div class="group-title">2. ADVERSARY FORCE (AI HOSTILE)</div>
-        <div id="p2-factions-carousel" class="carousel-track"></div>
+      <!-- 1. FACTION SELECTION (STICKY RANDOM + 3-CARD INFINITE CAROUSEL) -->
+      <div class="modal-section-title">&#9876; 1. CHOOSE YOUR ARMY</div>
+      <div class="faction-carousel-container">
+        <!-- STICKY OPTION 1: RANDOM ARMY (ALWAYS IN POSITION 1) -->
+        <div class="faction-card sticky-random-card selected-player" id="fcard-random">
+          <div class="faction-card-badge" id="fbadge-random" style="display:block;">AUTO</div>
+          <div class="faction-icon">🎲</div>
+          <div class="faction-name">Random Army</div>
+          <div class="faction-sub">Dynamic Mystery Force</div>
+          <div class="faction-desc">Roll a dynamic mystery army upon deployment. Test your mastery across all 8 warhosts.</div>
+          <div class="faction-units-preview">Mystery Selection • Adapt & Conquer</div>
+        </div>
+
+        <!-- CAROUSEL ROTATION ARROW (PREV) -->
+        <button id="btn-race-carousel-prev" class="race-nav-btn" title="Previous Factions" aria-label="Previous Factions">&#10094;</button>
+
+        <!-- ROTATING VIEWPORT (3 CARDS VISIBLE AT ONCE, INFINITELY LOOPABLE) -->
+        <div class="race-carousel-viewport">
+          <div class="factions-grid" id="factions-grid-track">
+            <!-- SET 1 (CLONE 1) -->
+            <div class="faction-card" data-race="marines">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🛡️</div>
+              <div class="faction-name">Space Marines</div>
+              <div class="faction-sub">Adeptus Astartes</div>
+              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
+              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+            </div>
+            <div class="faction-card" data-race="chaos">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">Chaos Marines</div>
+              <div class="faction-sub">Heretic Astartes</div>
+              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
+              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+            </div>
+            <div class="faction-card" data-race="orcs">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">Space Orcs</div>
+              <div class="faction-sub">Goff WAAAGH!</div>
+              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="necros">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">Necrons</div>
+              <div class="faction-sub">Sautekh Dynasty</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">✨</div>
+              <div class="faction-name">Aeldari</div>
+              <div class="faction-sub">Craftworld Ulthwé</div>
+              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
+              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+            </div>
+            <div class="faction-card" data-race="dark_eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🗡️</div>
+              <div class="faction-name">Dark Eldar</div>
+              <div class="faction-sub">Drukhari Kabal</div>
+              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+            </div>
+            <div class="faction-card" data-race="tyranids">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">👾</div>
+              <div class="faction-name">Tyranids</div>
+              <div class="faction-sub">Hive Fleet Leviathan</div>
+              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
+              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+            </div>
+            <div class="faction-card" data-race="tau">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💠</div>
+              <div class="faction-name">T'au Empire</div>
+              <div class="faction-sub">Hunter Cadre</div>
+              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
+              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+            </div>
+
+            <!-- SET 2 (MAIN ACTIVE SET) -->
+            <div class="faction-card" data-race="marines">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🛡️</div>
+              <div class="faction-name">Space Marines</div>
+              <div class="faction-sub">Adeptus Astartes</div>
+              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
+              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+            </div>
+            <div class="faction-card" data-race="chaos">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">Chaos Marines</div>
+              <div class="faction-sub">Heretic Astartes</div>
+              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
+              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+            </div>
+            <div class="faction-card" data-race="orcs">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">Space Orcs</div>
+              <div class="faction-sub">Goff WAAAGH!</div>
+              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="necros">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">Necrons</div>
+              <div class="faction-sub">Sautekh Dynasty</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">✨</div>
+              <div class="faction-name">Aeldari</div>
+              <div class="faction-sub">Craftworld Ulthwé</div>
+              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
+              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+            </div>
+            <div class="faction-card" data-race="dark_eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🗡️</div>
+              <div class="faction-name">Dark Eldar</div>
+              <div class="faction-sub">Drukhari Kabal</div>
+              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+            </div>
+            <div class="faction-card" data-race="tyranids">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">👾</div>
+              <div class="faction-name">Tyranids</div>
+              <div class="faction-sub">Hive Fleet Leviathan</div>
+              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
+              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+            </div>
+            <div class="faction-card" data-race="tau">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💠</div>
+              <div class="faction-name">T'au Empire</div>
+              <div class="faction-sub">Hunter Cadre</div>
+              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
+              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+            </div>
+
+            <!-- SET 3 (CLONE 3) -->
+            <div class="faction-card" data-race="marines">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🛡️</div>
+              <div class="faction-name">Space Marines</div>
+              <div class="faction-sub">Adeptus Astartes</div>
+              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
+              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+            </div>
+            <div class="faction-card" data-race="chaos">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">Chaos Marines</div>
+              <div class="faction-sub">Heretic Astartes</div>
+              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
+              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+            </div>
+            <div class="faction-card" data-race="orcs">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">Space Orcs</div>
+              <div class="faction-sub">Goff WAAAGH!</div>
+              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="necros">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">Necrons</div>
+              <div class="faction-sub">Sautekh Dynasty</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">✨</div>
+              <div class="faction-name">Aeldari</div>
+              <div class="faction-sub">Craftworld Ulthwé</div>
+              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
+              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+            </div>
+            <div class="faction-card" data-race="dark_eldar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🗡️</div>
+              <div class="faction-name">Dark Eldar</div>
+              <div class="faction-sub">Drukhari Kabal</div>
+              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+            </div>
+            <div class="faction-card" data-race="tyranids">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">👾</div>
+              <div class="faction-name">Tyranids</div>
+              <div class="faction-sub">Hive Fleet Leviathan</div>
+              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
+              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+            </div>
+            <div class="faction-card" data-race="tau">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💠</div>
+              <div class="faction-name">T'au Empire</div>
+              <div class="faction-sub">Hunter Cadre</div>
+              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
+              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAROUSEL ROTATION ARROW (NEXT) -->
+        <button id="btn-race-carousel-next" class="race-nav-btn" title="Next Factions" aria-label="Next Factions">&#10095;</button>
       </div>
 
-      <!-- Theater / Map -->
-      <div class="carousel-group">
-        <div class="group-title">3. THEATER OF WAR (MAP BIOME)</div>
-        <div id="maps-carousel" class="carousel-track"></div>
+      <!-- 2. BATTLEFIELD MAP BIOME SELECTION (STICKY RANDOM + 3-CARD INFINITE CAROUSEL) -->
+      <div class="modal-section-title">&#127758; 2. SELECT BATTLEFIELD BIOME</div>
+      <div class="map-carousel-container">
+        <!-- STICKY OPTION 1: RANDOM BIOME (ALWAYS IN POSITION 1) -->
+        <div class="map-card sticky-random-map-card selected-map" id="mcard-random">
+          <div class="map-card-badge">AUTO</div>
+          <div class="map-icon">🎲</div>
+          <div class="map-name">Random Biome</div>
+          <div class="map-sub">Dynamic Mystery Theater</div>
+        </div>
+
+        <!-- CAROUSEL ROTATION ARROW (PREV) -->
+        <button id="btn-map-carousel-prev" class="map-nav-btn" title="Previous Maps" aria-label="Previous Maps">&#10094;</button>
+
+        <!-- ROTATING VIEWPORT (3 CARDS VISIBLE AT ONCE, INFINITELY LOOPABLE) -->
+        <div class="map-carousel-viewport">
+          <div class="maps-grid" id="maps-grid-track">
+            <!-- SET 1 (CLONE 1) -->
+            <div class="map-card" data-map="jungle">
+              <div class="map-icon">🌿</div>
+              <div class="map-name">Jungle</div>
+              <div class="map-sub">Dense • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert</div>
+              <div class="map-sub">Open • High LoS</div>
+            </div>
+            <div class="map-card" data-map="snow">
+              <div class="map-icon">❄️</div>
+              <div class="map-name">Snow</div>
+              <div class="map-sub">Ridges • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="city">
+              <div class="map-icon">🏛️</div>
+              <div class="map-name">City</div>
+              <div class="map-sub">Streets • High LoS</div>
+            </div>
+            <div class="map-card" data-map="tech">
+              <div class="map-icon">🚀</div>
+              <div class="map-name">Tech Space</div>
+              <div class="map-sub">Corridors • High LoS</div>
+            </div>
+
+            <!-- SET 2 (MAIN ACTIVE SET) -->
+            <div class="map-card" data-map="jungle">
+              <div class="map-icon">🌿</div>
+              <div class="map-name">Jungle</div>
+              <div class="map-sub">Dense • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert</div>
+              <div class="map-sub">Open • High LoS</div>
+            </div>
+            <div class="map-card" data-map="snow">
+              <div class="map-icon">❄️</div>
+              <div class="map-name">Snow</div>
+              <div class="map-sub">Ridges • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="city">
+              <div class="map-icon">🏛️</div>
+              <div class="map-name">City</div>
+              <div class="map-sub">Streets • High LoS</div>
+            </div>
+            <div class="map-card" data-map="tech">
+              <div class="map-icon">🚀</div>
+              <div class="map-name">Tech Space</div>
+              <div class="map-sub">Corridors • High LoS</div>
+            </div>
+
+            <!-- SET 3 (CLONE 3) -->
+            <div class="map-card" data-map="jungle">
+              <div class="map-icon">🌿</div>
+              <div class="map-name">Jungle</div>
+              <div class="map-sub">Dense • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert</div>
+              <div class="map-sub">Open • High LoS</div>
+            </div>
+            <div class="map-card" data-map="snow">
+              <div class="map-icon">❄️</div>
+              <div class="map-name">Snow</div>
+              <div class="map-sub">Ridges • Low LoS</div>
+            </div>
+            <div class="map-card" data-map="city">
+              <div class="map-icon">🏛️</div>
+              <div class="map-name">City</div>
+              <div class="map-sub">Streets • High LoS</div>
+            </div>
+            <div class="map-card" data-map="tech">
+              <div class="map-icon">🚀</div>
+              <div class="map-name">Tech Space</div>
+              <div class="map-sub">Corridors • High LoS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAROUSEL ROTATION ARROW (NEXT) -->
+        <button id="btn-map-carousel-next" class="map-nav-btn" title="Next Maps" aria-label="Next Maps">&#10095;</button>
       </div>
 
-      <!-- Mission Mode -->
-      <div class="carousel-group">
-        <div class="group-title">4. STRATEGIC MISSION OBJECTIVE</div>
-        <div id="missions-carousel" class="carousel-track"></div>
+      <!-- 3. MISSION OBJECTIVE SELECTION -->
+      <div class="modal-section-title">&#9876; 3. CHOOSE YOUR MISSION</div>
+      <div class="mission-cards-grid">
+        <!-- Extermination Card -->
+        <div class="mission-card selected-mission" id="mcard-extermination">
+          <div class="mission-card-badge" id="mbadge-extermination">SELECTED</div>
+          <div class="mission-icon">⚔️</div>
+          <div class="mission-name">Extermination</div>
+          <div class="mission-sub">Annihilation &bull; Survival</div>
+          <div class="mission-desc">Annihilate all enemy forces to claim the sector. If the 8-round limit is reached, the force with the most surviving units wins.</div>
+          <div class="mission-params">Turn Limit: 8 Rounds &bull; Win by Elimination or Squad Count</div>
+        </div>
+
+        <!-- Escort Card -->
+        <div class="mission-card" id="mcard-escort">
+          <div class="mission-card-badge" id="mbadge-escort" style="display:none;">SELECTED</div>
+          <div class="mission-icon">🛡️</div>
+          <div class="mission-name">VIP Escort</div>
+          <div class="mission-sub">Extraction vs Interception</div>
+          <div class="mission-desc">Safely transport your VIP Courier to the extraction zone across enemy lines, or intercept and eliminate the rival VIP before extraction.</div>
+          <div class="mission-params">VIP Unit &bull; Extraction Landing Zone &bull; 8 Rounds</div>
+        </div>
+
+        <!-- Domination Card -->
+        <div class="mission-card" id="mcard-domination">
+          <div class="mission-card-badge" id="mbadge-domination" style="display:none;">SELECTED</div>
+          <div class="mission-icon">🚩</div>
+          <div class="mission-name">Domination</div>
+          <div class="mission-sub">Area Control &bull; Victory Points</div>
+          <div class="mission-desc">Capture and hold 3 Strategic Control Nodes (Alpha, Bravo, Charlie). Earn Victory Points each round. First to 100 VP or highest score at Round 8 wins.</div>
+          <div class="mission-params">3 Strategic Beacons &bull; Target: 100 VP &bull; 8 Rounds</div>
+        </div>
       </div>
 
-      <div id="escort-role-selection" style="display: none;" class="escort-box">
-        <div class="group-title">ESCORT ROLE PROTOCOL</div>
-        <div class="radio-row">
-          <label><input type="radio" name="escort-role" value="escort" checked> Escort Sacred Relic Courier</label>
-          <label><input type="radio" name="escort-role" value="attack"> Intercept & Destroy Courier</label>
+      <!-- ESCORT STANCE CONFIGURATION (Visible only when Escort mission is chosen) -->
+      <div id="escort-config-row" class="escort-config-row" style="display:none;">
+        <div class="escort-role-group">
+          <span><b>🛡️ Your Tactical Stance:</b></span>
+          <select id="player-escort-role">
+            <option value="escort">🛡️ Escort VIP (Reach Extraction Zone)</option>
+            <option value="attack">⚔️ Intercept VIP (Stop & Eliminate Enemy VIP)</option>
+            <option value="random">🎲 Random Stance</option>
+          </select>
+        </div>
+        <div class="escort-role-group">
+          <span><b>💀 AI Opponent Stance:</b></span>
+          <select id="enemy-escort-role">
+            <option value="opposite">🔄 Counter-Stance (Opposite to You)</option>
+            <option value="escort">🛡️ AI Escort VIP</option>
+            <option value="attack">⚔️ AI Intercept VIP</option>
+            <option value="random">🎲 Random Stance</option>
+          </select>
+        </div>
+        <div class="escort-note-text">
+          ℹ️ If both forces select the same stance, roles are automatically randomized on launch.
+        </div>
+      </div>
+
+      <!-- 4. OPPONENT & CONFIRM -->
+      <div class="race-settings-bar">
+        <div class="ai-select-group">
+          <span><b>AI Opponent:</b></span>
+          <select id="ai-race-select">
+            <option value="random">🎲 Random Rival Faction</option>
+            <option value="chaos">💀 Chaos Marines (Heretic Astartes)</option>
+            <option value="orcs">🐗 Space Orcs (Goff WAAAGH!)</option>
+            <option value="necros">⚡ Necrons (Sautekh Dynasty)</option>
+            <option value="eldar">✨ Aeldari (Craftworld Ulthwé)</option>
+            <option value="dark_eldar">🗡️ Dark Eldar (Drukhari Kabal)</option>
+            <option value="tyranids">👾 Tyranids (Hive Fleet)</option>
+            <option value="tau">💠 T'au Empire (Hunter Cadre)</option>
+            <option value="marines">🛡️ Space Marines (Loyalists)</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:center;">
+          <button id="btn-back-to-home" class="btn-action" style="background:transparent; border:1px solid rgba(212,175,55,0.4); color:var(--gold-dim); font-size:13px; padding:12px 20px;">
+            &larr; MAIN MENU
+          </button>
+          <button id="btn-confirm-race" class="btn-action btn-primary" style="font-size:14px; padding:12px 28px;">
+            COMMENCE DEPLOYMENT &rarr;
+          </button>
         </div>
       </div>
     </div>
-
-    <div class="lobby-footer">
-      <button id="btn-launch-deployment" class="btn btn-primary-glow btn-xl">INITIALIZE DEPLOYMENT</button>
-    </div>
   </div>
 
-  <!-- Screen 3: In-Game HUD Overlay -->
-  <div id="game-hud" style="display: none;">
-    <!-- Top HUD Bar -->
-    <header class="hud-top-bar">
-      <div id="turn-banner" class="hud-banner">ROUND 1 • PLAYER TURN</div>
-      <div id="mission-objective-tracker" class="hud-mission-tracker">EXERMINATION: Purge Hostile Forces</div>
-      <div class="hud-controls-right">
-        <button id="btn-toggle-actioncam" class="btn btn-hud active" title="Toggle Action Camera">ACTION CAM</button>
-        <button id="btn-undo-camera" class="btn btn-hud" title="Undo Camera Move (Ctrl+Z)">UNDO CAM</button>
-        <button id="btn-end-turn" class="btn btn-hud btn-end-turn" title="End Turn (Space)">END TURN</button>
+  <div id="ui-layer">
+    <!-- TOP BAR -->
+    <div class="header-bar">
+      <div class="view-controls interactive">
+        <button class="btn-cam active" id="cam-iso">Command</button>
+        <button class="btn-cam" id="cam-top">Top-Down</button>
+        <button class="btn-cam" id="cam-cinematic">Cinematic</button>
+        <button class="btn-cam" id="cam-action-toggle" title="Auto zoom on attack">Action Cam: ON</button>
+        <button class="btn-cam" id="btn-fullscreen" title="Toggle Fullscreen">⛶ Fullscreen</button>
+        <button class="btn-cam" id="btn-debug-movement" title="Toggle SC2 Movement, Collisions & Morale Debug Overlay (F2/D)">Debug: OFF</button>
+        <button class="btn-cam" id="btn-change-match" style="color:var(--gold-bright);">Change Match</button>
       </div>
-    </header>
-
-    <!-- Tactical Radar Minimap -->
-    <div id="minimap-container" class="minimap-panel">
-      <div class="panel-header">TACTICAL RADAR</div>
-      <canvas id="minimap-canvas"></canvas>
     </div>
 
-    <!-- Unit Datasheet Inspector -->
-    <div id="unit-datasheet" class="datasheet-panel" style="display: none;"></div>
+    <!-- MISSION & ROUND STATUS HUD BAR -->
+    <div id="mission-hud-bar" class="interactive" style="display:none;">
+      <div class="hud-round-pill" id="hud-round-badge">ROUND 1 / 8</div>
+      <div class="hud-mission-title" id="hud-mission-title">EXTERMINATION</div>
+      <div class="hud-mission-details" id="hud-mission-details">Squads: 🟦 6 vs 🟨 6</div>
+    </div>
 
-    <!-- Deployment Panel Dock -->
-    <div id="deployment-panel" class="deployment-dock-container" style="display: none;">
-      <div class="deployment-header">
-        <div id="deployment-status">Deploying Units...</div>
-        <div class="deployment-btn-row">
-          <button id="btn-auto-deploy" class="btn btn-secondary btn-sm">AUTO-DEPLOY</button>
-          <button id="btn-start-battle" class="btn btn-primary-glow btn-sm" disabled>COMMENCE COMBAT</button>
+    <!-- TOP-LEFT TACTICAL MINIMAP -->
+    <div id="minimap-panel" class="interactive">
+      <div id="minimap-header">
+        <div class="minimap-header-left">
+          <span class="minimap-title" id="minimap-title">Tech Space</span>
+          <span class="minimap-compass">&#9650; N</span>
+        </div>
+        <div class="minimap-header-right">
+          <button id="btn-toggle-minimap" class="minimap-toggle-btn" title="Collapse Tactical Map">&#9660;</button>
         </div>
       </div>
-      <div id="deployment-dock" class="roster-dock"></div>
-    </div>
-
-    <!-- Combat Log Panel -->
-    <div id="combat-log-container" class="combat-log-panel">
-      <div class="panel-header">COMBAT LOG & SENSORS</div>
-      <div id="combat-log-list" class="combat-log-list"></div>
-    </div>
-  </div>
-
-  <!-- Learn More Modal -->
-  <div id="modal-learn-more" class="modal-overlay" style="display: none;">
-    <div class="modal-card">
-      <h2 class="modal-title">ASCENSION TACTICS RULES</h2>
-      <div class="modal-desc rules-text">
-        <p><strong>Mechanics:</strong> Turn-based continuous physical combat inspired by Warhammer 40,000 10th Edition and StarCraft 2 collision steering.</p>
-        <p><strong>Morale:</strong> Taking casualties requires Battleshock tests (2D6 vs Leadership). Broken units suffer severe penalties and must rally.</p>
-        <p><strong>Line of Sight & Fog of War:</strong> Terrain blocks vision. Enemies in Fog of War are hidden from sensors and the action camera.</p>
-        <p><strong>Controls:</strong> Left Click to select/move/attack. Right Click in deployment to undeploy. Drag to reposition units. Ctrl+Z to undo camera.</p>
-      </div>
-      <button id="btn-close-learn-more" class="btn btn-primary btn-md">CLOSE</button>
-    </div>
-  </div>
-
-  <!-- Match Over Modal -->
-  <div id="game-over-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-card">
-      <h2 class="modal-title text-cyan">VICTORY ACHIEVED</h2>
-      <div class="modal-desc">Match conclusion report.</div>
-      <div class="modal-actions">
-        <button id="btn-restart-match" class="btn btn-primary-glow btn-lg">RETURN TO WAR ROOM</button>
+      <div id="minimap-body">
+        <canvas id="minimap-canvas" width="140" height="196"></canvas>
       </div>
     </div>
+
+    <!-- TARGETING STATUS / RANGE LEGEND -->
+    <div id="target-status-bar" class="interactive">
+      <div class="legend-item"><div class="legend-color legend-blue"></div><span>Move Zone</span></div>
+      <div class="legend-item"><div class="legend-color legend-red"></div><span>Weapon Range (LoS)</span></div>
+      <div class="legend-item"><div class="legend-color legend-target"></div><span>Valid Targets</span></div>
+      <div id="los-callout" style="margin-left:8px; font-weight:bold; color:var(--gold-bright);"></div>
+    </div>
+
+    <!-- COMBAT LOG PANEL -->
+    <div id="combat-log-wrapper" class="interactive">
+      <div id="combat-log-header">
+        <div class="log-header-left">
+          <span class="log-header-icon">&#9876;</span>
+          <span class="log-header-title">BATTLE LOG</span>
+          <span id="log-unread-badge" class="log-unread-badge">0</span>
+        </div>
+        <div class="log-header-right">
+          <button id="btn-toggle-log" class="log-toggle-btn" title="Collapse Battle Log">&#9660;</button>
+        </div>
+      </div>
+      <div id="combat-log-container">
+        <div class="log-entry" style="color:var(--gold-dim)">&#9876; Sector initialized. Select a squad card and deploy onto the southern glowing zone (Rows 48–55).</div>
+      </div>
+    </div>
+
+    <!-- DEPLOYMENT PHASE DOCK -->
+    <div id="deployment-panel" class="interactive" style="display:none;">
+      <div class="deploy-header">
+        <div>
+          <div class="deploy-title" id="deploy-dock-title">&#9876; DEPLOYMENT PHASE</div>
+          <div class="deploy-sub">Select a squad card, then click any tile in the southern deployment zone (Rows 48–55).</div>
+        </div>
+        <div class="deploy-actions">
+          <button class="btn-action" id="btn-auto-deploy">🎲 Auto-Deploy</button>
+          <button class="btn-action btn-primary" id="btn-start-battle" disabled>⚔️ Commence Battle</button>
+        </div>
+      </div>
+      <div class="deploy-cards-grid" id="deploy-cards-container">
+        <!-- Generated via JS -->
+      </div>
+    </div>
+
+    <!-- BOTTOM INSTRUCTIONS & COCKPIT -->
+    <div class="instructions-tip" id="instructions-tip">
+      DEPLOYMENT: Click squad card &bull; Click glowing Southern Zone (Rows 48–55) to place &bull; Right Click unit/card: Undeploy &bull; Ctrl+Z: Camera Undo &bull; Ctrl+Scroll: Height &bull; Shift+Left Drag: Rotate on Spot &bull; Left Drag: Orbit &bull; Right Drag: Pan
+    </div>
+
+    <div class="bottom-bar" id="gameplay-cockpit" style="display:none;">
+      <!-- DATASHEET (Hidden until unit is selected) -->
+      <div class="datasheet-panel interactive" id="datasheet" style="display:none;">
+        <div class="unit-portrait" id="ds-portrait">
+          <span id="ds-icon">&#9876;</span>
+          <div class="squad-count-badge" id="ds-models-badge">1x</div>
+        </div>
+        <div class="unit-info">
+          <div class="unit-name">
+            <span id="ds-name"></span>
+            <span class="unit-faction" id="ds-faction"></span>
+          </div>
+          <div class="unit-stats-grid" id="ds-stats"></div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions-group interactive">
+        <button class="btn-action" id="btn-end-turn">End Turn</button>
+        <button class="btn-action" id="btn-restart" style="font-size:11px; padding:8px 16px;">New Match</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Vite Module Entry -->
+  <!-- TURN BANNER -->
+  <div id="banner">YOUR TURN</div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="game-over-modal" style="display:none;">
+    <div class="modal-content interactive">
+      <div class="modal-title" id="go-title">VICTORY</div>
+      <div class="modal-desc" id="go-desc">The battlefield is cleansed in righteous fire.</div>
+      <button class="btn-action" id="btn-play-again" style="width:100%;">Play Again</button>
+    </div>
+  </div>
+
+  <div id="floating-text-layer"></div>
+
+  <!-- Vite module entry -->
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

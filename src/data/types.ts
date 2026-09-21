@@ -236,6 +236,9 @@ export interface GameState {
   objectives?: Objective[];
   escortTargetC: number;
   escortTargetR: number;
+  rosterPlayer?: DeploymentCard[];
+  rosterEnemy?: EnemyRosterItem[];
+  escortRole?: 'escort' | 'attack';
 }
 
 export interface DeploymentCard {

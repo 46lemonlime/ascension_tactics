@@ -7,7 +7,6 @@ import { DeploymentUI } from './ui/deployment-ui';
 import { DOMManager } from './ui/dom';
 import { GameEngine } from './game/engine';
 import { DEPLOYMENT_ZONES } from './data/constants';
-import { FACTIONS } from './data/factions';
 import { sfx } from './audio/synth';
 
 // Initialize core systems
@@ -21,20 +20,17 @@ const dom = new DOMManager();
 
 const engine = new GameEngine(scene, log, datasheet, minimap, dom);
 
-// Drag-to-reposition in deployment phase
-let isDraggingUnit: boolean = false;
-let draggedUnitId: number | null = null;
+// Start with title / home screen
+dom.showHomeScreen();
 
-// Wire Start Battle from Lobby
-dom.onStartGame = () => {
-  dom.showScreen('game');
-  engine.startNewGame(dom.selectedP1Faction, dom.selectedP2Faction, dom.selectedTheme, dom.selectedMission);
+// Wire Single Player launch from Race Select Modal
+dom.onStartGame = (p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole) => {
+  engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
 
-  const p1Faction = FACTIONS[dom.selectedP1Faction];
   deploymentUi.show(true);
-  deploymentUi.renderRoster(engine.state.p1Roster, engine.state.p1Deployed, p1Faction);
+  deploymentUi.renderRoster(engine.state.rosterPlayer || []);
 
-  // Highlight player 1 deployment zone
+  // Highlight Southern Deployment Zone (Rows 48–55)
   const zoneTiles: Array<{ c: number; r: number }> = [];
   const z = DEPLOYMENT_ZONES.player1;
   for (let r = z.minR; r <= z.maxR; r++) {
@@ -43,14 +39,13 @@ dom.onStartGame = () => {
     }
   }
   scene.clearHighlights();
-  scene.highlightTiles(zoneTiles, 0x10b981, 0.25);
+  scene.highlightTiles(zoneTiles, 0x10b981, 0.22);
 };
 
 // Wire Deployment UI events
 deploymentUi.onAutoDeploy = () => {
-  engine.autoDeployPlayer(1, engine.state.p1Roster);
-  const p1Faction = FACTIONS[dom.selectedP1Faction];
-  deploymentUi.renderRoster(engine.state.p1Roster, engine.state.p1Deployed, p1Faction);
+  engine.autoDeployPlayer();
+  deploymentUi.renderRoster(engine.state.rosterPlayer || []);
   sfx('footsteps');
 };
 
@@ -60,7 +55,88 @@ deploymentUi.onStartBattle = () => {
   engine.finalizeDeployment();
 };
 
-// HUD Controls
+// Top Bar View Controls
+const btnCamIso = document.getElementById('cam-iso');
+const btnCamTop = document.getElementById('cam-top');
+const btnCamCinematic = document.getElementById('cam-cinematic');
+const btnActionCamToggle = document.getElementById('cam-action-toggle');
+const btnFullscreen = document.getElementById('btn-fullscreen');
+const btnChangeMatch = document.getElementById('btn-change-match');
+
+const clearCamActive = () => {
+  [btnCamIso, btnCamTop, btnCamCinematic].forEach(b => b?.classList.remove('active'));
+};
+
+if (btnCamIso) {
+  btnCamIso.addEventListener('click', () => {
+    clearCamActive();
+    btnCamIso.classList.add('active');
+    scene.cameraController.setPresetView('iso');
+  });
+}
+
+if (btnCamTop) {
+  btnCamTop.addEventListener('click', () => {
+    clearCamActive();
+    btnCamTop.classList.add('active');
+    scene.cameraController.setPresetView('top');
+  });
+}
+
+if (btnCamCinematic) {
+  btnCamCinematic.addEventListener('click', () => {
+    clearCamActive();
+    btnCamCinematic.classList.add('active');
+    scene.cameraController.setPresetView('cinematic');
+  });
+}
+
+if (btnActionCamToggle) {
+  btnActionCamToggle.addEventListener('click', () => {
+    scene.cameraController.actionCamEnabled = !scene.cameraController.actionCamEnabled;
+    btnActionCamToggle.textContent = `Action Cam: ${scene.cameraController.actionCamEnabled ? 'ON' : 'OFF'}`;
+    btnActionCamToggle.classList.toggle('active', scene.cameraController.actionCamEnabled);
+  });
+}
+
+if (btnFullscreen) {
+  btnFullscreen.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+}
+
+if (btnChangeMatch) {
+  btnChangeMatch.addEventListener('click', () => {
+    dom.showRaceModal();
+  });
+}
+
+// Minimap & Log Collapsibles
+const btnToggleMinimap = document.getElementById('btn-toggle-minimap');
+const minimapBody = document.getElementById('minimap-body');
+if (btnToggleMinimap && minimapBody) {
+  btnToggleMinimap.addEventListener('click', () => {
+    const isCollapsed = minimapBody.style.display === 'none';
+    minimapBody.style.display = isCollapsed ? 'block' : 'none';
+    btnToggleMinimap.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
+  });
+}
+
+const btnToggleLog = document.getElementById('btn-toggle-log');
+const logContainer = document.getElementById('combat-log-container');
+if (btnToggleLog && logContainer) {
+  btnToggleLog.addEventListener('click', () => {
+    const isCollapsed = logContainer.style.display === 'none';
+    logContainer.style.display = isCollapsed ? 'flex' : 'none';
+    btnToggleLog.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
+  });
+}
+
+// Bottom Cockpit Actions
 const btnEndTurn = document.getElementById('btn-end-turn');
 if (btnEndTurn) {
   btnEndTurn.addEventListener('click', () => {
@@ -70,19 +146,10 @@ if (btnEndTurn) {
   });
 }
 
-const btnUndoCam = document.getElementById('btn-undo-camera');
-if (btnUndoCam) {
-  btnUndoCam.addEventListener('click', () => {
-    scene.cameraController.undoCameraPosition();
-  });
-}
-
-const btnActionCamToggle = document.getElementById('btn-toggle-actioncam');
-if (btnActionCamToggle) {
-  btnActionCamToggle.addEventListener('click', () => {
-    scene.cameraController.actionCamEnabled = !scene.cameraController.actionCamEnabled;
-    btnActionCamToggle.classList.toggle('active', scene.cameraController.actionCamEnabled);
-    log.log(`Action Camera ${scene.cameraController.actionCamEnabled ? 'Enabled' : 'Disabled'}`, 'info');
+const btnRestart = document.getElementById('btn-restart');
+if (btnRestart) {
+  btnRestart.addEventListener('click', () => {
+    dom.showRaceModal();
   });
 }
 
@@ -92,80 +159,49 @@ container.addEventListener('pointerdown', (e: MouseEvent) => {
   if (!hit) return;
 
   if (engine.state.phase === 'deployment') {
-    const existingUnit = engine.state.units.find(u => u.c === hit.c && u.r === hit.r && u.player === 1 && !u.isVip);
+    const clickedExistingUnit = engine.state.units.find(
+      u => u.c === hit.c && u.r === hit.r && u.player === 1 && !u.isVip
+    );
 
-    // Right click undeploys unit
-    if (e.button === 2 && existingUnit) {
-      const rosterIdx = engine.state.p1Roster.findIndex(u => u.id === existingUnit.unitDefId);
-      if (rosterIdx !== -1) {
-        engine.state.p1Deployed[rosterIdx] = false;
-        engine.scene.removeUnitMesh(existingUnit.id);
-        engine.state.units = engine.state.units.filter(u => u.id !== existingUnit.id);
-        deploymentUi.renderRoster(engine.state.p1Roster, engine.state.p1Deployed, FACTIONS[dom.selectedP1Faction]);
-        sfx('footsteps');
+    // Right click on placed unit: Undeploy
+    if (e.button === 2 && clickedExistingUnit) {
+      const card = engine.state.rosterPlayer?.find(c => c.unitRef?.id === clickedExistingUnit.id);
+      if (card) {
+        engine.undeployPlayerCard(card.key);
+        deploymentUi.renderRoster(engine.state.rosterPlayer || [], deploymentUi.selectedCardKey);
       }
       return;
     }
 
-    // Left click on existing unit starts drag to reposition
-    if (e.button === 0 && existingUnit) {
-      isDraggingUnit = true;
-      draggedUnitId = existingUnit.id;
-      return;
-    }
-
-    // Deploy selected roster unit to valid tile
-    if (e.button === 0 && deploymentUi.selectedRosterIndex !== null) {
-      const z = DEPLOYMENT_ZONES.player1;
-      if (hit.c >= z.minC && hit.c <= z.maxC && hit.r >= z.minR && hit.r <= z.maxR) {
-        if (!engine.state.units.some(u => u.c === hit.c && u.r === hit.r)) {
-          const unitDef = engine.state.p1Roster[deploymentUi.selectedRosterIndex];
-          engine.deployUnitOnBoard(unitDef, 1, hit.c, hit.r);
-          engine.state.p1Deployed[deploymentUi.selectedRosterIndex] = true;
+    // Left click on board
+    if (e.button === 0) {
+      if (deploymentUi.selectedCardKey) {
+        const deployed = engine.deployPlayerCard(deploymentUi.selectedCardKey, hit.c, hit.r);
+        if (deployed) {
           deploymentUi.clearSelection();
-          deploymentUi.renderRoster(engine.state.p1Roster, engine.state.p1Deployed, FACTIONS[dom.selectedP1Faction]);
-          sfx('footsteps');
+          deploymentUi.renderRoster(engine.state.rosterPlayer || []);
+        }
+      } else if (clickedExistingUnit) {
+        // Select corresponding dock card
+        const card = engine.state.rosterPlayer?.find(c => c.unitRef?.id === clickedExistingUnit.id);
+        if (card) {
+          deploymentUi.selectedCardKey = card.key;
+          deploymentUi.renderRoster(engine.state.rosterPlayer || [], card.key);
         }
       }
     }
   } else {
-    // Battle phase left click
+    // Battle Phase interactions
     if (e.button === 0) {
       engine.handleTileClick(hit.c, hit.r);
+    } else if (e.button === 2) {
+      // Right click cancels active move/shoot targeting
+      engine.selectUnit(null);
     }
   }
 });
 
-container.addEventListener('pointerup', (e: MouseEvent) => {
-  if (isDraggingUnit && draggedUnitId !== null && engine.state.phase === 'deployment') {
-    const hit = scene.raycastGround(e.clientX, e.clientY);
-    if (hit) {
-      const z = DEPLOYMENT_ZONES.player1;
-      if (hit.c >= z.minC && hit.c <= z.maxC && hit.r >= z.minR && hit.r <= z.maxR) {
-        if (!engine.state.units.some(u => u.c === hit.c && u.r === hit.r && u.id !== draggedUnitId)) {
-          const unit = engine.state.units.find(u => u.id === draggedUnitId);
-          if (unit) {
-            unit.c = hit.c;
-            unit.r = hit.r;
-            const mesh = scene.unitMeshes.get(unit.id);
-            if (mesh) {
-              const wPos = scene.unitMeshes.get(unit.id);
-              if (wPos) {
-                // update position in scene
-                engine.scene.addOrUpdateUnitMesh(unit, engine.state.p1Roster.find(r => r.id === unit.unitDefId)!, FACTIONS[dom.selectedP1Faction]);
-              }
-            }
-            sfx('footsteps');
-          }
-        }
-      }
-    }
-    isDraggingUnit = false;
-    draggedUnitId = null;
-  }
-});
-
-// Context menu disable on canvas to permit right-click undeploy
+// Context menu disable on canvas to permit right-click interactions
 container.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Keyboard shortcuts
@@ -178,10 +214,21 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
   }
 
   // Camera presets
-  if (e.key === '1') scene.cameraController.setPresetView('tactical');
-  if (e.key === '2') scene.cameraController.setPresetView('iso');
-  if (e.key === '3') scene.cameraController.setPresetView('top');
-  if (e.key === '4') scene.cameraController.setPresetView('cinematic');
+  if (e.key === '1') {
+    clearCamActive();
+    btnCamIso?.classList.add('active');
+    scene.cameraController.setPresetView('iso');
+  }
+  if (e.key === '2') {
+    clearCamActive();
+    btnCamTop?.classList.add('active');
+    scene.cameraController.setPresetView('top');
+  }
+  if (e.key === '3') {
+    clearCamActive();
+    btnCamCinematic?.classList.add('active');
+    scene.cameraController.setPresetView('cinematic');
+  }
 
   // Rotate camera
   if (e.key.toLowerCase() === 'q') scene.cameraController.rotateOnSpot(-Math.PI / 8);
@@ -211,3 +258,4 @@ function animate(now: number) {
 }
 
 requestAnimationFrame(animate);
+
