@@ -15,6 +15,46 @@ export function addTween(
   activeTweens.push({ t: 0, dur: Math.max(dur, 0.001), onUpdate, onDone });
 }
 
+export function updateTweens(dt: number, camera?: THREE.Camera): void {
+  for (let i = activeTweens.length - 1; i >= 0; i--) {
+    const tw = activeTweens[i];
+    tw.t += dt;
+    const p = Math.min(tw.t / tw.dur, 1);
+    if (tw.onUpdate) tw.onUpdate(p);
+    if (p >= 1) {
+      activeTweens.splice(i, 1);
+      if (tw.onDone) tw.onDone();
+    }
+  }
+
+  if (camera) {
+    for (let i = activeFloaters.length - 1; i >= 0; i--) {
+      const f = activeFloaters[i];
+      f.age += dt;
+      const p = f.age / 1.2;
+      const v = f.pos.clone().add(new THREE.Vector3(0, 3.4 + p * 2.2, 0));
+      v.project(camera);
+      const x = (v.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-(v.y * 0.5) + 0.5) * window.innerHeight;
+      f.el.style.left = `${x}px`;
+      f.el.style.top = `${y}px`;
+      f.el.style.opacity = `${Math.max(1 - p, 0)}`;
+      if (p >= 1) {
+        f.el.remove();
+        activeFloaters.splice(i, 1);
+      }
+    }
+  }
+}
+
+export function clearTweens(): void {
+  activeTweens.length = 0;
+  for (const f of activeFloaters) {
+    f.el.remove();
+  }
+  activeFloaters.length = 0;
+}
+
 export function showWorldText(text: string, pos: THREE.Vector3, color = '#fcd34d'): void {
   const container = document.getElementById('floating-text-layer');
   if (!container) return;

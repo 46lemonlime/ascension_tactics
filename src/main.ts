@@ -7,6 +7,8 @@ import { DeploymentUI } from './ui/deployment-ui';
 import { DOMManager } from './ui/dom';
 import { GameEngine } from './game/engine';
 import { DEPLOYMENT_ZONES } from './data/constants';
+import { updateTweens } from './game/effects';
+import { PhysicsEngine } from './game/physics';
 import { sfx } from './audio/synth';
 
 // Initialize core systems
@@ -111,6 +113,8 @@ if (btnFullscreen) {
 
 if (btnChangeMatch) {
   btnChangeMatch.addEventListener('click', () => {
+    engine.resetGameSession();
+    deploymentUi.show(false);
     dom.showRaceModal();
   });
 }
@@ -149,6 +153,8 @@ if (btnEndTurn) {
 const btnRestart = document.getElementById('btn-restart');
 if (btnRestart) {
   btnRestart.addEventListener('click', () => {
+    engine.resetGameSession();
+    deploymentUi.show(false);
     dom.showRaceModal();
   });
 }
@@ -250,8 +256,14 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 let lastTime = performance.now();
 function animate(now: number) {
   requestAnimationFrame(animate);
-  const dt = (now - lastTime) / 1000;
+  const dt = Math.min((now - lastTime) / 1000, 0.06);
   lastTime = now;
+
+  updateTweens(dt, scene.camera);
+
+  if (engine.state.phase === 'battle') {
+    PhysicsEngine.step(dt, engine.state.units);
+  }
 
   scene.render(dt);
   minimap.render(engine.state);

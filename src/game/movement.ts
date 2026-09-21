@@ -92,8 +92,10 @@ export function animateMovePath(
     if (stepIdx >= path.length) {
       unit.x = path[path.length - 1].x;
       unit.z = path[path.length - 1].z;
-      const endAnchorX = unitWorldX(unit.x, sz);
-      const endAnchorZ = unitWorldZ(unit.z, sz);
+      unit.c = unit.x;
+      unit.r = unit.z;
+      const endAnchorX = unitWorldX(unit.c, sz);
+      const endAnchorZ = unitWorldZ(unit.r, sz);
       unit.model.position.set(endAnchorX, 0, endAnchorZ);
       unit.anchor = { x: endAnchorX, z: endAnchorZ };
       if (onStepAwareness) onStepAwareness();
@@ -162,10 +164,12 @@ export function animateMovePath(
       return;
     }
 
-    const current = { x: unit.x, z: unit.z };
+    const current = { x: unit.c !== undefined ? unit.c : unit.x, z: unit.r !== undefined ? unit.r : unit.z };
     const next = path[stepIdx++];
     unit.x = next.x;
     unit.z = next.z;
+    unit.c = next.x;
+    unit.r = next.z;
     if (onStepAwareness) onStepAwareness();
 
     const startPos = new THREE.Vector3(unitWorldX(current.x, sz), 0, unitWorldZ(current.z, sz));

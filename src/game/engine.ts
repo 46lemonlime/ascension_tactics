@@ -7,6 +7,8 @@ import { resolveAttack } from './combat';
 import { rallyUnit } from './morale';
 import { pathTo } from './pathfinding';
 import { PhysicsEngine } from './physics';
+import { animateMovePath } from './movement';
+import { clearTweens } from './effects';
 import { sfx } from '../audio/synth';
 import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem } from '../data/types';
 import type { GameScene } from '../renderer/scene';
@@ -74,6 +76,32 @@ export class GameEngine {
     };
   }
 
+  public resetGameSession(): void {
+    // 1. Clear all Tweens & Floaters
+    clearTweens();
+
+    // 2. Remove all existing unit 3D meshes from Three.js scene and clear tracking
+    this.scene.unitMeshes.forEach(mesh => {
+      this.scene.scene.remove(mesh);
+    });
+    this.scene.unitMeshes.clear();
+
+    // 3. Clear scene highlights and targeting rings
+    this.scene.clearHighlights();
+
+    // 4. Hide datasheet & clear selection
+    this.selectedUnitId = null;
+    this.actionMode = 'idle';
+    this.isExecutingAiTurn = false;
+    this.datasheet.hide();
+
+    // 5. Reset internal state
+    this.state = this.createInitialState();
+
+    // 6. Reset combat log
+    this.log.clear();
+  }
+
   public startNewGame(
     p1Faction: string,
     p2Faction: string,
@@ -82,15 +110,10 @@ export class GameEngine {
     p1EscortRole: 'escort' | 'attack' = 'escort',
     p2EscortRole: 'escort' | 'attack' = 'attack'
   ): void {
-    this.state = this.createInitialState();
+    this.resetGameSession();
     this.state.theme = theme;
     this.state.mission = mission;
     this.state.escortRole = p1EscortRole;
-
-    // Clear old unit meshes
-    this.scene.clearHighlights();
-    this.state.units.forEach(u => this.scene.removeUnitMesh(u.id));
-    this.state.units = [];
 
     // Initialize board terrain
     this.scene.initBoard(theme);
@@ -443,29 +466,32 @@ export class GameEngine {
       return;
     }
 
-    unit.c = targetC;
-    unit.r = targetR;
-    const worldPos = gridToWorld(targetC, targetR);
-    unit.x = worldPos.x;
-    unit.z = worldPos.z;
-    unit.anchor = { x: worldPos.x, z: worldPos.z };
     unit.hasMoved = true;
+    this.actionMode = 'idle';
+    this.scene.clearHighlights();
     sfx('footsteps');
 
-    const mesh = this.scene.unitMeshes.get(unit.id);
-    if (mesh) {
-      mesh.position.set(worldPos.x, 0, worldPos.z);
-    }
+    animateMovePath(
+      unit,
+      path,
+      this.state.units,
+      () => {
+        updateFogOfWar(this.state);
+        this.scene.fowManager.updateVisibility(this.state.fow);
+        this.selectUnit(unit.id);
+        this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
 
-    updateFogOfWar(this.state);
-    this.scene.fowManager.updateVisibility(this.state.fow);
-    this.selectUnit(unit.id);
-    this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
-
-    // Automatically transition to shoot mode if targets exist
-    if (!unit.hasAttacked) {
-      this.enterShootMode();
-    }
+        // Automatically transition to shoot mode if targets exist
+        if (!unit.hasAttacked) {
+          this.enterShootMode();
+        }
+        this.checkVictoryConditions();
+      },
+      () => {
+        updateFogOfWar(this.state);
+        this.scene.fowManager.updateVisibility(this.state.fow);
+      }
+    );
   }
 
   public executeAttack(attackerId: number, defenderId: number): void {
@@ -583,16 +609,26 @@ export class GameEngine {
           const targetR = Math.max(0, Math.min(GRID_ROWS - 1, unit.r + dr * 2));
 
           if (!this.state.units.some(u => u.c === targetC && u.r === targetR && u.id !== unit.id)) {
-            unit.c = targetC;
-            unit.r = targetR;
-            const worldPos = gridToWorld(targetC, targetR);
-            unit.x = worldPos.x;
-            unit.z = worldPos.z;
-            unit.anchor = { x: worldPos.x, z: worldPos.z };
-
-            const mesh = this.scene.unitMeshes.get(unit.id);
-            if (mesh) {
-              mesh.position.set(worldPos.x, 0, worldPos.z);
+            const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units);
+            if (path && path.length > 0) {
+              await new Promise<void>(resolve => {
+                unit.hasMoved = true;
+                sfx('footsteps');
+                animateMovePath(
+                  unit,
+                  path,
+                  this.state.units,
+                  () => {
+                    updateFogOfWar(this.state);
+                    this.scene.fowManager.updateVisibility(this.state.fow);
+                    resolve();
+                  },
+                  () => {
+                    updateFogOfWar(this.state);
+                    this.scene.fowManager.updateVisibility(this.state.fow);
+                  }
+                );
+              });
             }
           }
         }
@@ -637,32 +673,50 @@ export class GameEngine {
 
     if (this.state.mission === 'escort') {
       if (vip && (vip.wounds <= 0 || vip.dead)) {
-        this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => this.dom.showHomeScreen());
+        this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
         return;
       }
       if (vip && chebyshevDist(vip.c, vip.r, this.state.escortTargetC, this.state.escortTargetR) <= 2) {
-        this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship!', () => this.dom.showHomeScreen());
+        this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship!', () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
         return;
       }
     }
 
     if (p2Alive.length === 0) {
-      this.dom.showGameOver(1, 'All hostile enemy forces were completely purged!', () => this.dom.showHomeScreen());
+      this.dom.showGameOver(1, 'All hostile enemy forces were completely purged!', () => {
+        this.resetGameSession();
+        this.dom.showHomeScreen();
+      });
       return;
     }
 
     if (p1Alive.length === 0) {
-      this.dom.showGameOver(2, 'Your strike force suffered total annihilation.', () => this.dom.showHomeScreen());
+      this.dom.showGameOver(2, 'Your strike force suffered total annihilation.', () => {
+        this.resetGameSession();
+        this.dom.showHomeScreen();
+      });
       return;
     }
 
     if (this.state.round > 8) {
       if (this.state.mission === 'domination') {
         const winner = this.state.p1Score >= this.state.p2Score ? 1 : 2;
-        this.dom.showGameOver(winner, `Match concluded after 8 rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score}`, () => this.dom.showHomeScreen());
+        this.dom.showGameOver(winner, `Match concluded after 8 rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score}`, () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
       } else {
         const winner = p1Alive.length >= p2Alive.length ? 1 : 2;
-        this.dom.showGameOver(winner, `Match round limit reached. Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}`, () => this.dom.showHomeScreen());
+        this.dom.showGameOver(winner, `Match round limit reached. Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}`, () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
       }
     }
   }
