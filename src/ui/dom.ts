@@ -1,11 +1,13 @@
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
+import { UNIT_DEFS } from '../data/units';
 import type { MissionType } from '../data/types';
 
 export class DOMManager {
   // Screens & Modals
   public homeScreen: HTMLElement | null;
   public raceModal: HTMLElement | null;
+  public learnModal: HTMLElement | null;
   public uiLayer: HTMLElement | null;
   public missionHudBar: HTMLElement | null;
   public gameOverModal: HTMLElement | null;
@@ -33,12 +35,14 @@ export class DOMManager {
   constructor() {
     this.homeScreen = document.getElementById('home-screen');
     this.raceModal = document.getElementById('race-modal');
+    this.learnModal = document.getElementById('learn-modal');
     this.uiLayer = document.getElementById('ui-layer');
     this.missionHudBar = document.getElementById('mission-hud-bar');
     this.gameOverModal = document.getElementById('game-over-modal');
 
     this.initHomeScreen();
     this.initRaceModal();
+    this.initLearnModal();
   }
 
   private initHomeScreen(): void {
@@ -48,11 +52,19 @@ export class DOMManager {
         this.showRaceModal();
       });
     }
+
+    const btnLearnMore = document.getElementById('btn-start-learn');
+    if (btnLearnMore) {
+      btnLearnMore.addEventListener('click', () => {
+        this.showLearnModal();
+      });
+    }
   }
 
   public showHomeScreen(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'flex';
     if (this.raceModal) this.raceModal.style.display = 'none';
+    if (this.learnModal) this.learnModal.style.display = 'none';
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
   }
@@ -60,6 +72,7 @@ export class DOMManager {
   public showRaceModal(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'none';
     if (this.raceModal) this.raceModal.style.display = 'flex';
+    if (this.learnModal) this.learnModal.style.display = 'none';
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
     
@@ -70,11 +83,148 @@ export class DOMManager {
     }, 50);
   }
 
+  public showLearnModal(): void {
+    if (this.homeScreen) this.homeScreen.style.display = 'none';
+    if (this.raceModal) this.raceModal.style.display = 'none';
+    if (this.learnModal) this.learnModal.style.display = 'flex';
+    if (this.uiLayer) this.uiLayer.style.display = 'none';
+    if (this.missionHudBar) this.missionHudBar.style.display = 'none';
+
+    // Default to rules tab and render initial faction dossier
+    this.switchLearnTab('rules');
+    this.renderFactionDossier('space_marines');
+  }
+
   public showGameUI(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'none';
     if (this.raceModal) this.raceModal.style.display = 'none';
+    if (this.learnModal) this.learnModal.style.display = 'none';
     if (this.uiLayer) this.uiLayer.style.display = 'flex';
     if (this.missionHudBar) this.missionHudBar.style.display = 'flex';
+  }
+
+  private initLearnModal(): void {
+    const btnTabRules = document.getElementById('btn-tab-rules');
+    const btnTabFactions = document.getElementById('btn-tab-factions');
+    const btnLearnBack = document.getElementById('btn-learn-back');
+
+    if (btnTabRules) {
+      btnTabRules.addEventListener('click', () => this.switchLearnTab('rules'));
+    }
+    if (btnTabFactions) {
+      btnTabFactions.addEventListener('click', () => this.switchLearnTab('factions'));
+    }
+    if (btnLearnBack) {
+      btnLearnBack.addEventListener('click', () => this.showHomeScreen());
+    }
+
+    // Faction Pills
+    const pills = document.querySelectorAll('.faction-pill');
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const fKey = pill.getAttribute('data-fkey') || 'space_marines';
+        this.renderFactionDossier(fKey);
+      });
+    });
+  }
+
+  public switchLearnTab(tab: 'rules' | 'factions'): void {
+    const btnTabRules = document.getElementById('btn-tab-rules');
+    const btnTabFactions = document.getElementById('btn-tab-factions');
+    const rulesContent = document.getElementById('learn-tab-rules-content');
+    const factionsContent = document.getElementById('learn-tab-factions-content');
+
+    if (tab === 'rules') {
+      btnTabRules?.classList.add('active');
+      btnTabFactions?.classList.remove('active');
+      if (rulesContent) rulesContent.style.display = 'flex';
+      if (factionsContent) factionsContent.style.display = 'none';
+    } else {
+      btnTabRules?.classList.remove('active');
+      btnTabFactions?.classList.add('active');
+      if (rulesContent) rulesContent.style.display = 'none';
+      if (factionsContent) factionsContent.style.display = 'flex';
+    }
+  }
+
+  public renderFactionDossier(fKey: string): void {
+    const container = document.getElementById('learn-faction-dossier');
+    if (!container) return;
+
+    const faction = FACTIONS[fKey] || FACTIONS.space_marines;
+    const factionUnits = Object.values(UNIT_DEFS).filter(u => {
+      if (fKey === 'space_marines' || fKey === 'marines') return u.factionId === 'marines';
+      if (fKey === 'chaos_marines' || fKey === 'chaos') return u.factionId === 'chaos';
+      if (fKey === 'necrons' || fKey === 'necros') return u.factionId === 'necros';
+      return u.factionId === fKey;
+    });
+
+    const doctrines: Record<string, string> = {
+      space_marines: 'DOCTRINE: Power-armored resilience (2+/3+ saves), versatile 26" Rapid Fire Bolters, Jump Assault shock troops, and heavy Devastator support.',
+      chaos_marines: 'DOCTRINE: Brutal melee shock assaults with Daemon Axes, high close-quarters damage, corrupted Bolters, and screening Cultist swarms.',
+      orcs: 'DOCTRINE: Overwhelming Close Combat savagery, high Toughness (T5), Power Klaws, and sustained Dakka firestorms.',
+      necrons: 'DOCTRINE: Armor-shredding Gauss weaponry, deadly Hyperphase melee immortals, and resilient Reanimation protocols.',
+      eldar: 'DOCTRINE: Exceptional agility (M8 movement), lethal Shuriken blasters, and specialized Aspect Shrines.',
+      dark_eldar: 'DOCTRINE: Extreme speed, poison splinter shards that wound on 4+, and lethal Incubi Klaive executioners.',
+      tyranids: 'DOCTRINE: Ravenous bio-plasma firepower, biological swarms, and massive Synapse warrior command organisms.',
+      tau: 'DOCTRINE: Superior long-range marksmanship (24" Pulse / 28" Railguns), Markerlight support, and armored Battlesuits.'
+    };
+
+    const doctrine = doctrines[fKey] || 'DOCTRINE: Combined arms tactical warfare with specialized warband equipment.';
+
+    let unitsHtml = '';
+    factionUnits.forEach(u => {
+      const role = u.role ? u.role.toUpperCase() : (u.isCharacter ? 'COMMANDER' : 'INFANTRY');
+      unitsHtml += `
+        <div class="dossier-unit-card">
+          <div class="dossier-unit-header">
+            <span class="dossier-unit-name">${u.icon || '⚔️'} ${u.name}</span>
+            <span class="dossier-unit-role">${role}</span>
+          </div>
+          <div class="dossier-unit-weapon">🗡️ ${u.weapon || 'Standard Arms'}</div>
+          <div class="dossier-stats-row">
+            <div class="dossier-stat-badge">
+              <div class="dossier-stat-lbl">Move</div>
+              <div class="dossier-stat-val">${u.m || 6}"</div>
+            </div>
+            <div class="dossier-stat-badge">
+              <div class="dossier-stat-lbl">Range</div>
+              <div class="dossier-stat-val">${u.range || 18}"</div>
+            </div>
+            <div class="dossier-stat-badge">
+              <div class="dossier-stat-lbl">Dmg</div>
+              <div class="dossier-stat-val">${u.dmg || 2}</div>
+            </div>
+            <div class="dossier-stat-badge">
+              <div class="dossier-stat-lbl">Wounds</div>
+              <div class="dossier-stat-val">${u.hp || 5}</div>
+            </div>
+            <div class="dossier-stat-badge">
+              <div class="dossier-stat-lbl">Save</div>
+              <div class="dossier-stat-val">${u.sv || 3}+</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = `
+      <div class="dossier-header">
+        <div class="dossier-icon">${faction.icon}</div>
+        <div class="dossier-title-box">
+          <h3>${faction.name.toUpperCase()}</h3>
+          <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>
+        </div>
+      </div>
+      <div class="dossier-lore">${faction.desc || ''}</div>
+      <div class="dossier-doctrine">${doctrine}</div>
+      <div class="dossier-roster-title">&#9876; AUTHORITATIVE SQUAD ROSTER & COMBAT DATASHEETS</div>
+      <div class="dossier-roster-grid">
+        ${unitsHtml}
+      </div>
+    `;
   }
 
   private initRaceModal(): void {

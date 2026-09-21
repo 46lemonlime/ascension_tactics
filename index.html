@@ -34,15 +34,202 @@
           <span class="home-badge-lock">COMING SOON</span>
         </button>
 
-        <!-- 3. LEARN MORE (UNCLICKABLE / COMING SOON) -->
-        <button class="home-btn disabled-btn" disabled>
+        <!-- 3. LEARN MORE (CLICKABLE -> OPENS FIELD MANUAL & CODEX) -->
+        <button id="btn-start-learn" class="home-btn active-btn">
           <span>📖 LEARN MORE</span>
-          <span class="home-btn-sub">Rules, Datasheets & Tactics Lore</span>
-          <span class="home-badge-lock">COMING SOON</span>
+          <span class="home-btn-sub">Game Rules, Factions & How to Play</span>
         </button>
       </div>
 
       <div class="home-version">ASCENSION EDITION • 3D TACTICAL WARFARE</div>
+    </div>
+  </div>
+
+  <!-- LEARN MORE / TACTICAL CODEX & FIELD MANUAL MODAL -->
+  <div id="learn-modal" style="display:none;">
+    <div class="race-dialog learn-dialog interactive">
+      <div class="race-dialog-header">
+        <div class="modal-game-banner">&#9876; ASCENSION TACTICS &#9876;</div>
+        <div class="modal-game-tagline">FIELD MANUAL & FACTION CODEX</div>
+        <h2>HOW TO PLAY & WARZONE ARCHIVES</h2>
+        <p>Master battlefield movement, line of sight combat, tactical objectives, and study all 8 warhost factions.</p>
+      </div>
+
+      <!-- LEARN NAVIGATION TABS -->
+      <div class="learn-tabs-header">
+        <button id="btn-tab-rules" class="learn-tab-btn active">
+          <span>📖 HOW TO PLAY & RULES</span>
+        </button>
+        <button id="btn-tab-factions" class="learn-tab-btn">
+          <span>🛡️ FACTION CODEX & LORE</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: HOW TO PLAY & RULES -->
+      <div id="learn-tab-rules-content" class="learn-tab-content">
+        <div class="learn-grid">
+          <!-- 1. DEPLOYMENT -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>🛡️</span> 1. DEPLOYMENT PHASE</div>
+            <div class="learn-card-body">
+              <p>Before battle begins, assemble your strike force in the <strong>Southern Sector (Rows 48–55)</strong>.</p>
+              <ul>
+                <li><strong>Placing Squads:</strong> Click any unit card in the bottom dock, then click a valid deployment tile. Selection auto-advances to the next unplaced squad.</li>
+                <li><strong>Repositioning & Recall:</strong> Click a placed unit on the board to select it. <em>Right-click</em> a placed unit or dock card to recall it.</li>
+                <li><strong>Auto-Deploy:</strong> Click <strong>AUTO-DEPLOY</strong> to instantly position your force into standard tactical formation.</li>
+                <li><strong>Commence Battle:</strong> Once all squads are deployed, click <strong>COMMENCE BATTLE</strong>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 2. MOVEMENT & POSITIONING -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>⚡</span> 2. MOVEMENT & PATHFINDING</div>
+            <div class="learn-card-body">
+              <p>Positioning and zone control are critical to victory.</p>
+              <ul>
+                <li><strong>Reachable Grid:</strong> Left-clicking a player unit highlights all valid movement tiles in <strong>Cyan</strong> based on the squad's Movement stat (<strong>M</strong>).</li>
+                <li><strong>Fluid Path Traversal:</strong> Left-clicking any highlighted cyan tile smoothly moves the entire squad along the shortest path around obstacles and friendly units.</li>
+                <li><strong>Squad Cohesion:</strong> Multi-model squads automatically maintain tactical formation (wedge, line, or echelon) during movement.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 3. SHOOTING & COMBAT -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>💥</span> 3. BALLISTIC & MELEE COMBAT</div>
+            <div class="learn-card-body">
+              <p>Engage enemy warbands with heavy weapons or brutal close assault.</p>
+              <ul>
+                <li><strong>Targeting:</strong> Hostile units within weapon Range (<strong>R</strong>) and direct Line of Sight are highlighted in <strong>Red</strong>.</li>
+                <li><strong>Executing Attacks:</strong> Click any red hostile target to open fire. Ballistic Skill (<strong>BS</strong>), Weapon Strength (<strong>S</strong>), and Damage (<strong>D</strong>) determine casualties against enemy Toughness (<strong>T</strong>) and Armor Saves (<strong>Sv+</strong>).</li>
+                <li><strong>Action Sequence:</strong> Each squad may move once and fire once per turn. Moving after firing or shooting on the run depends on weapon classification.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 4. LINE OF SIGHT & COVER -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>👁️</span> 4. LINE OF SIGHT & FOG OF WAR</div>
+            <div class="learn-card-body">
+              <p>Dynamic line-of-sight simulates true tabletop battlefield vision.</p>
+              <ul>
+                <li><strong>Obstacle Occlusion:</strong> Solid ruins, ancient temples, dense trees, fossil dunes, and reactor cores block sight lines.</li>
+                <li><strong>Fog of War Shroud:</strong> Areas outside your squads' Awareness radius remain hidden in dark tactical fog. Enemy squads in FoW cannot be targeted until spotted.</li>
+                <li><strong>Radar Minimap:</strong> The tactical minimap in the upper left renders terrain, detected hostiles, active objectives, and the camera reticle in real time.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 5. MORALE & COHESION -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>💀</span> 5. MORALE & RALLIES</div>
+            <div class="learn-card-body">
+              <p>Heavy casualties can break a squad's nerve.</p>
+              <ul>
+                <li><strong>Morale Checks:</strong> When a unit suffers 50%+ casualties in a turn, it must roll against its Leadership (<strong>Ld</strong>).</li>
+                <li><strong>Broken Status:</strong> Broken units break formation, lose movement effectiveness, and cannot fire until rallied.</li>
+                <li><strong>Rallying:</strong> Squads attempt to rally at the start of each round or via Hero Captain aura abilities.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 6. MISSIONS & VICTORY -->
+          <div class="learn-card">
+            <div class="learn-card-title"><span>👑</span> 6. MISSIONS & OBJECTIVES</div>
+            <div class="learn-card-body">
+              <p>Choose from 3 competitive battlefield missions:</p>
+              <ul>
+                <li><strong>Extermination:</strong> Total annihilation of all hostile squads.</li>
+                <li><strong>Domination:</strong> Control the 3 central tactical nodes (<strong>Nodes 1, 2, 3</strong>) at the end of each round to accumulate Victory Points (VP). Highest score after 8 rounds or first to 100 VP wins.</li>
+                <li><strong>VIP Escort:</strong> Escort the Sacred Relic Courier to the extraction landing zone in the opposing sector, or eliminate the enemy courier.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTROLS CHEAT SHEET -->
+        <div class="learn-section-title">&#9876; TACTICAL CONTROLS & HOTKEYS</div>
+        <div class="learn-controls-table-container">
+          <table class="learn-controls-table">
+            <thead>
+              <tr>
+                <th>ACTION</th>
+                <th>KEY / MOUSE INPUT</th>
+                <th>DESCRIPTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Select / Move / Attack</strong></td>
+                <td><kbd>Left Click</kbd></td>
+                <td>Click squad to select. Click cyan tile to move. Click red enemy to attack.</td>
+              </tr>
+              <tr>
+                <td><strong>Cancel / Deselect / Recall</strong></td>
+                <td><kbd>Right Click</kbd></td>
+                <td>Deselect active squad. In deployment, right-clicking placed unit recalls it to dock.</td>
+              </tr>
+              <tr>
+                <td><strong>Orbit Camera</strong></td>
+                <td><kbd>Right Drag</kbd> / <kbd>Arrow Keys</kbd></td>
+                <td>Rotate and pan camera around the active focal point.</td>
+              </tr>
+              <tr>
+                <td><strong>Rotate on Spot</strong></td>
+                <td><kbd>Shift</kbd> + <kbd>Left Drag</kbd> / <kbd>Q</kbd> / <kbd>E</kbd></td>
+                <td>Look around from current viewpoint. <kbd>Q</kbd> / <kbd>E</kbd> steps rotation.</td>
+              </tr>
+              <tr>
+                <td><strong>Elevation & Zoom</strong></td>
+                <td><kbd>Ctrl</kbd> + <kbd>Mouse Scroll</kbd></td>
+                <td>Adjust camera height and vertical viewing angle.</td>
+              </tr>
+              <tr>
+                <td><strong>Camera Presets</strong></td>
+                <td><kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td>
+                <td><kbd>1</kbd> Isometric 3D • <kbd>2</kbd> Overhead Top-Down • <kbd>3</kbd> Cinematic Action</td>
+              </tr>
+              <tr>
+                <td><strong>Camera Undo</strong></td>
+                <td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
+                <td>Restore previous camera vantage point.</td>
+              </tr>
+              <tr>
+                <td><strong>End Turn</strong></td>
+                <td><kbd>Space</kbd> / Click Button</td>
+                <td>Conclude your turn and hand initiative to the Enemy AI Overseer.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: FACTION CODEX & LORE -->
+      <div id="learn-tab-factions-content" class="learn-tab-content" style="display:none;">
+        <!-- FACTION PICKER CHIPS -->
+        <div class="learn-faction-pills" id="learn-faction-pills">
+          <!-- Populated dynamically via DOMManager or pre-rendered -->
+          <button class="faction-pill active" data-fkey="space_marines">🛡️ Space Marines</button>
+          <button class="faction-pill" data-fkey="chaos_marines">💀 Chaos Marines</button>
+          <button class="faction-pill" data-fkey="orcs">🐗 Space Orcs</button>
+          <button class="faction-pill" data-fkey="necrons">⚡ Necrons</button>
+          <button class="faction-pill" data-fkey="eldar">✨ Aeldari</button>
+          <button class="faction-pill" data-fkey="dark_eldar">🗡️ Dark Eldar</button>
+          <button class="faction-pill" data-fkey="tyranids">👾 Tyranids</button>
+          <button class="faction-pill" data-fkey="tau">💠 T'au Empire</button>
+        </div>
+
+        <!-- DYNAMIC FACTION DOSSIER CONTAINER -->
+        <div id="learn-faction-dossier" class="learn-faction-dossier">
+          <!-- Populated by DOMManager -->
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="learn-modal-footer">
+        <button id="btn-learn-back" class="race-start-btn">◀ RETURN TO MAIN MENU</button>
+      </div>
     </div>
   </div>
 
