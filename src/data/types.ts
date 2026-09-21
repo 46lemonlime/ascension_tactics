@@ -185,6 +185,7 @@ export interface Faction {
     name: string;
     desc: string;
   };
+  image?: string;
 }
 
 export interface Objective {

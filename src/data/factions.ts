@@ -36,6 +36,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Difficult to replace casualties',
       'Vulnerable to being surrounded'
     ],
+    image: '/assets/factions/ascendants.jpg',
     roster: getFactionRoster('marines')
   },
 
@@ -68,6 +69,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Vulnerable when isolated',
       'Command structure can be disrupted'
     ],
+    image: '/assets/factions/directorate.jpg',
     roster: getFactionRoster('directorate')
   },
 
@@ -99,6 +101,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Poor prolonged engagements',
       'Mistakes are heavily punished'
     ],
+    image: '/assets/factions/elyri.jpg',
     roster: getFactionRoster('eldar')
   },
 
@@ -134,6 +137,7 @@ export const FACTIONS: Record<string, Faction> = {
       name: 'Raiding',
       desc: 'Veykari armies capture and loot battlefield objectives for combat buffs, temporary upgrades, and tactical advantages.'
     },
+    image: '/assets/factions/veykari.jpg',
     roster: getFactionRoster('dark_eldar')
   },
 
@@ -169,6 +173,7 @@ export const FACTIONS: Record<string, Faction> = {
       name: 'War Momentum',
       desc: 'Winning engagements generates War Momentum, unlocking powerful combat surges and aggressive battle buffs.'
     },
+    image: '/assets/factions/ghar.jpg',
     roster: getFactionRoster('orcs')
   },
 
