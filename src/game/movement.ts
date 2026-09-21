@@ -132,9 +132,11 @@ export function animateMovePath(
   const isHover = unit.type === 'tau_hammerhead' || unit.type === 'de_ravager';
   const isWalker = isLarge && !isHover;
 
+  // Movement speed tuned for snappy, responsive, natural military locomotion (TILE_SIZE = 6.0)
   const baseSpeed = (unit.def?.physical && unit.def.physical.maxSpeed) || 12.0;
-  const speed = isLarge ? baseSpeed * 0.75 : baseSpeed * 0.85;
-  const totalDuration = Math.max(0.3, totalDist / speed);
+  const speedMultiplier = isHover ? 2.3 : (isWalker ? 1.6 : 2.0);
+  const worldSpeed = Math.max(baseSpeed * speedMultiplier, 22.0);
+  const totalDuration = Math.max(0.18, totalDist / worldSpeed);
 
   const living = getSurvivingFigures(unit);
   const isSingleModel = unit.squadSize === 1 || sz >= 2 || living.length <= 1;
@@ -175,7 +177,7 @@ export function animateMovePath(
         const segDir = segEnd.clone().sub(segStart).normalize();
         if (segDir.lengthSq() > 0.001) {
           const targetHeading = Math.atan2(segDir.x, segDir.z);
-          unit.model.rotation.y = lerpAngle(unit.model.rotation.y, targetHeading, Math.min(dtTween * 14.0, 1.0));
+          unit.model.rotation.y = lerpAngle(unit.model.rotation.y, targetHeading, Math.min(dtTween * 16.0, 1.0));
           unit.angle = unit.model.rotation.y;
         }
 
@@ -194,17 +196,17 @@ export function animateMovePath(
         // Physics step for squad miniatures
         PhysicsEngine.step(dtTween, unitsList, unit);
 
-        // Fluid, non-halting stride & body animations
+        // Natural, proportionate stride & bobbing animations
         if (isHover) {
-          const hoverFloat = Math.sin(currentD * 2.5) * 0.12;
+          const hoverFloat = Math.sin(currentD * 0.85) * 0.14;
           living.forEach((fig: any) => {
             const body = getFigBody(fig);
             if (body) body.position.y = 0.2 + hoverFloat;
           });
         } else if (isWalker) {
-          const stridePhase = currentD * 2.2;
-          const legAngle = Math.sin(stridePhase) * 0.48;
-          const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.12;
+          const stridePhase = currentD * (Math.PI * 2 / 5.2);
+          const legAngle = Math.sin(stridePhase) * 0.45;
+          const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.10;
 
           living.forEach((fig: any) => {
             const lLeg = getLeftLeg(fig);
@@ -215,9 +217,9 @@ export function animateMovePath(
             if (body) body.position.y = 0.2 + bodyBob;
           });
         } else {
-          const stridePhase = currentD * 3.6;
-          const legAngle = Math.sin(stridePhase) * 0.65;
-          const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.14;
+          const stridePhase = currentD * (Math.PI * 2 / 3.4);
+          const legAngle = Math.sin(stridePhase) * 0.55;
+          const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.12;
 
           living.forEach((fig: any) => {
             const lLeg = getLeftLeg(fig);
@@ -292,25 +294,25 @@ export function animateMovePath(
 
         if (useActionCam && preMoveCamPos && preMoveCamTarget && unit.team === 'player') {
           setTimeout(() => {
-            animateCameraTo(preMoveCamPos!, preMoveCamTarget!, 0.6);
+            animateCameraTo(preMoveCamPos!, preMoveCamTarget!, 0.45);
             clearActionSavedCam();
             setTimeout(() => {
               onDone();
-            }, 350);
-          }, 250);
+            }, 250);
+          }, 150);
         } else {
           clearActionSavedCam();
           setTimeout(
             () => {
               onDone();
             },
-            unit.team === 'enemy' && useActionCam ? 200 : 0
+            unit.team === 'enemy' && useActionCam ? 150 : 0
           );
         }
       }
     );
   }
 
-  const camArrivalDelay = useActionCam ? 600 : 0;
+  const camArrivalDelay = useActionCam ? 350 : 0;
   setTimeout(startMovement, camArrivalDelay);
 }

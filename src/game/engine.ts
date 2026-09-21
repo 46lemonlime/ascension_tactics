@@ -607,7 +607,7 @@ export class GameEngine {
 
     for (const unit of enemyUnits) {
       if (unit.wounds <= 0 || unit.dead) continue;
-      await new Promise(r => setTimeout(r, 450));
+      await new Promise(r => setTimeout(r, 200));
       if (unit.wounds <= 0 || unit.dead) continue;
 
       const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
