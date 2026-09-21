@@ -176,6 +176,15 @@ export interface Faction {
   laserColor: number;
   desc: string;
   roster: UnitDef[];
+  battlefieldIdentity?: string;
+  quote?: string;
+  doctrine?: string;
+  strengths?: string[];
+  weaknesses?: string[];
+  uniqueMechanic?: {
+    name: string;
+    desc: string;
+  };
 }
 
 export interface Objective {

@@ -125,22 +125,41 @@ export function createMiniatureFigure(unitDef: UnitDef, faction: Faction | undef
   const factionId = faction?.id || unitDef.factionId || 'space_marines';
 
   switch (factionId) {
+    case 'forsaken':
     case 'chaos':
     case 'chaos_marines':
       return createChaosFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'riftborn':
+    case 'daemons':
+    case 'chaos_daemons':
+      return createChaosFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'ghar':
     case 'orcs':
+    case 'orks':
       return createOrcFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'revenant':
     case 'necros':
     case 'necrons':
       return createNecronFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'elyri':
     case 'eldar':
+    case 'aeldari':
       return createEldarFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'veykari':
     case 'dark_eldar':
+    case 'drukhari':
       return createDarkEldarFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'devourers':
     case 'tyranids':
       return createTyranidFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'concordat':
     case 'tau':
       return createTauFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'directorate':
+    case 'guard':
+    case 'astra_militarum':
+      return createMarineFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'ascendants':
     case 'marines':
     case 'space_marines':
     default:

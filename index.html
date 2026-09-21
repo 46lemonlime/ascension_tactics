@@ -209,15 +209,16 @@
       <div id="learn-tab-factions-content" class="learn-tab-content" style="display:none;">
         <!-- FACTION PICKER CHIPS -->
         <div class="learn-faction-pills" id="learn-faction-pills">
-          <!-- Populated dynamically via DOMManager or pre-rendered -->
-          <button class="faction-pill active" data-fkey="space_marines">🛡️ Space Marines</button>
-          <button class="faction-pill" data-fkey="chaos_marines">💀 Chaos Marines</button>
-          <button class="faction-pill" data-fkey="orcs">🐗 Space Orcs</button>
-          <button class="faction-pill" data-fkey="necrons">⚡ Necrons</button>
-          <button class="faction-pill" data-fkey="eldar">✨ Aeldari</button>
-          <button class="faction-pill" data-fkey="dark_eldar">🗡️ Dark Eldar</button>
-          <button class="faction-pill" data-fkey="tyranids">👾 Tyranids</button>
-          <button class="faction-pill" data-fkey="tau">💠 T'au Empire</button>
+          <button class="faction-pill active" data-fkey="ascendants">🛡️ The Ascendants</button>
+          <button class="faction-pill" data-fkey="directorate">🎖️ The Directorate</button>
+          <button class="faction-pill" data-fkey="elyri">✨ The Elyri</button>
+          <button class="faction-pill" data-fkey="veykari">🗡️ The Veykari</button>
+          <button class="faction-pill" data-fkey="ghar">🐗 The Ghar</button>
+          <button class="faction-pill" data-fkey="devourers">👾 The Devourers</button>
+          <button class="faction-pill" data-fkey="revenant">⚡ The Revenant</button>
+          <button class="faction-pill" data-fkey="concordat">💠 The Concordat</button>
+          <button class="faction-pill" data-fkey="riftborn">🌀 The Riftborn</button>
+          <button class="faction-pill" data-fkey="forsaken">💀 The Forsaken</button>
         </div>
 
         <!-- DYNAMIC FACTION DOSSIER CONTAINER -->
@@ -237,7 +238,7 @@
   <div id="race-modal" style="display:none;">
     <div class="race-dialog interactive">
       <div class="race-dialog-header">
-        <div class="modal-game-banner">&#9876; GRIMDARK TACTICS 3D &#9876;</div>
+        <div class="modal-game-banner">&#9876; ASCENSION TACTICS 3D &#9876;</div>
         <div class="modal-game-tagline">TABLETOP SKIRMISH WARFARE</div>
         <h2>MISSION BRIEFING & WARZONE SETUP</h2>
         <p>Select your strike faction, configure the AI opponent, and choose your tactical theater of war.</p>
@@ -252,7 +253,7 @@
           <div class="faction-icon">🎲</div>
           <div class="faction-name">Random Army</div>
           <div class="faction-sub">Dynamic Mystery Force</div>
-          <div class="faction-desc">Roll a dynamic mystery army upon deployment. Test your mastery across all 8 warhosts.</div>
+          <div class="faction-desc">Roll a dynamic mystery army upon deployment. Test your mastery across all 10 warhosts.</div>
           <div class="faction-units-preview">Mystery Selection • Adapt & Conquer</div>
         </div>
 
@@ -263,201 +264,249 @@
         <div class="race-carousel-viewport">
           <div class="factions-grid" id="factions-grid-track">
             <!-- SET 1 (CLONE 1) -->
-            <div class="faction-card" data-race="marines">
+            <div class="faction-card" data-race="ascendants">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🛡️</div>
-              <div class="faction-name">Space Marines</div>
-              <div class="faction-sub">Adeptus Astartes</div>
-              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
-              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+              <div class="faction-name">The Ascendants</div>
+              <div class="faction-sub">Elite Super-Warriors</div>
+              <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
+              <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="chaos">
+            <div class="faction-card" data-race="directorate">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">💀</div>
-              <div class="faction-name">Chaos Marines</div>
-              <div class="faction-sub">Heretic Astartes</div>
-              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
-              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+              <div class="faction-icon">🎖️</div>
+              <div class="faction-name">The Directorate</div>
+              <div class="faction-sub">Mass Combined Arms</div>
+              <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
+              <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="orcs">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">🐗</div>
-              <div class="faction-name">Space Orcs</div>
-              <div class="faction-sub">Goff WAAAGH!</div>
-              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
-              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
-            </div>
-            <div class="faction-card" data-race="necros">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">⚡</div>
-              <div class="faction-name">Necrons</div>
-              <div class="faction-sub">Sautekh Dynasty</div>
-              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
-              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
-            </div>
-            <div class="faction-card" data-race="eldar">
+            <div class="faction-card" data-race="elyri">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">✨</div>
-              <div class="faction-name">Aeldari</div>
-              <div class="faction-sub">Craftworld Ulthwé</div>
-              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
-              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+              <div class="faction-name">The Elyri</div>
+              <div class="faction-sub">Speed & Precision</div>
+              <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
+              <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="dark_eldar">
+            <div class="faction-card" data-race="veykari">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🗡️</div>
-              <div class="faction-name">Dark Eldar</div>
-              <div class="faction-sub">Drukhari Kabal</div>
-              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
-              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+              <div class="faction-name">The Veykari</div>
+              <div class="faction-sub">Predatory Raiders</div>
+              <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="tyranids">
+            <div class="faction-card" data-race="ghar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">The Ghar</div>
+              <div class="faction-sub">Aggressive Horde</div>
+              <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="devourers">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">👾</div>
-              <div class="faction-name">Tyranids</div>
-              <div class="faction-sub">Hive Fleet Leviathan</div>
-              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
-              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+              <div class="faction-name">The Devourers</div>
+              <div class="faction-sub">Adaptive Swarm</div>
+              <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
+              <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="tau">
+            <div class="faction-card" data-race="revenant">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">The Revenant</div>
+              <div class="faction-sub">Synthetic Dynasties</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="concordat">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">💠</div>
-              <div class="faction-name">T'au Empire</div>
-              <div class="faction-sub">Hunter Cadre</div>
-              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
-              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+              <div class="faction-name">The Concordat</div>
+              <div class="faction-sub">Networked Firepower</div>
+              <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
+              <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
+            </div>
+            <div class="faction-card" data-race="riftborn">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🌀</div>
+              <div class="faction-name">The Riftborn</div>
+              <div class="faction-sub">Reality Shifters</div>
+              <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
+              <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
+            </div>
+            <div class="faction-card" data-race="forsaken">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">The Forsaken</div>
+              <div class="faction-sub">Corrupted Ascendants</div>
+              <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption, daemon axes, and fleshmetal siege engines.</div>
+              <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
             </div>
 
             <!-- SET 2 (MAIN ACTIVE SET) -->
-            <div class="faction-card" data-race="marines">
+            <div class="faction-card" data-race="ascendants">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🛡️</div>
-              <div class="faction-name">Space Marines</div>
-              <div class="faction-sub">Adeptus Astartes</div>
-              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
-              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+              <div class="faction-name">The Ascendants</div>
+              <div class="faction-sub">Elite Super-Warriors</div>
+              <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
+              <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="chaos">
+            <div class="faction-card" data-race="directorate">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">💀</div>
-              <div class="faction-name">Chaos Marines</div>
-              <div class="faction-sub">Heretic Astartes</div>
-              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
-              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+              <div class="faction-icon">🎖️</div>
+              <div class="faction-name">The Directorate</div>
+              <div class="faction-sub">Mass Combined Arms</div>
+              <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
+              <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="orcs">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">🐗</div>
-              <div class="faction-name">Space Orcs</div>
-              <div class="faction-sub">Goff WAAAGH!</div>
-              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
-              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
-            </div>
-            <div class="faction-card" data-race="necros">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">⚡</div>
-              <div class="faction-name">Necrons</div>
-              <div class="faction-sub">Sautekh Dynasty</div>
-              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
-              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
-            </div>
-            <div class="faction-card" data-race="eldar">
+            <div class="faction-card" data-race="elyri">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">✨</div>
-              <div class="faction-name">Aeldari</div>
-              <div class="faction-sub">Craftworld Ulthwé</div>
-              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
-              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+              <div class="faction-name">The Elyri</div>
+              <div class="faction-sub">Speed & Precision</div>
+              <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
+              <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="dark_eldar">
+            <div class="faction-card" data-race="veykari">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🗡️</div>
-              <div class="faction-name">Dark Eldar</div>
-              <div class="faction-sub">Drukhari Kabal</div>
-              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
-              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+              <div class="faction-name">The Veykari</div>
+              <div class="faction-sub">Predatory Raiders</div>
+              <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="tyranids">
+            <div class="faction-card" data-race="ghar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">The Ghar</div>
+              <div class="faction-sub">Aggressive Horde</div>
+              <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="devourers">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">👾</div>
-              <div class="faction-name">Tyranids</div>
-              <div class="faction-sub">Hive Fleet Leviathan</div>
-              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
-              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+              <div class="faction-name">The Devourers</div>
+              <div class="faction-sub">Adaptive Swarm</div>
+              <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
+              <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="tau">
+            <div class="faction-card" data-race="revenant">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">The Revenant</div>
+              <div class="faction-sub">Synthetic Dynasties</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="concordat">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">💠</div>
-              <div class="faction-name">T'au Empire</div>
-              <div class="faction-sub">Hunter Cadre</div>
-              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
-              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+              <div class="faction-name">The Concordat</div>
+              <div class="faction-sub">Networked Firepower</div>
+              <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
+              <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
+            </div>
+            <div class="faction-card" data-race="riftborn">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🌀</div>
+              <div class="faction-name">The Riftborn</div>
+              <div class="faction-sub">Reality Shifters</div>
+              <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
+              <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
+            </div>
+            <div class="faction-card" data-race="forsaken">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">The Forsaken</div>
+              <div class="faction-sub">Corrupted Ascendants</div>
+              <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption, daemon axes, and fleshmetal siege engines.</div>
+              <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
             </div>
 
             <!-- SET 3 (CLONE 3) -->
-            <div class="faction-card" data-race="marines">
+            <div class="faction-card" data-race="ascendants">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🛡️</div>
-              <div class="faction-name">Space Marines</div>
-              <div class="faction-sub">Adeptus Astartes</div>
-              <div class="faction-desc">Disciplined power-armored heroes with 3+ saves, versatile 18" bolters, jump packs, and 26" heavy weapons.</div>
-              <div class="faction-units-preview">Captain • Tacticals • Assault • Devastators • Centurions • Dreadnought</div>
+              <div class="faction-name">The Ascendants</div>
+              <div class="faction-sub">Elite Super-Warriors</div>
+              <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
+              <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="chaos">
+            <div class="faction-card" data-race="directorate">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">💀</div>
-              <div class="faction-name">Chaos Marines</div>
-              <div class="faction-sub">Heretic Astartes</div>
-              <div class="faction-desc">Ruthless traitor warbands with daemon axes, corrupted bolters, raptor jump troops, and expendable cultists.</div>
-              <div class="faction-units-preview">Chaos Lord • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
+              <div class="faction-icon">🎖️</div>
+              <div class="faction-name">The Directorate</div>
+              <div class="faction-sub">Mass Combined Arms</div>
+              <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
+              <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="orcs">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">🐗</div>
-              <div class="faction-name">Space Orcs</div>
-              <div class="faction-sub">Goff WAAAGH!</div>
-              <div class="faction-desc">Brutal greenskin horde with high toughness (T5), savage Power Klaws, Big Choppas, and overwhelming Dakka.</div>
-              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Boyz Mob • Mek Gunz • Deff Dread</div>
-            </div>
-            <div class="faction-card" data-race="necros">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
-              <div class="faction-icon">⚡</div>
-              <div class="faction-name">Necrons</div>
-              <div class="faction-sub">Sautekh Dynasty</div>
-              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss Flayers, tripod Skorpekhs, and resurrection orbs.</div>
-              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Warriors • Heavy Destroyer • Doomstalker</div>
-            </div>
-            <div class="faction-card" data-race="eldar">
+            <div class="faction-card" data-race="elyri">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">✨</div>
-              <div class="faction-name">Aeldari</div>
-              <div class="faction-sub">Craftworld Ulthwé</div>
-              <div class="faction-desc">Graceful psychic warriors with extreme agility (M8), shuriken volleys, Howling Banshees, and Dark Reapers.</div>
-              <div class="faction-units-preview">Farseer • Banshees • Dark Reapers • Guardians • D-Cannon • Wraithlord</div>
+              <div class="faction-name">The Elyri</div>
+              <div class="faction-sub">Speed & Precision</div>
+              <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
+              <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="dark_eldar">
+            <div class="faction-card" data-race="veykari">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">🗡️</div>
-              <div class="faction-name">Dark Eldar</div>
-              <div class="faction-sub">Drukhari Kabal</div>
-              <div class="faction-desc">Sadistic raiders with toxic splinter shard rifles, executioner Incubi Klaives, and winged Dark Lance Scourges.</div>
-              <div class="faction-units-preview">Archon • Incubi • Scourges • Kabalites • Talos • Ravager</div>
+              <div class="faction-name">The Veykari</div>
+              <div class="faction-sub">Predatory Raiders</div>
+              <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
+              <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="tyranids">
+            <div class="faction-card" data-race="ghar">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🐗</div>
+              <div class="faction-name">The Ghar</div>
+              <div class="faction-sub">Aggressive Horde</div>
+              <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
+              <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
+            </div>
+            <div class="faction-card" data-race="devourers">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">👾</div>
-              <div class="faction-name">Tyranids</div>
-              <div class="faction-sub">Hive Fleet Leviathan</div>
-              <div class="faction-desc">Chitinous bio-monsters featuring huge scything talons, 20" venom cannons, swift rending claws, and gaunt swarms.</div>
-              <div class="faction-units-preview">Hive Tyrant • Warriors • Genestealers • Gaunts • Biovore • Carnifex</div>
+              <div class="faction-name">The Devourers</div>
+              <div class="faction-sub">Adaptive Swarm</div>
+              <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
+              <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="tau">
+            <div class="faction-card" data-race="revenant">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">⚡</div>
+              <div class="faction-name">The Revenant</div>
+              <div class="faction-sub">Synthetic Dynasties</div>
+              <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
+              <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
+            </div>
+            <div class="faction-card" data-race="concordat">
               <div class="faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon">💠</div>
-              <div class="faction-name">T'au Empire</div>
-              <div class="faction-sub">Hunter Cadre</div>
-              <div class="faction-desc">High-tech pulse supremacy with extreme-range 24" pulse rifles, 28" heavy railguns, and agile crisis battlesuits.</div>
-              <div class="faction-units-preview">Commander • Strike Teams • Stealth • Pathfinders • Broadside • Hammerhead</div>
+              <div class="faction-name">The Concordat</div>
+              <div class="faction-sub">Networked Firepower</div>
+              <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
+              <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
+            </div>
+            <div class="faction-card" data-race="riftborn">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">🌀</div>
+              <div class="faction-name">The Riftborn</div>
+              <div class="faction-sub">Reality Shifters</div>
+              <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
+              <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
+            </div>
+            <div class="faction-card" data-race="forsaken">
+              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+              <div class="faction-icon">💀</div>
+              <div class="faction-name">The Forsaken</div>
+              <div class="faction-sub">Corrupted Ascendants</div>
+              <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption, daemon axes, and fleshmetal siege engines.</div>
+              <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Obliterators • Defiler</div>
             </div>
           </div>
         </div>
@@ -633,15 +682,17 @@
         <div class="ai-select-group">
           <span><b>AI Opponent:</b></span>
           <select id="ai-race-select">
-            <option value="random">🎲 Random Rival Faction</option>
-            <option value="chaos">💀 Chaos Marines (Heretic Astartes)</option>
-            <option value="orcs">🐗 Space Orcs (Goff WAAAGH!)</option>
-            <option value="necros">⚡ Necrons (Sautekh Dynasty)</option>
-            <option value="eldar">✨ Aeldari (Craftworld Ulthwé)</option>
-            <option value="dark_eldar">🗡️ Dark Eldar (Drukhari Kabal)</option>
-            <option value="tyranids">👾 Tyranids (Hive Fleet)</option>
-            <option value="tau">💠 T'au Empire (Hunter Cadre)</option>
-            <option value="marines">🛡️ Space Marines (Loyalists)</option>
+            <option value="random">🎲 Random Rival Warhost</option>
+            <option value="ascendants">🛡️ The Ascendants (Super-Warriors)</option>
+            <option value="directorate">🎖️ The Directorate (Combined Arms)</option>
+            <option value="elyri">✨ The Elyri (Speed & Precision)</option>
+            <option value="veykari">🗡️ The Veykari (Predatory Raiders)</option>
+            <option value="ghar">🐗 The Ghar (Aggressive Horde)</option>
+            <option value="devourers">👾 The Devourers (Adaptive Swarm)</option>
+            <option value="revenant">⚡ The Revenant (Synthetic Dynasties)</option>
+            <option value="concordat">💠 The Concordat (Networked Warfare)</option>
+            <option value="riftborn">🌀 The Riftborn (Reality Shifters)</option>
+            <option value="forsaken">💀 The Forsaken (Corrupted Ascendants)</option>
           </select>
         </div>
 

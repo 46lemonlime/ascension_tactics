@@ -20,7 +20,7 @@ export class DOMManager {
   public p1EscortRole: 'escort' | 'attack' | 'random' = 'escort';
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
 
-  private raceCarouselIndex: number = 8;
+  private raceCarouselIndex: number = 10;
   private mapCarouselIndex: number = 5;
 
   public onStartGame?: (
@@ -153,26 +153,22 @@ export class DOMManager {
     const container = document.getElementById('learn-faction-dossier');
     if (!container) return;
 
-    const faction = FACTIONS[fKey] || FACTIONS.space_marines;
-    const factionUnits = Object.values(UNIT_DEFS).filter(u => {
-      if (fKey === 'space_marines' || fKey === 'marines') return u.factionId === 'marines';
-      if (fKey === 'chaos_marines' || fKey === 'chaos') return u.factionId === 'chaos';
-      if (fKey === 'necrons' || fKey === 'necros') return u.factionId === 'necros';
-      return u.factionId === fKey;
-    });
+    const faction = FACTIONS[fKey] || FACTIONS.ascendants || FACTIONS.space_marines;
+    
+    // Map any alias to the factionId stored on unit definitions
+    let targetFactionId = fKey;
+    if (fKey === 'ascendants' || fKey === 'space_marines' || fKey === 'marines') targetFactionId = 'marines';
+    else if (fKey === 'directorate' || fKey === 'guard' || fKey === 'astra_militarum') targetFactionId = 'directorate';
+    else if (fKey === 'elyri' || fKey === 'eldar' || fKey === 'aeldari') targetFactionId = 'eldar';
+    else if (fKey === 'veykari' || fKey === 'dark_eldar' || fKey === 'drukhari') targetFactionId = 'dark_eldar';
+    else if (fKey === 'ghar' || fKey === 'orcs' || fKey === 'orks') targetFactionId = 'orcs';
+    else if (fKey === 'devourers' || fKey === 'tyranids') targetFactionId = 'tyranids';
+    else if (fKey === 'revenant' || fKey === 'necrons' || fKey === 'necros') targetFactionId = 'necros';
+    else if (fKey === 'concordat' || fKey === 'tau') targetFactionId = 'tau';
+    else if (fKey === 'riftborn' || fKey === 'daemons' || fKey === 'chaos_daemons') targetFactionId = 'riftborn';
+    else if (fKey === 'forsaken' || fKey === 'chaos' || fKey === 'chaos_marines') targetFactionId = 'chaos';
 
-    const doctrines: Record<string, string> = {
-      space_marines: 'DOCTRINE: Power-armored resilience (2+/3+ saves), versatile 26" Rapid Fire Bolters, Jump Assault shock troops, and heavy Devastator support.',
-      chaos_marines: 'DOCTRINE: Brutal melee shock assaults with Daemon Axes, high close-quarters damage, corrupted Bolters, and screening Cultist swarms.',
-      orcs: 'DOCTRINE: Overwhelming Close Combat savagery, high Toughness (T5), Power Klaws, and sustained Dakka firestorms.',
-      necrons: 'DOCTRINE: Armor-shredding Gauss weaponry, deadly Hyperphase melee immortals, and resilient Reanimation protocols.',
-      eldar: 'DOCTRINE: Exceptional agility (M8 movement), lethal Shuriken blasters, and specialized Aspect Shrines.',
-      dark_eldar: 'DOCTRINE: Extreme speed, poison splinter shards that wound on 4+, and lethal Incubi Klaive executioners.',
-      tyranids: 'DOCTRINE: Ravenous bio-plasma firepower, biological swarms, and massive Synapse warrior command organisms.',
-      tau: 'DOCTRINE: Superior long-range marksmanship (24" Pulse / 28" Railguns), Markerlight support, and armored Battlesuits.'
-    };
-
-    const doctrine = doctrines[fKey] || 'DOCTRINE: Combined arms tactical warfare with specialized warband equipment.';
+    const factionUnits = Object.values(UNIT_DEFS).filter(u => u.factionId === targetFactionId);
 
     let unitsHtml = '';
     factionUnits.forEach(u => {
@@ -210,6 +206,48 @@ export class DOMManager {
       `;
     });
 
+    const quoteHtml = faction.quote ? `<div class="dossier-quote">“${faction.quote}”</div>` : '';
+    
+    const identityHtml = faction.battlefieldIdentity ? `
+      <div class="dossier-card-box">
+        <div class="dossier-box-title">⚔️ BATTLEFIELD IDENTITY</div>
+        <div style="font-size:13.5px; color:#f1f5f9; line-height:1.5;">${faction.battlefieldIdentity}</div>
+        ${faction.doctrine ? `<div class="dossier-doctrine" style="margin-top:6px;"><strong>DOCTRINE:</strong> ${faction.doctrine}</div>` : ''}
+      </div>
+    ` : '';
+
+    const strengthsHtml = faction.strengths && faction.strengths.length > 0 ? `
+      <div class="dossier-card-box">
+        <div class="dossier-box-title strengths">✔ STRENGTHS</div>
+        <ul class="dossier-list">
+          ${faction.strengths.map(s => `<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const weaknessesHtml = faction.weaknesses && faction.weaknesses.length > 0 ? `
+      <div class="dossier-card-box">
+        <div class="dossier-box-title weaknesses">✖ WEAKNESSES</div>
+        <ul class="dossier-list">
+          ${faction.weaknesses.map(w => `<li>${w}</li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const metaGridHtml = (strengthsHtml || weaknessesHtml) ? `
+      <div class="dossier-meta-grid">
+        ${strengthsHtml}
+        ${weaknessesHtml}
+      </div>
+    ` : '';
+
+    const mechanicHtml = faction.uniqueMechanic ? `
+      <div class="dossier-card-box mechanic">
+        <div class="dossier-box-title mechanic">⚡ UNIQUE MECHANIC — ${faction.uniqueMechanic.name.toUpperCase()}</div>
+        <div style="font-size:13px; color:#e0f2fe; line-height:1.5;">${faction.uniqueMechanic.desc}</div>
+      </div>
+    ` : '';
+
     container.innerHTML = `
       <div class="dossier-header">
         <div class="dossier-icon">${faction.icon}</div>
@@ -218,8 +256,11 @@ export class DOMManager {
           <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>
         </div>
       </div>
+      ${quoteHtml}
       <div class="dossier-lore">${faction.desc || ''}</div>
-      <div class="dossier-doctrine">${doctrine}</div>
+      ${identityHtml}
+      ${mechanicHtml}
+      ${metaGridHtml}
       <div class="dossier-roster-title">&#9876; AUTHORITATIVE SQUAD ROSTER & COMBAT DATASHEETS</div>
       <div class="dossier-roster-grid">
         ${unitsHtml}
@@ -365,8 +406,8 @@ export class DOMManager {
     if (!raceTrack) return;
 
     this.raceCarouselIndex += delta;
-    if (this.raceCarouselIndex < 0) this.raceCarouselIndex = 15;
-    if (this.raceCarouselIndex > 16) this.raceCarouselIndex = 8;
+    if (this.raceCarouselIndex < 0) this.raceCarouselIndex = 19;
+    if (this.raceCarouselIndex > 20) this.raceCarouselIndex = 10;
 
     const firstCard = raceTrack.querySelector<HTMLElement>('.faction-card');
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 220;
@@ -417,7 +458,18 @@ export class DOMManager {
   }
 
   private launchSkirmish(): void {
-    const factionKeys = ['marines', 'chaos', 'orcs', 'necros', 'eldar', 'dark_eldar', 'tyranids', 'tau'];
+    const factionKeys = [
+      'ascendants',
+      'directorate',
+      'elyri',
+      'veykari',
+      'ghar',
+      'devourers',
+      'revenant',
+      'concordat',
+      'riftborn',
+      'forsaken'
+    ];
     const themeKeys = ['jungle', 'desert', 'snow', 'city', 'tech'];
 
     // Resolve Player Faction
@@ -431,7 +483,7 @@ export class DOMManager {
     let finalP2Faction = aiSelect ? aiSelect.value : 'random';
     if (finalP2Faction === 'random') {
       const candidates = factionKeys.filter(f => f !== finalP1Faction);
-      finalP2Faction = candidates[Math.floor(Math.random() * candidates.length)] || 'chaos';
+      finalP2Faction = candidates[Math.floor(Math.random() * candidates.length)] || 'forsaken';
     }
 
     // Resolve Theme
