@@ -9,6 +9,7 @@ export class DeploymentUI {
 
   public selectedCardKey: string | null = null;
   public onSelectCard?: (cardKey: string) => void;
+  public onUndeployCard?: (cardKey: string) => void;
   public onAutoDeploy?: () => void;
   public onStartBattle?: () => void;
 
@@ -37,9 +38,20 @@ export class DeploymentUI {
     }
   }
 
-  public renderRoster(roster: DeploymentCard[], selectedKey: string | null = null): void {
+  public renderRoster(roster: DeploymentCard[], selectedKey?: string | null): void {
     if (!this.container) return;
-    this.selectedCardKey = selectedKey;
+
+    if (selectedKey !== undefined) {
+      this.selectedCardKey = selectedKey;
+    } else if (this.selectedCardKey) {
+      const curCard = roster.find(c => c.key === this.selectedCardKey);
+      if (!curCard || curCard.placed) {
+        this.selectedCardKey = roster.find(c => !c.placed)?.key || null;
+      }
+    } else {
+      this.selectedCardKey = roster.find(c => !c.placed)?.key || null;
+    }
+
     this.container.innerHTML = '';
 
     const allPlaced = roster.length > 0 && roster.every(c => c.placed);
@@ -76,6 +88,13 @@ export class DeploymentUI {
         this.selectedCardKey = card.key;
         if (this.onSelectCard) this.onSelectCard(card.key);
         this.renderRoster(roster, this.selectedCardKey);
+      });
+
+      cardEl.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (card.placed && this.onUndeployCard) {
+          this.onUndeployCard(card.key);
+        }
       });
 
       this.container!.appendChild(cardEl);

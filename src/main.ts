@@ -30,7 +30,8 @@ dom.onStartGame = (p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortR
   engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
 
   deploymentUi.show(true);
-  deploymentUi.renderRoster(engine.state.rosterPlayer || []);
+  const initialKey = engine.state.rosterPlayer?.[0]?.key || null;
+  deploymentUi.renderRoster(engine.state.rosterPlayer || [], initialKey);
 
   // Highlight Southern Deployment Zone (Rows 48–55)
   const zoneTiles: Array<{ c: number; r: number }> = [];
@@ -45,9 +46,19 @@ dom.onStartGame = (p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortR
 };
 
 // Wire Deployment UI events
+deploymentUi.onSelectCard = (cardKey: string) => {
+  deploymentUi.selectedCardKey = cardKey;
+  deploymentUi.renderRoster(engine.state.rosterPlayer || [], cardKey);
+};
+
+deploymentUi.onUndeployCard = (cardKey: string) => {
+  engine.undeployPlayerCard(cardKey);
+  deploymentUi.renderRoster(engine.state.rosterPlayer || [], cardKey);
+};
+
 deploymentUi.onAutoDeploy = () => {
   engine.autoDeployPlayer();
-  deploymentUi.renderRoster(engine.state.rosterPlayer || []);
+  deploymentUi.renderRoster(engine.state.rosterPlayer || [], null);
   sfx('footsteps');
 };
 
@@ -175,7 +186,7 @@ container.addEventListener('pointerdown', (e: MouseEvent) => {
       const card = engine.state.rosterPlayer?.find(c => c.unitRef?.id === clickedExistingUnit.id);
       if (card) {
         engine.undeployPlayerCard(card.key);
-        deploymentUi.renderRoster(engine.state.rosterPlayer || [], deploymentUi.selectedCardKey);
+        deploymentUi.renderRoster(engine.state.rosterPlayer || [], card.key);
       }
       return;
     }
@@ -185,14 +196,13 @@ container.addEventListener('pointerdown', (e: MouseEvent) => {
       if (deploymentUi.selectedCardKey) {
         const deployed = engine.deployPlayerCard(deploymentUi.selectedCardKey, hit.c, hit.r);
         if (deployed) {
-          deploymentUi.clearSelection();
-          deploymentUi.renderRoster(engine.state.rosterPlayer || []);
+          const nextUnplaced = engine.state.rosterPlayer?.find(c => !c.placed);
+          deploymentUi.renderRoster(engine.state.rosterPlayer || [], nextUnplaced ? nextUnplaced.key : null);
         }
       } else if (clickedExistingUnit) {
         // Select corresponding dock card
         const card = engine.state.rosterPlayer?.find(c => c.unitRef?.id === clickedExistingUnit.id);
         if (card) {
-          deploymentUi.selectedCardKey = card.key;
           deploymentUi.renderRoster(engine.state.rosterPlayer || [], card.key);
         }
       }

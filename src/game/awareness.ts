@@ -91,9 +91,18 @@ export function checkUnitLineOfSight(a: any, b: any): boolean {
 }
 
 export function updateFogOfWar(state: GameState): void {
-  if (!state.fow) {
+  if (!state.fow || state.fow.length === 0) {
     state.fow = [];
     for (let r = 0; r < ROWS; r++) state.fow[r] = new Array(COLS).fill(0);
+  }
+
+  if (state.phase === 'deployment') {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        state.fow[r][c] = 2;
+      }
+    }
+    return;
   }
 
   // Degrade current visible (2) to explored (1)
@@ -134,7 +143,7 @@ export function updatePlayerAwareness(
   playerAwareTiles.clear();
 
   if (gameState === 'DEPLOYMENT') {
-    for (let z = Math.max(0, PLAYER_DEPLOY_MIN_Z - 6); z < ROWS; z++) {
+    for (let z = 0; z < ROWS; z++) {
       for (let x = 0; x < COLS; x++) {
         playerAwareTiles.add(key(x, z));
       }
