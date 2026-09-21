@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Unit } from '../data/types';
+import type { Unit } from '../data/types';
 import { cheb, worldX, worldZ, COLS, TILE_SIZE, key } from '../data/constants';
 import { sfx } from '../audio/synth';
 import { logCombat } from '../ui/combat-log';
@@ -12,10 +12,14 @@ import { setActionSavedCam, clearActionSavedCam } from './movement';
 export const d6 = (): number => Math.floor(Math.random() * 6) + 1;
 
 export function updateSquadCasualties(unit: Unit): void {
+  if (!unit || !unit.model || !unit.model.userData) return;
   const figures = unit.model.userData.figures;
   if (!figures) return;
-  const hpPerModel = unit.maxhp / unit.squadSize;
-  const modelsLiving = Math.max(0, Math.ceil(unit.hp / hpPerModel));
+  const maxhp = unit.maxhp || unit.maxWounds || 5;
+  const curhp = unit.hp || unit.wounds || 0;
+  const squadSize = unit.squadSize || 1;
+  const hpPerModel = maxhp / squadSize;
+  const modelsLiving = Math.max(0, Math.ceil(curhp / hpPerModel));
 
   let casualtyOccurred = false;
   for (let i = figures.length - 1; i >= 0; i--) {
@@ -45,52 +49,63 @@ export function updateSquadCasualties(unit: Unit): void {
 
 export function killUnit(
   u: Unit,
-  scene: THREE.Scene,
+  scene?: THREE.Scene,
   onAfterKill?: () => void
 ): void {
   u.alive = false;
   u.dead = true;
   sfx.death();
-  showWorldText('SQUAD DESTROYED!', u.model.position, '#dc2626');
-  logCombat(`💀 <b>${u.name}</b> has been wiped out!`, u.team);
+  if (u.model) {
+    showWorldText('SQUAD DESTROYED!', u.model.position, '#dc2626');
+  }
+  logCombat(`💀 <b>${u.name}</b> has been wiped out!`, 'morale');
 
-  const initScale = u.model.scale.clone();
-  addTween(
-    0.7,
-    p => {
-      u.model.rotation.x = p * (Math.PI / 2);
-      u.model.position.y = -p * 0.3;
-      u.model.scale.copy(initScale).multiplyScalar(Math.max(1 - p * 0.4, 0.01));
-    },
-    () => {
-      scene.remove(u.model);
-      if (onAfterKill) onAfterKill();
-    }
-  );
+  if (u.model && scene) {
+    const initScale = u.model.scale.clone();
+    addTween(
+      0.7,
+      p => {
+        u.model.rotation.x = p * (Math.PI / 2);
+        u.model.position.y = -p * 0.3;
+        u.model.scale.copy(initScale).multiplyScalar(Math.max(1 - p * 0.4, 0.01));
+      },
+      () => {
+        scene.remove(u.model);
+        if (onAfterKill) onAfterKill();
+      }
+    );
+  } else if (onAfterKill) {
+    onAfterKill();
+  }
 }
 
 export function applyDamage(
   target: Unit,
   dmg: number,
-  unitsList: Unit[],
-  scene: THREE.Scene,
-  isBusy: () => boolean,
+  unitsList: Unit[] = [],
+  scene?: THREE.Scene,
+  isBusy: () => boolean = () => false,
   onUpdateDatasheet?: () => void,
   onCheckGameEnd?: () => void
 ): void {
   const prevFiguresLiving = getSurvivingFigures(target).length;
-  target.hp -= dmg;
+  target.hp = (target.hp !== undefined ? target.hp : target.wounds) - dmg;
+  target.wounds = target.hp;
   sfx.hit();
-  showWorldText(`-${dmg} DMG`, target.model.position, '#ef4444');
+  if (target.model) {
+    showWorldText(`-${dmg} DMG`, target.model.position, '#ef4444');
+  }
   logCombat(
     `💥 <b>${target.name}</b> takes <b>${dmg}</b> damage! (${Math.max(
       target.hp,
       0
-    )}/${target.maxhp} HP remaining)`,
-    target.team
+    )}/${target.maxhp || target.maxWounds} HP remaining)`,
+    'combat'
   );
 
-  spawnHitSparks(target.model.position, scene);
+  if (scene && target.model) {
+    spawnHitSparks(target.model.position, scene);
+  }
   updateSquadCasualties(target);
 
   const currentFiguresLiving = getSurvivingFigures(target).length;
@@ -108,38 +123,78 @@ export function applyDamage(
 export function resolveAttack(
   attacker: Unit,
   target: Unit,
-  unitsList: Unit[],
-  scene: THREE.Scene,
-  camera: THREE.Camera,
-  controlsTarget: THREE.Vector3,
-  setBusy: (b: boolean) => void,
-  isBusy: () => boolean,
+  unitsList: Unit[] = [],
+  scene?: THREE.Scene,
+  camera?: THREE.Camera,
+  controlsTarget?: THREE.Vector3,
+  setBusy?: (b: boolean) => void,
+  isBusy?: () => boolean,
   onComplete?: () => void,
   onUpdateDatasheet?: () => void,
   onCheckGameEnd?: () => void
-): void {
+): { totalDamage: number; casualties: number } {
+  // If called without full interactive 3D context, resolve synchronously
+  if (!scene || !camera || !setBusy || !isBusy) {
+    const attackerDef = attacker.def;
+    const targetDef = target.def;
+
+    const hitRoll = d6();
+    const reqHit = attackerDef?.bs || 3;
+    if (hitRoll < reqHit) {
+      logCombat(`🎲 To Hit: Rolled <b>[${hitRoll}]</b> (Needed ${reqHit}+) &rarr; MISS!`, 'combat');
+      return { totalDamage: 0, casualties: 0 };
+    }
+
+    const woundRoll = d6();
+    const reqWound = (attackerDef?.s || 4) >= (targetDef?.t || 4) ? 4 : 5;
+    if (woundRoll < reqWound) {
+      logCombat(`🎲 To Wound: Rolled <b>[${woundRoll}]</b> (Needed ${reqWound}+) &rarr; FAILED TO WOUND!`, 'combat');
+      return { totalDamage: 0, casualties: 0 };
+    }
+
+    const saveRoll = d6();
+    const reqSave = targetDef?.sv || 3;
+    if (saveRoll >= reqSave) {
+      logCombat(`🎲 Armor Save: Rolled <b>[${saveRoll}]</b> (Needed ${reqSave}+) &rarr; ARMOR SAVED!`, 'combat');
+      return { totalDamage: 0, casualties: 0 };
+    }
+
+    const dmg = attackerDef?.dmg || 2;
+    target.wounds = Math.max(0, (target.wounds || target.hp || 5) - dmg);
+    target.hp = target.wounds;
+    updateSquadCasualties(target);
+    return { totalDamage: dmg, casualties: target.wounds <= 0 ? 1 : 0 };
+  }
+
+  // Interactive full 3D combat resolution
   setBusy(true);
   attacker.hasAttacked = true;
 
   const targetDist = cheb(attacker, target);
   const isMeleeCombat = targetDist <= 1 && attacker.hasMelee;
-  const attackDamage = isMeleeCombat ? attacker.meleeDmg : attacker.dmg;
+  const attackDamage = isMeleeCombat ? (attacker.meleeDmg || 2) : (attacker.dmg || 2);
   const weaponDesc = isMeleeCombat ? 'Melee Strike' : 'Ranged Volley';
 
   const preActionCamPos = camera.position.clone();
-  const preActionCamTarget = controlsTarget.clone();
+  const preActionCamTarget = (controlsTarget || new THREE.Vector3()).clone();
   setActionSavedCam(preActionCamPos, preActionCamTarget);
 
   // Face target
-  const targetWorld = new THREE.Vector3(worldX(target.x), 0, worldZ(target.z));
-  const attackerWorld = new THREE.Vector3(worldX(attacker.x), 0, worldZ(attacker.z));
+  const targetWorld = new THREE.Vector3(worldX(target.c !== undefined ? target.c : target.x), 0, worldZ(target.r !== undefined ? target.r : target.z));
+  const attackerWorld = new THREE.Vector3(worldX(attacker.c !== undefined ? attacker.c : attacker.x), 0, worldZ(attacker.r !== undefined ? attacker.r : attacker.z));
   const lookDir = targetWorld.clone().sub(attackerWorld).normalize();
   attacker.model.rotation.y = Math.atan2(lookDir.x, lookDir.z);
 
+  const ux = attacker.c !== undefined ? attacker.c : attacker.x;
+  const uz = attacker.r !== undefined ? attacker.r : attacker.z;
+  const tx = target.c !== undefined ? target.c : target.x;
+  const tz = target.r !== undefined ? target.r : target.z;
+
   const isAttackVisibleToPlayer =
     attacker.team === 'player' ||
-    playerAwareTiles.has(key(attacker.x, attacker.z)) ||
-    playerAwareTiles.has(key(target.x, target.z));
+    attacker.player === 1 ||
+    playerAwareTiles.has(key(ux, uz)) ||
+    playerAwareTiles.has(key(tx, tz));
   const useActionCam = getActionCamEnabled() && isAttackVisibleToPlayer;
 
   if (useActionCam) {
@@ -174,7 +229,7 @@ export function resolveAttack(
   const finishAttack = (delay = 700) => {
     setTimeout(() => {
       const shouldReturnCamera =
-        useActionCam && preActionCamPos && preActionCamTarget && attacker.team === 'player';
+        useActionCam && preActionCamPos && preActionCamTarget && (attacker.team === 'player' || attacker.player === 1);
       if (shouldReturnCamera) {
         animateCameraTo(preActionCamPos, preActionCamTarget, 0.65);
       }
@@ -188,31 +243,30 @@ export function resolveAttack(
 
   const startCombatAction = () => {
     const hitRoll = d6();
-    const reqHit = isMeleeCombat ? attacker.def.ws : attacker.def.bs;
+    const reqHit = isMeleeCombat ? (attacker.def?.ws || 3) : (attacker.def?.bs || 3);
     const isHit = hitRoll >= reqHit;
 
     sfx.dice();
     logCombat(
-      `<b>${attacker.name}</b> attacks <b>${target.name}</b> with <i>${attacker.def.weapon}</i> (${weaponDesc}):`,
-      attacker.team
+      `<b>${attacker.name}</b> attacks <b>${target.name}</b> with <i>${attacker.def?.weapon || 'Weapons'}</i> (${weaponDesc}):`,
+      'combat'
     );
     logCombat(
       `🎲 To Hit: Rolled <b>[${hitRoll}]</b> (Needed ${reqHit}+) &rarr; ${
         isHit ? '<span style="color:#34d399">HIT!</span>' : '<span style="color:#f87171">MISS!</span>'
       }`,
-      attacker.team,
-      true
+      'combat'
     );
 
     if (!isHit) {
-      if (!isMeleeCombat) spawnSquadVolley(attacker, target, false, scene);
+      if (!isMeleeCombat && scene) spawnSquadVolley(attacker, target, false, scene);
       showWorldText('MISS!', target.model.position, '#9ca3af');
       finishAttack(650);
       return;
     }
 
     const woundRoll = d6();
-    const reqWound = attacker.def.s >= target.def.t ? 4 : 5;
+    const reqWound = (attacker.def?.s || 4) >= (target.def?.t || 4) ? 4 : 5;
     const isWound = woundRoll >= reqWound;
     logCombat(
       `🎲 To Wound: Rolled <b>[${woundRoll}]</b> (Needed ${reqWound}+) &rarr; ${
@@ -220,19 +274,18 @@ export function resolveAttack(
           ? '<span style="color:#34d399">WOUND!</span>'
           : '<span style="color:#f87171">FAILED TO WOUND!</span>'
       }`,
-      attacker.team,
-      true
+      'combat'
     );
 
     if (!isWound) {
-      if (!isMeleeCombat) spawnSquadVolley(attacker, target, true, scene);
+      if (!isMeleeCombat && scene) spawnSquadVolley(attacker, target, true, scene);
       showWorldText('DEFLECTED!', target.model.position, '#9ca3af');
       finishAttack(650);
       return;
     }
 
     const saveRoll = d6();
-    const reqSave = target.def.sv;
+    const reqSave = target.def?.sv || 3;
     const isSaved = saveRoll >= reqSave;
     logCombat(
       `🎲 Armor Save: Rolled <b>[${saveRoll}]</b> (Needed ${reqSave}+) &rarr; ${
@@ -240,12 +293,11 @@ export function resolveAttack(
           ? '<span style="color:#38bdf8">ARMOR SAVED!</span>'
           : '<span style="color:#ef4444">SAVE FAILED!</span>'
       }`,
-      target.team,
-      true
+      'combat'
     );
 
     if (isSaved) {
-      if (!isMeleeCombat) spawnSquadVolley(attacker, target, true, scene);
+      if (!isMeleeCombat && scene) spawnSquadVolley(attacker, target, true, scene);
       showWorldText('SAVED!', target.model.position, '#38bdf8');
       sfx.hit();
       finishAttack(650);
@@ -254,13 +306,13 @@ export function resolveAttack(
 
     if (!isMeleeCombat) {
       sfx.bolter();
-      spawnSquadVolley(attacker, target, true, scene);
+      if (scene) spawnSquadVolley(attacker, target, true, scene);
       setTimeout(() => {
         applyDamage(target, attackDamage, unitsList, scene, isBusy, onUpdateDatasheet, onCheckGameEnd);
         finishAttack(500);
       }, 280);
     } else {
-      if (attacker.def.factionId === 'tyranids') sfx.hit();
+      if (attacker.def?.factionId === 'tyranids') sfx.hit();
       else if (attacker.type === 'sm_assault' || attacker.type === 'c_raptors') sfx.chainsword();
       else sfx.powerWeapon();
 
@@ -273,4 +325,6 @@ export function resolveAttack(
 
   const camArrivalDelay = useActionCam ? 1900 : 50;
   setTimeout(startCombatAction, camArrivalDelay);
+
+  return { totalDamage: attackDamage, casualties: 0 };
 }

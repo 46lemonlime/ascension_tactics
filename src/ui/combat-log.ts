@@ -13,6 +13,7 @@ export class CombatLogUI {
       this.container.appendChild(list);
     }
     this.listElement = list;
+    activeLogUI = this;
   }
 
   public log(message: string, type: 'info' | 'combat' | 'morale' | 'alert' | 'success' = 'info'): void {
@@ -45,5 +46,15 @@ export class CombatLogUI {
 
   public clear(): void {
     this.listElement.innerHTML = '';
+  }
+}
+
+let activeLogUI: CombatLogUI | null = null;
+
+export function logCombat(message: string, type: 'info' | 'combat' | 'morale' | 'alert' | 'success' = 'info'): void {
+  if (activeLogUI) {
+    activeLogUI.log(message, type);
+  } else {
+    console.log(`[COMBAT-LOG] (${type}) ${message}`);
   }
 }

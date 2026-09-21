@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Unit, MoraleState, Team } from '../data/types';
+import type { Unit, MoraleState, Team } from '../data/types';
 import { logCombat } from '../ui/combat-log';
 import { showWorldText } from './effects';
 import { FormationSystem } from './formation';
@@ -8,6 +8,7 @@ import { canFitUnit } from './pathfinding';
 import { animateMovePath } from './movement';
 
 export function getSurvivingFigures(unit: Unit) {
+  if (!unit || !unit.model || !unit.model.userData || !unit.model.userData.figures) return [];
   return unit.model.userData.figures.filter((f: any) => f.alive);
 }
 
@@ -15,8 +16,8 @@ export function restructureSquadFormation(unit: Unit): void {
   if (!unit || !unit.model || !unit.model.userData || !unit.model.userData.figures) return;
   const living = getSurvivingFigures(unit);
   if (!living.length) return;
-  const fType = (unit.def.formation && unit.def.formation.type) || 'wedge';
-  const spacing = (unit.def.formation && unit.def.formation.spacing) || 1.45;
+  const fType = (unit.def?.formation && unit.def.formation.type) || 'wedge';
+  const spacing = (unit.def?.formation && unit.def.formation.spacing) || 1.45;
   const newOffsets = FormationSystem.getOffsets(unit.squadSize, fType, spacing, living.length);
 
   const anchorX = unit.model.position.x;
@@ -39,7 +40,7 @@ export function triggerBrokenFlee(unit: Unit, unitsList: Unit[], isBusy: () => b
   let nearestEnemy: Unit | null = null;
   let minDist = 9999;
   unitsList
-    .filter(u => u.alive && u.team !== unit.team)
+    .filter(u => u.alive && (u.team !== unit.team || u.player !== unit.player))
     .forEach(enemy => {
       const d = cheb(unit, enemy);
       if (d < minDist) {
@@ -48,19 +49,22 @@ export function triggerBrokenFlee(unit: Unit, unitsList: Unit[], isBusy: () => b
       }
     });
 
-  const homeZ = unit.team === 'player' ? 52 : 2;
+  const homeZ = unit.team === 'player' || unit.player === 1 ? 52 : 2;
+  const ux = unit.c !== undefined ? unit.c : unit.x;
+  const uz = unit.r !== undefined ? unit.r : unit.z;
+  const ex = nearestEnemy ? (nearestEnemy.c !== undefined ? nearestEnemy.c : nearestEnemy.x) : ux;
   const dirX = nearestEnemy
-    ? Math.sign(unit.x - nearestEnemy.x) || (Math.random() < 0.5 ? 1 : -1)
+    ? Math.sign(ux - ex) || (Math.random() < 0.5 ? 1 : -1)
     : 0;
-  const dirZ = Math.sign(homeZ - unit.z) || (unit.team === 'player' ? 1 : -1);
+  const dirZ = Math.sign(homeZ - uz) || (unit.player === 1 ? 1 : -1);
 
   let bestTile: { x: number; z: number } | null = null;
   const candidates = [
-    { x: unit.x + dirX * 2, z: unit.z + dirZ * 2 },
-    { x: unit.x + dirX, z: unit.z + dirZ * 2 },
-    { x: unit.x, z: unit.z + dirZ * 2 },
-    { x: unit.x + dirX * 2, z: unit.z + dirZ },
-    { x: unit.x + dirX, z: unit.z + dirZ }
+    { x: ux + dirX * 2, z: uz + dirZ * 2 },
+    { x: ux + dirX, z: uz + dirZ * 2 },
+    { x: ux, z: uz + dirZ * 2 },
+    { x: ux + dirX * 2, z: uz + dirZ },
+    { x: ux + dirX, z: uz + dirZ }
   ];
 
   for (const c of candidates) {
@@ -80,7 +84,7 @@ export function triggerBrokenFlee(unit: Unit, unitsList: Unit[], isBusy: () => b
             unit.model.position.clone().add(new THREE.Vector3(0, 3, 0)),
             '#dc2626'
           );
-          logCombat(`🏃 <b>${unit.name}</b> broke rank and fled in panic!`, unit.team, true);
+          logCombat(`🏃 <b>${unit.name}</b> broke rank and fled in panic!`, 'morale');
         });
       }
     }, 450);
@@ -91,14 +95,17 @@ export const MoraleSystem = {
   getCohesionFactor(state: MoraleState): number {
     switch (state) {
       case 'STEADY':
+      case 'steady':
         return 1.0;
       case 'SHAKEN':
+      case 'shaken':
         return 0.75;
       case 'DISTRESSED':
         return 0.4;
       case 'PANICKED':
         return 0.15;
       case 'BROKEN':
+      case 'broken':
         return 0.0;
       default:
         return 1.0;
@@ -116,14 +123,17 @@ export const MoraleSystem = {
   getStateColor(state: MoraleState): string {
     switch (state) {
       case 'STEADY':
+      case 'steady':
         return '#34d399';
       case 'SHAKEN':
+      case 'shaken':
         return '#facc15';
       case 'DISTRESSED':
         return '#fb923c';
       case 'PANICKED':
         return '#f87171';
       case 'BROKEN':
+      case 'broken':
         return '#dc2626';
       default:
         return '#34d399';
@@ -137,27 +147,42 @@ export const MoraleSystem = {
     unitsList: Unit[],
     isBusy: () => boolean
   ): void {
-    if (!unit || !unit.morale) return;
-    const loss = dmg * 5 + casualties * (unit.morale.casualtyPenalty || 20);
-    const oldState = unit.morale.state;
-    unit.morale.current = Math.max(0, unit.morale.current - loss);
-    unit.morale.state = this.getState(unit.morale.current);
+    if (!unit) return;
+    const moraleObj = typeof unit.morale === 'object' ? unit.morale : null;
+    if (moraleObj) {
+      const loss = dmg * 5 + casualties * (moraleObj.casualtyPenalty || 20);
+      const oldState = moraleObj.state;
+      moraleObj.current = Math.max(0, moraleObj.current - loss);
+      moraleObj.state = this.getState(moraleObj.current);
+      unit.moraleState = moraleObj.state === 'BROKEN' ? 'broken' : moraleObj.state === 'SHAKEN' ? 'shaken' : 'steady';
 
-    if (unit.morale.state !== oldState) {
-      const color = this.getStateColor(unit.morale.state);
-      showWorldText(
-        `MORALE: ${unit.morale.state}!`,
-        unit.model.position.clone().add(new THREE.Vector3(0, 3, 0)),
-        color
-      );
-      logCombat(
-        `<b>${unit.name}</b> morale dropped to <b style="color:${color}">${unit.morale.state}</b> (${unit.morale.current}%)!`,
-        unit.team,
-        true
-      );
+      if (moraleObj.state !== oldState) {
+        const color = this.getStateColor(moraleObj.state);
+        showWorldText(
+          `MORALE: ${moraleObj.state}!`,
+          unit.model.position.clone().add(new THREE.Vector3(0, 3, 0)),
+          color
+        );
+        logCombat(
+          `<b>${unit.name}</b> morale dropped to <b style="color:${color}">${moraleObj.state}</b> (${moraleObj.current}%)!`,
+          'morale'
+        );
 
-      if (unit.morale.state === 'BROKEN') {
-        triggerBrokenFlee(unit, unitsList, isBusy);
+        if (moraleObj.state === 'BROKEN') {
+          unit.isBroken = true;
+          triggerBrokenFlee(unit, unitsList, isBusy);
+        }
+      }
+    } else {
+      const currentVal = typeof unit.morale === 'number' ? unit.morale : 7;
+      if (casualties > 0) {
+        const test = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
+        if (test > currentVal) {
+          unit.moraleState = 'broken';
+          unit.isBroken = true;
+          logCombat(`<b>${unit.name}</b> failed battleshock test and is BROKEN!`, 'morale');
+          triggerBrokenFlee(unit, unitsList, isBusy);
+        }
       }
     }
   },
@@ -166,18 +191,36 @@ export const MoraleSystem = {
     unitsList
       .filter(u => u.alive && u.team === team && u.morale)
       .forEach(u => {
-        const oldState = u.morale.state;
-        u.morale.current = Math.min(100, u.morale.current + (u.morale.recoverRate || 15));
-        u.morale.state = this.getState(u.morale.current);
-        if (oldState === 'BROKEN' && u.morale.state !== 'BROKEN') {
-          showWorldText(
-            'RALLIED!',
-            u.model.position.clone().add(new THREE.Vector3(0, 3, 0)),
-            '#34d399'
-          );
-          logCombat(`<b>${u.name}</b> has <b style="color:#34d399">RALLIED</b> and reformed rank!`, u.team);
-          restructureSquadFormation(u);
+        if (typeof u.morale === 'object') {
+          const oldState = u.morale.state;
+          u.morale.current = Math.min(100, u.morale.current + (u.morale.recoverRate || 15));
+          u.morale.state = this.getState(u.morale.current);
+          u.moraleState = u.morale.state === 'BROKEN' ? 'broken' : u.morale.state === 'SHAKEN' ? 'shaken' : 'steady';
+          if (oldState === 'BROKEN' && u.morale.state !== 'BROKEN') {
+            u.isBroken = false;
+            showWorldText(
+              'RALLIED!',
+              u.model.position.clone().add(new THREE.Vector3(0, 3, 0)),
+              '#34d399'
+            );
+            logCombat(`<b>${u.name}</b> has <b style="color:#34d399">RALLIED</b> and reformed rank!`, 'morale');
+            restructureSquadFormation(u);
+          }
         }
       });
   }
 };
+
+export function rallyUnit(unit: Unit): { success: boolean } {
+  if (!unit) return { success: false };
+  if (typeof unit.morale === 'object') {
+    unit.morale.current = Math.min(100, unit.morale.current + 40);
+    unit.morale.state = MoraleSystem.getState(unit.morale.current);
+    unit.moraleState = unit.morale.state === 'BROKEN' ? 'broken' : unit.morale.state === 'SHAKEN' ? 'shaken' : 'steady';
+  } else {
+    unit.morale = unit.maxMorale || 7;
+    unit.moraleState = 'steady';
+  }
+  unit.isBroken = false;
+  return { success: true };
+}

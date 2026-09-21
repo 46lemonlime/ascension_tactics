@@ -7,6 +7,34 @@ export interface CameraHistoryEntry {
   target: THREE.Vector3;
 }
 
+let activeCameraController: CameraController | null = null;
+
+export function getActiveCameraController(): CameraController | null {
+  return activeCameraController;
+}
+
+export function setActiveCameraController(ctrl: CameraController | null): void {
+  activeCameraController = ctrl;
+}
+
+export function getActionCamEnabled(): boolean {
+  return activeCameraController ? activeCameraController.actionCamEnabled : true;
+}
+
+export function setActionCamEnabled(val: boolean): void {
+  if (activeCameraController) {
+    activeCameraController.actionCamEnabled = val;
+  }
+}
+
+export function animateCameraTo(targetEye: THREE.Vector3 | { x: number; y: number; z: number }, targetLookAt: THREE.Vector3 | { x: number; y: number; z: number }, durationMs: number = 400): void {
+  if (activeCameraController) {
+    const eye = targetEye instanceof THREE.Vector3 ? targetEye : new THREE.Vector3(targetEye.x, targetEye.y, targetEye.z);
+    const lookAt = targetLookAt instanceof THREE.Vector3 ? targetLookAt : new THREE.Vector3(targetLookAt.x, targetLookAt.y, targetLookAt.z);
+    activeCameraController.animateTo(eye, lookAt, durationMs);
+  }
+}
+
 export class CameraController {
   public camera: THREE.PerspectiveCamera;
   public controls: OrbitControls;
@@ -24,6 +52,8 @@ export class CameraController {
     this.controls.minDistance = 15;
     this.controls.maxDistance = 280;
     this.controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+    activeCameraController = this;
 
     // Track user camera move starts to save undo history
     this.controls.addEventListener('start', () => {

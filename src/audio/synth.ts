@@ -62,7 +62,7 @@ export function noiseBurst(dur: number, vol: number, cutoff = 1500): void {
   s.start();
 }
 
-export const sfx = {
+const sfxMethods = {
   bolter(): void {
     tone(190, 0.14, 'sawtooth', 0.12, 60);
     noiseBurst(0.12, 0.14, 2500);
@@ -97,5 +97,35 @@ export const sfx = {
   teleport(): void {
     tone(300, 0.4, 'sine', 0.18, 950);
     noiseBurst(0.25, 0.12, 4000);
+  },
+  horn(): void {
+    tone(220, 0.6, 'sawtooth', 0.2, 180);
+    tone(440, 0.5, 'sine', 0.1, 350);
+  },
+  explosion(): void {
+    tone(90, 0.6, 'sawtooth', 0.25, 30);
+    noiseBurst(0.6, 0.25, 800);
+  },
+  footsteps(): void {
+    noiseBurst(0.04, 0.06, 1000);
   }
 };
+
+type SfxFunction = ((name?: string) => void) & typeof sfxMethods;
+
+const sfxCallable = function (name?: string) {
+  if (!name) {
+    sfxMethods.click();
+    return;
+  }
+  const fn = (sfxMethods as Record<string, () => void>)[name];
+  if (typeof fn === 'function') {
+    fn();
+  } else {
+    sfxMethods.click();
+  }
+} as SfxFunction;
+
+Object.assign(sfxCallable, sfxMethods);
+
+export const sfx = sfxCallable;

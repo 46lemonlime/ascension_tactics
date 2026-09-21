@@ -1246,8 +1246,35 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
   }
 };
 
-// Enrich all UNIT_DEFS with physical profiles, dynamic formations, and morale schemas
+// Enrich all UNIT_DEFS with physical profiles, dynamic formations, morale schemas, and combat profile fields
 Object.values(UNIT_DEFS).forEach(def => {
+  def.id = def.id || def.type;
+  def.wounds = def.wounds !== undefined ? def.wounds : def.hp;
+  def.hp = def.wounds;
+  def.movement = def.movement !== undefined ? def.movement : def.m;
+  def.m = def.movement;
+  def.leadership = def.leadership !== undefined ? def.leadership : 7;
+  def.toughness = def.toughness !== undefined ? def.toughness : def.t;
+  def.t = def.toughness;
+  def.armorSave = def.armorSave !== undefined ? def.armorSave : def.sv;
+  def.sv = def.armorSave;
+  def.role = def.role || def.title || (def.isCharacter ? 'Commander' : def.isLarge ? 'Heavy Support' : 'Troops');
+  def.size = def.size || (def.isLarge ? 2 : (def.baseRadius && def.baseRadius > 1.8 ? 2 : 1));
+  def.tags = def.tags || [def.factionId, def.isCharacter ? 'character' : 'infantry', def.isLarge ? 'vehicle' : ''];
+
+  if (!def.weapons || def.weapons.length === 0) {
+    def.weapons = [
+      {
+        name: def.weapon || 'Standard Armament',
+        range: def.range || 18,
+        attacks: def.squadSize || 1,
+        strength: def.s || 4,
+        ap: Math.max(0, 4 - (def.sv || 3)),
+        damage: def.dmg || 2
+      }
+    ];
+  }
+
   const isLarge = !!def.isLarge;
   const isHeavy = (def.s >= 5 || def.t >= 5) && !isLarge;
   const isSwarm = def.squadSize >= 5;
@@ -1289,3 +1316,6 @@ Object.values(UNIT_DEFS).forEach(def => {
     casualtyPenalty: 20
   };
 });
+
+export const UNIT_ROSTER = UNIT_DEFS;
+

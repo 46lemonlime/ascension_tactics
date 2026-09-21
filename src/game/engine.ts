@@ -7,7 +7,7 @@ import { rallyUnit } from './morale';
 import { pathTo } from './pathfinding';
 import { PhysicsEngine } from './physics';
 import { sfx } from '../audio/synth';
-import type { GameState, Unit, UnitDef, MissionType, Objective } from '../data/types';
+import type { GameState, Unit, UnitDef, MissionType } from '../data/types';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
 import type { DatasheetUI } from '../ui/datasheet-ui';
@@ -127,30 +127,55 @@ export class GameEngine {
   }
 
   public deployUnitOnBoard(unitDef: UnitDef, player: number, c: number, r: number, isVip: boolean = false): Unit {
+    const worldPos = gridToWorld(c, r);
+    const faction = Object.values(FACTIONS).find(f => f.roster?.some(u => u.id === unitDef.id || u.type === unitDef.type));
+
     const unit: Unit = {
       id: this.nextUnitId++,
-      unitDefId: unitDef.id,
+      unitDefId: unitDef.id || unitDef.type,
+      type: unitDef.type || unitDef.id,
       player,
+      team: player === 1 ? 'player' : 'enemy',
+      name: unitDef.name,
+      def: unitDef,
       c,
       r,
-      size: unitDef.size,
+      x: worldPos.x,
+      z: worldPos.z,
+      px: worldPos.x,
+      pz: worldPos.z,
+      size: unitDef.size || 1,
       squadSize: unitDef.squadSize || 1,
       squadCasualties: new Array(unitDef.squadSize || 1).fill(false),
-      wounds: unitDef.wounds,
-      maxWounds: unitDef.wounds,
-      morale: unitDef.leadership,
-      maxMorale: unitDef.leadership,
+      wounds: unitDef.wounds || unitDef.hp || 5,
+      maxWounds: unitDef.wounds || unitDef.hp || 5,
+      hp: unitDef.hp || unitDef.wounds || 5,
+      maxhp: unitDef.hp || unitDef.wounds || 5,
+      morale: unitDef.leadership || 7,
+      maxMorale: unitDef.leadership || 7,
       moraleState: 'steady',
       hasMoved: false,
       hasAttacked: false,
       isBroken: false,
       isVip,
-      rotation: player === 1 ? Math.PI : 0
+      alive: true,
+      dead: false,
+      rotation: player === 1 ? Math.PI : 0,
+      angle: player === 1 ? Math.PI : 0,
+      anchor: { x: worldPos.x, z: worldPos.z },
+      m: unitDef.movement || unitDef.m || 6,
+      awareness: unitDef.awareness || 16,
+      range: unitDef.range || 18,
+      dmg: unitDef.dmg || 2,
+      ranged: unitDef.ranged ?? true,
+      hasMelee: unitDef.hasMelee ?? true,
+      meleeDmg: unitDef.meleeDmg || 2,
+      model: new THREE.Group()
     };
 
+    const mesh = this.scene.addOrUpdateUnitMesh(unit, unitDef, faction);
+    unit.model = mesh;
     this.state.units.push(unit);
-    const faction = Object.values(FACTIONS).find(f => f.roster.some(u => u.id === unitDef.id));
-    this.scene.addOrUpdateUnitMesh(unit, unitDef, faction);
     return unit;
   }
 
@@ -179,7 +204,7 @@ export class GameEngine {
     if (unitId !== null) {
       const unit = this.state.units.find(u => u.id === unitId);
       if (unit) {
-        const unitDef = UNIT_ROSTER[unit.unitDefId];
+        const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
         const mesh = this.scene.unitMeshes.get(unit.id);
         if (mesh) {
           const ring = mesh.getObjectByName('selection_ring');
@@ -204,15 +229,16 @@ export class GameEngine {
     if (!unit || unit.hasMoved) return;
 
     this.actionMode = 'move';
-    const unitDef = UNIT_ROSTER[unit.unitDefId];
+    const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+    const moveRange = unitDef.movement || unit.m || 6;
     const reachTiles: Array<{ c: number; r: number }> = [];
 
-    for (let dr = -unitDef.movement; dr <= unitDef.movement; dr++) {
-      for (let dc = -unitDef.movement; dc <= unitDef.movement; dc++) {
+    for (let dr = -moveRange; dr <= moveRange; dr++) {
+      for (let dc = -moveRange; dc <= moveRange; dc++) {
         const nc = unit.c + dc;
         const nr = unit.r + dr;
         if (nc >= 0 && nc < GRID_COLS && nr >= 0 && nr < GRID_ROWS) {
-          if (chebyshevDist(unit.c, unit.r, nc, nr) <= unitDef.movement) {
+          if (chebyshevDist(unit.c, unit.r, nc, nr) <= moveRange) {
             reachTiles.push({ c: nc, r: nr });
           }
         }
@@ -230,8 +256,8 @@ export class GameEngine {
     if (!unit || unit.hasAttacked) return;
 
     this.actionMode = 'shoot';
-    const unitDef = UNIT_ROSTER[unit.unitDefId];
-    const maxRange = Math.max(...unitDef.weapons.map(w => w.range));
+    const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+    const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
 
     const targetTiles: Array<{ c: number; r: number }> = [];
     this.state.units.forEach(enemy => {
@@ -280,15 +306,16 @@ export class GameEngine {
   public executeMove(unitId: number, targetC: number, targetR: number): void {
     const unit = this.state.units.find(u => u.id === unitId);
     if (!unit) return;
-    const unitDef = UNIT_ROSTER[unit.unitDefId];
+    const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+    const moveRange = unitDef.movement || unit.m || 6;
 
     const dist = chebyshevDist(unit.c, unit.r, targetC, targetR);
-    if (dist > unitDef.movement) {
+    if (dist > moveRange) {
       this.log.log('Target tile is out of movement range!', 'alert');
       return;
     }
 
-    const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size, this.state.theme, this.state.units);
+    const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units);
     if (!path || path.length === 0) {
       this.log.log('Path blocked by terrain or units!', 'alert');
       return;
@@ -296,12 +323,15 @@ export class GameEngine {
 
     unit.c = targetC;
     unit.r = targetR;
+    const worldPos = gridToWorld(targetC, targetR);
+    unit.x = worldPos.x;
+    unit.z = worldPos.z;
+    unit.anchor = { x: worldPos.x, z: worldPos.z };
     unit.hasMoved = true;
     sfx('footsteps');
 
     const mesh = this.scene.unitMeshes.get(unit.id);
     if (mesh) {
-      const worldPos = gridToWorld(targetC, targetR);
       mesh.position.set(worldPos.x, 0, worldPos.z);
     }
 
@@ -316,8 +346,8 @@ export class GameEngine {
     const defender = this.state.units.find(u => u.id === defenderId);
     if (!attacker || !defender) return;
 
-    const attackerDef = UNIT_ROSTER[attacker.unitDefId];
-    const defenderDef = UNIT_ROSTER[defender.unitDefId];
+    const attackerDef = UNIT_ROSTER[attacker.unitDefId] || attacker.def;
+    const defenderDef = UNIT_ROSTER[defender.unitDefId] || defender.def;
 
     // Check FoW gating for action camera
     const isDefenderInFoW = this.state.fow[defender.r]?.[defender.c] !== 2;
@@ -333,7 +363,7 @@ export class GameEngine {
 
     this.log.log(`[COMBAT] ${attackerDef.name} attacks ${defenderDef.name}: ${result.totalDamage} Damage dealt! (${result.casualties} casualties)`, 'combat');
 
-    if (defender.wounds <= 0) {
+    if (defender.wounds <= 0 || defender.hp <= 0) {
       this.eliminateUnit(defender);
     }
 
@@ -345,16 +375,19 @@ export class GameEngine {
     const result = rallyUnit(unit);
     if (result.success) {
       sfx('horn');
-      this.log.log(`${UNIT_ROSTER[unit.unitDefId].name} rallied successfully!`, 'success');
+      this.log.log(`${(UNIT_ROSTER[unit.unitDefId] || unit.def).name} rallied successfully!`, 'success');
     } else {
-      this.log.log(`${UNIT_ROSTER[unit.unitDefId].name} failed to rally.`, 'alert');
+      this.log.log(`${(UNIT_ROSTER[unit.unitDefId] || unit.def).name} failed to rally.`, 'alert');
     }
     this.selectUnit(unit.id);
   }
 
   public eliminateUnit(unit: Unit): void {
-    this.log.log(`[CASUALTY] ${UNIT_ROSTER[unit.unitDefId].name} was destroyed!`, 'morale');
+    const uDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+    this.log.log(`[CASUALTY] ${uDef.name} was destroyed!`, 'morale');
     sfx('explosion');
+    unit.alive = false;
+    unit.dead = true;
     this.scene.removeUnitMesh(unit.id);
     this.state.units = this.state.units.filter(u => u.id !== unit.id);
     if (this.selectedUnitId === unit.id) {
@@ -393,14 +426,14 @@ export class GameEngine {
 
     for (const unit of enemyUnits) {
       await new Promise(r => setTimeout(r, 600));
-      if (unit.wounds <= 0) continue;
+      if (unit.wounds <= 0 || unit.dead) continue;
 
       // Find closest player unit
       let closestTarget: Unit | null = null;
       let minDist = 999;
 
       this.state.units.forEach(pUnit => {
-        if (pUnit.player === 1) {
+        if (pUnit.player === 1 && !pUnit.dead) {
           const d = chebyshevDist(unit.c, unit.r, pUnit.c, pUnit.r);
           if (d < minDist) {
             minDist = d;
@@ -410,8 +443,8 @@ export class GameEngine {
       });
 
       if (closestTarget) {
-        const unitDef = UNIT_ROSTER[unit.unitDefId];
-        const maxRange = Math.max(...unitDef.weapons.map(w => w.range));
+        const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+        const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
 
         if (minDist <= maxRange && hasLineOfSight(unit.c, unit.r, closestTarget.c, closestTarget.r, this.state.theme)) {
           this.executeAttack(unit.id, closestTarget.id);
@@ -424,10 +457,14 @@ export class GameEngine {
           
           unit.c = targetC;
           unit.r = targetR;
+          const worldPos = gridToWorld(targetC, targetR);
+          unit.x = worldPos.x;
+          unit.z = worldPos.z;
+          unit.anchor = { x: worldPos.x, z: worldPos.z };
+
           const mesh = this.scene.unitMeshes.get(unit.id);
           if (mesh) {
-            const wPos = gridToWorld(targetC, targetR);
-            mesh.position.set(wPos.x, 0, wPos.z);
+            mesh.position.set(worldPos.x, 0, worldPos.z);
           }
         }
       }
@@ -462,12 +499,12 @@ export class GameEngine {
   }
 
   public checkVictoryConditions(): void {
-    const p1Alive = this.state.units.filter(u => u.player === 1 && !u.isVip);
-    const p2Alive = this.state.units.filter(u => u.player === 2);
+    const p1Alive = this.state.units.filter(u => u.player === 1 && !u.isVip && !u.dead);
+    const p2Alive = this.state.units.filter(u => u.player === 2 && !u.dead);
     const vip = this.state.units.find(u => u.isVip);
 
     if (this.state.mission === 'escort') {
-      if (vip && vip.wounds <= 0) {
+      if (vip && (vip.wounds <= 0 || vip.dead)) {
         this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => this.dom.showScreen('lobby'));
         return;
       }

@@ -1,20 +1,20 @@
-import { Unit, Figure } from '../data/types';
+import type { Unit, Figure } from '../data/types';
 import { FormationSystem } from './formation';
 import { MoraleSystem } from './morale';
 import { OBSTACLES } from '../data/themes';
 import { COLS, ROWS, TILE_SIZE, worldX, worldZ } from '../data/constants';
 
-export const PhysicsEngine = {
-  step(dt: number, unitsList: Unit[], targetUnit: Unit | null = null): void {
-    const activeUnits = targetUnit ? [targetUnit] : unitsList.filter(u => u.alive);
+export class PhysicsEngine {
+  public static step(dt: number, unitsList: Unit[], targetUnit: Unit | null = null): void {
+    const activeUnits = targetUnit ? [targetUnit] : unitsList.filter(u => u.alive && !u.dead);
     if (!activeUnits.length) return;
 
     // Gather all living figures across all units for collision / separation checks
     const allFigures: { fig: Figure; unit: Unit }[] = [];
     unitsList
-      .filter(u => u.alive)
+      .filter(u => u.alive && !u.dead)
       .forEach(u => {
-        const figures = u.model.userData.figures as Figure[] | undefined;
+        const figures = u.model?.userData?.figures as Figure[] | undefined;
         if (!figures) return;
         const living = figures.filter(f => f.alive);
         living.forEach(fig => {
@@ -23,7 +23,7 @@ export const PhysicsEngine = {
       });
 
     activeUnits.forEach(u => {
-      const figures = u.model.userData.figures as Figure[] | undefined;
+      const figures = u.model?.userData?.figures as Figure[] | undefined;
       if (!figures) return;
       const living = figures.filter(f => f.alive);
       if (!living.length) return;
@@ -48,11 +48,12 @@ export const PhysicsEngine = {
       }
 
       // 2. Multi-Model Squads (Infantry Formations & Swarms)
-      const fType = (u.def.formation && u.def.formation.type) || 'wedge';
-      const spacing = (u.def.formation && u.def.formation.spacing) || 1.45;
+      const fType = (u.def?.formation && u.def.formation.type) || 'wedge';
+      const spacing = (u.def?.formation && u.def.formation.spacing) || 1.45;
       const offsets = FormationSystem.getOffsets(u.squadSize, fType, spacing, living.length);
-      const cohesionWeight = (u.def.formation && u.def.formation.cohesionWeight) || 1.0;
-      const moraleFactor = u.morale ? MoraleSystem.getCohesionFactor(u.morale.state) : 1.0;
+      const cohesionWeight = (u.def?.formation && u.def.formation.cohesionWeight) || 1.0;
+      const moraleState = typeof u.morale === 'object' ? u.morale.state : (u.moraleState.toUpperCase() as any);
+      const moraleFactor = moraleState ? MoraleSystem.getCohesionFactor(moraleState) : 1.0;
       const effectiveCohesion = cohesionWeight * moraleFactor;
 
       const anchorX = u.model.position.x;
@@ -81,9 +82,9 @@ export const PhysicsEngine = {
         }
 
         // B. Morale Broken / Fleeing Force
-        if (u.morale && u.morale.state === 'BROKEN') {
+        if (u.moraleState === 'broken' || (typeof u.morale === 'object' && u.morale.state === 'BROKEN')) {
           const homeZ =
-            u.team === 'player'
+            u.team === 'player' || u.player === 1
               ? (52 - ROWS / 2 + 0.5) * TILE_SIZE
               : (2 - ROWS / 2 + 0.5) * TILE_SIZE;
           const toHomeZ = homeZ - fig.worldZ;
@@ -186,7 +187,7 @@ export const PhysicsEngine = {
         fig.vx = (fig.vx + ax * dt) * 0.82;
         fig.vz = (fig.vz + az * dt) * 0.82;
 
-        const maxSpd = (u.def.physical && u.def.physical.maxSpeed) || 12.0;
+        const maxSpd = (u.def?.physical && u.def.physical.maxSpeed) || 12.0;
         const spdSq = fig.vx * fig.vx + fig.vz * fig.vz;
         if (spdSq > maxSpd * maxSpd) {
           const spd = Math.sqrt(spdSq);
@@ -213,4 +214,8 @@ export const PhysicsEngine = {
       });
     });
   }
-};
+
+  public step(dt: number, unitsList: Unit[], targetUnit: Unit | null = null): void {
+    PhysicsEngine.step(dt, unitsList, targetUnit);
+  }
+}

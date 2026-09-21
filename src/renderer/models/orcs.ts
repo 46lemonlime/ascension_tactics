@@ -367,3 +367,6 @@ export function buildOrkFigure(
     figBody.add(shoota);
   }
 }
+
+export const buildOrcFigure = buildOrkFigure;
+
