@@ -7,7 +7,7 @@ import { buildNecronFigure } from './necrons';
 import { buildEldarFigure } from './eldar';
 import { buildDarkEldarFigure } from './dark_eldar';
 import { buildTyranidFigure } from './tyranids';
-import { createTauFigure as buildTauFigureDirect } from './tau';
+import { buildTauFigure } from './tau';
 import { buildVipCourierFigure } from './vip';
 
 /**
@@ -103,8 +103,8 @@ export function createTyranidFigure(unitDef: UnitDef, primaryColor: number = 0x5
   return buildFigureWithBuilder(buildTyranidFigure, unitDef, primaryColor, trimColor, isLeader);
 }
 
-export function createTauFigure(unitDef: UnitDef, primaryColor: number = 0xc2410c, trimColor: number = 0x06b6d4): THREE.Group {
-  return buildTauFigureDirect(unitDef, primaryColor, trimColor);
+export function createTauFigure(unitDef: UnitDef, primaryColor: number = 0xc2410c, trimColor: number = 0x06b6d4, isLeader = false): THREE.Group {
+  return buildFigureWithBuilder(buildTauFigure, unitDef, primaryColor, trimColor, isLeader);
 }
 
 export function createVipFigure(unitDef?: UnitDef): THREE.Group {
@@ -140,7 +140,7 @@ export function createMiniatureFigure(unitDef: UnitDef, faction: Faction | undef
     case 'tyranids':
       return createTyranidFigure(unitDef, primaryColor, trimColor, isLeader);
     case 'tau':
-      return createTauFigure(unitDef, primaryColor, trimColor);
+      return createTauFigure(unitDef, primaryColor, trimColor, isLeader);
     case 'marines':
     case 'space_marines':
     default:
@@ -175,6 +175,12 @@ export function createSquadUnitMesh(unit: Unit, unitDef: UnitDef, faction: Facti
     figure.scale.set(figureScale, figureScale, figureScale);
     figure.position.y = 0.15;
     memberRoot.add(figure);
+
+    // Propagate figure animation references to memberRoot
+    memberRoot.userData.leftLeg = figure.userData.leftLeg;
+    memberRoot.userData.rightLeg = figure.userData.rightLeg;
+    memberRoot.userData.figBody = figure.userData.figBody || figure;
+    memberRoot.userData.figure = figure;
 
     const figData: Figure = {
       root: memberRoot,

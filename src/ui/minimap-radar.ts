@@ -74,10 +74,11 @@ export class MinimapRadar {
     }
 
     // Draw Obstacles
-    const obstacles: Obstacle[] = MAP_OBSTACLES[state.theme] || MAP_OBSTACLES.jungle;
+    const obstacles: string[] = (MAP_OBSTACLES[state.theme] || MAP_OBSTACLES.jungle) as string[];
     ctx.fillStyle = '#1e293b';
-    obstacles.forEach(obs => {
-      ctx.fillRect(obs.c * cellW, obs.r * cellH, obs.w * cellW, obs.h * cellH);
+    obstacles.forEach(k => {
+      const [ox, oz] = k.split(',').map(Number);
+      ctx.fillRect(ox * cellW + 1, oz * cellH + 1, cellW - 2, cellH - 2);
     });
 
     // Draw Objectives / Extraction

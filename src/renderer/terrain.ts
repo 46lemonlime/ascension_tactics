@@ -465,12 +465,13 @@ export function createObstacleMeshes(themeId: string): THREE.Group {
 
   const obstacles = MAP_OBSTACLES[themeId] || MAP_OBSTACLES.tech;
 
-  obstacles.forEach(obs => {
-    const wx = worldX(obs.c);
-    const wz = worldZ(obs.r);
+  obstacles.forEach(k => {
+    const [x, z] = k.split(',').map(Number);
+    const wx = worldX(x);
+    const wz = worldZ(z);
     const obsGroup = new THREE.Group();
     obsGroup.position.set(wx, 0, wz);
-    const type = (obs.c * 3 + obs.r) % 3;
+    const type = (x * 3 + z) % 3;
 
     if (themeId === 'jungle') {
       buildJungleObstacle(obsGroup, type);

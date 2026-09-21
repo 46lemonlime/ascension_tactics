@@ -111,6 +111,10 @@ export function animateMovePath(
       const living = getSurvivingFigures(unit);
       const isSingleModel = unit.squadSize === 1 || sz >= 2 || living.length <= 1;
 
+      const getLeftLeg = (fig: any) => fig.root?.userData?.leftLeg || fig.root?.userData?.figure?.userData?.leftLeg;
+      const getRightLeg = (fig: any) => fig.root?.userData?.rightLeg || fig.root?.userData?.figure?.userData?.rightLeg;
+      const getFigBody = (fig: any) => fig.root?.userData?.figBody || fig.root?.userData?.figure?.userData?.figBody;
+
       if (isSingleModel) {
         const fig = living[0];
         if (fig) {
@@ -123,9 +127,12 @@ export function animateMovePath(
           fig.vz = 0;
           fig.root.position.set(0, 0, 0);
           fig.root.rotation.y = 0;
-          if (fig.root.userData.leftLeg) fig.root.userData.leftLeg.rotation.x = 0;
-          if (fig.root.userData.rightLeg) fig.root.userData.rightLeg.rotation.x = 0;
-          if (fig.root.userData.figBody) fig.root.userData.figBody.position.y = 0.2;
+          const lLeg = getLeftLeg(fig);
+          const rLeg = getRightLeg(fig);
+          const body = getFigBody(fig);
+          if (lLeg) lLeg.rotation.x = 0;
+          if (rLeg) rLeg.rotation.x = 0;
+          if (body) body.position.y = 0.2;
         }
       } else {
         const fType = (unit.def.formation && unit.def.formation.type) || 'wedge';
@@ -146,9 +153,12 @@ export function animateMovePath(
           fig.vz = 0;
           fig.root.position.set(off.x, 0, off.z);
           fig.root.rotation.y = 0;
-          if (fig.root.userData.leftLeg) fig.root.userData.leftLeg.rotation.x = 0;
-          if (fig.root.userData.rightLeg) fig.root.userData.rightLeg.rotation.x = 0;
-          if (fig.root.userData.figBody) fig.root.userData.figBody.position.y = 0.2;
+          const lLeg = getLeftLeg(fig);
+          const rLeg = getRightLeg(fig);
+          const body = getFigBody(fig);
+          if (lLeg) lLeg.rotation.x = 0;
+          if (rLeg) rLeg.rotation.x = 0;
+          if (body) body.position.y = 0.2;
         });
       }
 
@@ -197,6 +207,10 @@ export function animateMovePath(
       : Math.max(0.2, Math.min(0.32, segmentDist / (baseSpeed * 0.75)));
     const living = getSurvivingFigures(unit);
 
+    const getLeftLeg = (fig: any) => fig.root?.userData?.leftLeg || fig.root?.userData?.figure?.userData?.leftLeg;
+    const getRightLeg = (fig: any) => fig.root?.userData?.rightLeg || fig.root?.userData?.figure?.userData?.rightLeg;
+    const getFigBody = (fig: any) => fig.root?.userData?.figBody || fig.root?.userData?.figure?.userData?.figBody;
+
     let lastP = 0;
     addTween(
       runDuration,
@@ -214,7 +228,8 @@ export function animateMovePath(
         if (isHover) {
           const hoverFloat = Math.sin(p * Math.PI * 4) * 0.12;
           living.forEach((fig: any) => {
-            if (fig.root.userData.figBody) fig.root.userData.figBody.position.y = 0.2 + hoverFloat;
+            const body = getFigBody(fig);
+            if (body) body.position.y = 0.2 + hoverFloat;
           });
         } else if (isWalker) {
           const stridePhase = p * Math.PI * 2.4;
@@ -222,9 +237,12 @@ export function animateMovePath(
           const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.12;
 
           living.forEach((fig: any) => {
-            if (fig.root.userData.leftLeg) fig.root.userData.leftLeg.rotation.x = legAngle;
-            if (fig.root.userData.rightLeg) fig.root.userData.rightLeg.rotation.x = -legAngle;
-            if (fig.root.userData.figBody) fig.root.userData.figBody.position.y = 0.2 + bodyBob;
+            const lLeg = getLeftLeg(fig);
+            const rLeg = getRightLeg(fig);
+            const body = getFigBody(fig);
+            if (lLeg) lLeg.rotation.x = legAngle;
+            if (rLeg) rLeg.rotation.x = -legAngle;
+            if (body) body.position.y = 0.2 + bodyBob;
           });
         } else {
           const stridePhase = p * Math.PI * 4;
@@ -232,9 +250,12 @@ export function animateMovePath(
           const bodyBob = Math.abs(Math.sin(stridePhase)) * 0.14;
 
           living.forEach((fig: any) => {
-            if (fig.root.userData.leftLeg) fig.root.userData.leftLeg.rotation.x = legAngle;
-            if (fig.root.userData.rightLeg) fig.root.userData.rightLeg.rotation.x = -legAngle;
-            if (fig.root.userData.figBody) fig.root.userData.figBody.position.y = 0.2 + bodyBob;
+            const lLeg = getLeftLeg(fig);
+            const rLeg = getRightLeg(fig);
+            const body = getFigBody(fig);
+            if (lLeg) lLeg.rotation.x = legAngle;
+            if (rLeg) rLeg.rotation.x = -legAngle;
+            if (body) body.position.y = 0.2 + bodyBob;
           });
         }
       },

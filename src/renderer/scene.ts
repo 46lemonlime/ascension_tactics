@@ -13,6 +13,8 @@ export class GameScene {
   public renderer: THREE.WebGLRenderer;
   public cameraController: CameraController;
   public unitMeshes: Map<number, THREE.Group> = new Map();
+  public fowMeshes: Map<string, THREE.Mesh> = new Map();
+  public fowGroup: THREE.Group = new THREE.Group();
 
   private tableMatMesh!: THREE.Mesh;
   private tableMatMaterial!: THREE.MeshStandardMaterial;
@@ -124,6 +126,10 @@ export class GameScene {
     if (this.obstaclesGroup) {
       this.scene.remove(this.obstaclesGroup);
     }
+    if (this.fowGroup) {
+      this.scene.remove(this.fowGroup);
+      this.fowMeshes.clear();
+    }
 
     // 1. Rebuild Obstacles data set for the selected theme
     initObstaclesForTheme(themeId);
@@ -170,8 +176,45 @@ export class GameScene {
     this.obstaclesGroup = createObstacleMeshes(themeId);
     this.scene.add(this.obstaclesGroup);
 
-    // 6. Update atmospheric weather particles
+    // 6. Build 3D Fog of War (FoW) Shroud Overlay (40x56 grid)
+    this.fowGroup = new THREE.Group();
+    this.fowGroup.name = 'fow_group';
+    this.scene.add(this.fowGroup);
+
+    const fowGeo = new THREE.PlaneGeometry(TILE_SIZE * 1.0, TILE_SIZE * 1.0);
+    fowGeo.rotateX(-Math.PI / 2);
+
+    for (let z = 0; z < GRID_ROWS; z++) {
+      for (let x = 0; x < GRID_COLS; x++) {
+        const k = `${x},${z}`;
+        const fowMat = new THREE.MeshBasicMaterial({
+          color: 0x05080e,
+          transparent: true,
+          opacity: 0.84,
+          depthWrite: false
+        });
+        const fowMesh = new THREE.Mesh(fowGeo, fowMat);
+        const wPos = gridToWorld(x, z);
+        fowMesh.position.set(wPos.x, 0.025, wPos.z);
+        this.fowGroup.add(fowMesh);
+        this.fowMeshes.set(k, fowMesh);
+      }
+    }
+
+    // 7. Update atmospheric weather particles
     this.updateWeatherParticles(themeId);
+  }
+
+  public updateFowOverlay(playerAwareSet: Set<string>): void {
+    this.fowMeshes.forEach((mesh, k) => {
+      if (playerAwareSet.has(k)) {
+        (mesh.material as THREE.MeshBasicMaterial).opacity = 0;
+        mesh.visible = false;
+      } else {
+        (mesh.material as THREE.MeshBasicMaterial).opacity = 0.84;
+        mesh.visible = true;
+      }
+    });
   }
 
   private setupLighting(): void {

@@ -2,7 +2,7 @@ import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld } fr
 import { FACTIONS } from '../data/factions';
 import { UNIT_ROSTER } from '../data/units';
 import { buildFactionRosters } from '../data/rosters';
-import { updateFogOfWar, hasLineOfSight } from './awareness';
+import { updateFogOfWar, hasLineOfSight, updatePlayerAwareness, playerAwareTiles, enemyAwareTiles } from './awareness';
 import { resolveAttack } from './combat';
 import { rallyUnit } from './morale';
 import { pathTo } from './pathfinding';
@@ -49,12 +49,17 @@ export class GameEngine {
     this.state = this.createInitialState();
   }
 
-  private createInitialState(): GameState {
-    const fow: number[][] = [];
-    for (let r = 0; r < GRID_ROWS; r++) {
-      fow[r] = new Array(GRID_COLS).fill(0);
-    }
+  public refreshAwareness(): void {
+    updatePlayerAwareness(
+      this.state.phase === 'deployment' ? 'DEPLOYMENT' : 'BATTLE',
+      this.state.units,
+      this.scene.fowMeshes
+    );
+    updateFogOfWar(this.state);
+    this.minimap.render(this.state);
+  }
 
+  private createInitialState(): GameState {
     return {
       mission: 'extermination',
       theme: 'jungle',
@@ -62,14 +67,14 @@ export class GameEngine {
       round: 1,
       phase: 'deployment',
       units: [],
-      fow,
+      fow: [],
       p1Score: 0,
       p2Score: 0,
       p1Roster: [],
       p2Roster: [],
       p1Deployed: [],
       p2Deployed: [],
-      escortTargetC: Math.floor(GRID_COLS / 2),
+      escortTargetC: 20,
       escortTargetR: 4,
       rosterPlayer: [],
       rosterEnemy: []
@@ -77,28 +82,32 @@ export class GameEngine {
   }
 
   public resetGameSession(): void {
-    // 1. Clear all Tweens & Floaters
     clearTweens();
 
-    // 2. Remove all existing unit 3D meshes from Three.js scene and clear tracking
-    this.scene.unitMeshes.forEach(mesh => {
-      this.scene.scene.remove(mesh);
-    });
-    this.scene.unitMeshes.clear();
-
-    // 3. Clear scene highlights and targeting rings
     this.scene.clearHighlights();
-
-    // 4. Hide datasheet & clear selection
     this.selectedUnitId = null;
     this.actionMode = 'idle';
     this.isExecutingAiTurn = false;
+
+    this.state.units.forEach(u => {
+      this.scene.removeUnitMesh(u.id);
+    });
+
+    this.state.units = [];
+    this.state.p1Score = 0;
+    this.state.p2Score = 0;
+    this.state.turn = 1;
+    this.state.round = 1;
+    this.state.phase = 'deployment';
+    this.state.rosterPlayer = [];
+    this.state.rosterEnemy = [];
+    this.state.objectives = [];
+    this.nextUnitId = 1;
+
+    const cockpit = document.getElementById('gameplay-cockpit');
+    if (cockpit) cockpit.style.display = 'none';
+
     this.datasheet.hide();
-
-    // 5. Reset internal state
-    this.state = this.createInitialState();
-
-    // 6. Reset combat log
     this.log.clear();
   }
 
@@ -157,7 +166,7 @@ export class GameEngine {
 
     this.state.phase = 'deployment';
     this.scene.cameraController.frameDeploymentZone();
-    updateFogOfWar(this.state);
+    this.refreshAwareness();
 
     const p1Name = (FACTIONS[p1Faction] || FACTIONS.marines).name;
     const p2Name = (FACTIONS[p2Faction] || FACTIONS.chaos).name;
@@ -193,6 +202,7 @@ export class GameEngine {
     card.z = r;
     card.unitRef = unit;
 
+    this.refreshAwareness();
     sfx('footsteps');
     return unit;
   }
@@ -206,6 +216,7 @@ export class GameEngine {
       card.x = null;
       card.z = null;
       card.unitRef = null;
+      this.refreshAwareness();
       sfx('footsteps');
     }
   }
@@ -249,6 +260,7 @@ export class GameEngine {
         }
       }
     });
+    this.refreshAwareness();
   }
 
   public deployUnitOnBoard(
@@ -320,7 +332,7 @@ export class GameEngine {
     const cockpit = document.getElementById('gameplay-cockpit');
     if (cockpit) cockpit.style.display = 'flex';
 
-    updateFogOfWar(this.state);
+    this.refreshAwareness();
     this.dom.updateTurnBanner(1, 1, 'battle');
     sfx('horn');
     this.log.log('Deployment complete! Combat commences.', 'alert');
@@ -474,7 +486,7 @@ export class GameEngine {
       path,
       this.state.units,
       () => {
-        updateFogOfWar(this.state);
+        this.refreshAwareness();
         this.selectUnit(unit.id);
         this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
 
@@ -485,7 +497,7 @@ export class GameEngine {
         this.checkVictoryConditions();
       },
       () => {
-        updateFogOfWar(this.state);
+        this.refreshAwareness();
       }
     );
   }
@@ -499,7 +511,7 @@ export class GameEngine {
     const defenderDef = UNIT_ROSTER[defender.unitDefId] || defender.def;
 
     // Check FoW gating for action camera
-    const isDefenderInFoW = this.state.fow[defender.r]?.[defender.c] !== 2;
+    const isDefenderInFoW = !playerAwareTiles.has(`${defender.c},${defender.r}`);
     if (!isDefenderInFoW) {
       const aPos = gridToWorld(attacker.c, attacker.r);
       const dPos = gridToWorld(defender.c, defender.r);
@@ -514,6 +526,8 @@ export class GameEngine {
 
     if (defender.wounds <= 0 || defender.hp <= 0) {
       this.eliminateUnit(defender);
+    } else {
+      this.refreshAwareness();
     }
 
     this.selectUnit(attacker.id);
@@ -539,6 +553,7 @@ export class GameEngine {
     unit.dead = true;
     this.scene.removeUnitMesh(unit.id);
     this.state.units = this.state.units.filter(u => u.id !== unit.id);
+    this.refreshAwareness();
     if (this.selectedUnitId === unit.id) {
       this.selectUnit(null);
     }
@@ -554,6 +569,7 @@ export class GameEngine {
       this.state.round++;
       this.resetUnitTurnFlags();
       this.evaluateObjectives();
+      this.refreshAwareness();
       this.dom.updateTurnBanner(1, this.state.round, 'battle');
       this.checkVictoryConditions();
     }
@@ -583,8 +599,9 @@ export class GameEngine {
 
       this.state.units.forEach(pUnit => {
         if (pUnit.player === 1 && !pUnit.dead) {
+          const isPlayerInEnemyAwareness = enemyAwareTiles.has(`${pUnit.c},${pUnit.r}`);
           const d = chebyshevDist(unit.c, unit.r, pUnit.c, pUnit.r);
-          if (d < minDist) {
+          if (isPlayerInEnemyAwareness && d < minDist) {
             minDist = d;
             closestTarget = pUnit;
           }
@@ -595,12 +612,12 @@ export class GameEngine {
         const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
         const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
 
-        if (minDist <= maxRange && hasLineOfSight(unit.c, unit.r, closestTarget.c, closestTarget.r, this.state.theme)) {
-          this.executeAttack(unit.id, closestTarget.id);
+        if (minDist <= maxRange && hasLineOfSight(unit.c, unit.r, (closestTarget as Unit).c, (closestTarget as Unit).r, this.state.theme)) {
+          this.executeAttack(unit.id, (closestTarget as Unit).id);
         } else {
           // Advance towards target
-          const dc = Math.sign(closestTarget.c - unit.c);
-          const dr = Math.sign(closestTarget.r - unit.r);
+          const dc = Math.sign((closestTarget as Unit).c - unit.c);
+          const dr = Math.sign((closestTarget as Unit).r - unit.r);
           const targetC = Math.max(0, Math.min(GRID_COLS - 1, unit.c + dc * 2));
           const targetR = Math.max(0, Math.min(GRID_ROWS - 1, unit.r + dr * 2));
 
@@ -615,11 +632,11 @@ export class GameEngine {
                   path,
                   this.state.units,
                   () => {
-                    updateFogOfWar(this.state);
+                    this.refreshAwareness();
                     resolve();
                   },
                   () => {
-                    updateFogOfWar(this.state);
+                    this.refreshAwareness();
                   }
                 );
               });

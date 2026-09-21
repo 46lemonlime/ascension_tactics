@@ -91,12 +91,8 @@ export const OBSTACLES = new Set<string>();
 export function initObstaclesForTheme(themeId: string = 'jungle'): void {
   OBSTACLES.clear();
   const list = MAP_OBSTACLES[themeId] || MAP_OBSTACLES.jungle;
-  list.forEach(obs => {
-    for (let dr = 0; dr < obs.h; dr++) {
-      for (let dc = 0; dc < obs.w; dc++) {
-        OBSTACLES.add(key(obs.c + dc, obs.r + dr));
-      }
-    }
+  list.forEach(k => {
+    OBSTACLES.add(k);
   });
 }
 

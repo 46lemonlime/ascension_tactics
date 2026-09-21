@@ -1,210 +1,358 @@
 import * as THREE from 'three';
-import type { UnitDef } from '../../data/types';
+import { UnitDef, Team } from '../../data/types';
 
-export function createTauFigure(unitDef: UnitDef, primaryColor: number, trimColor: number): THREE.Group {
-  const group = new THREE.Group();
-  const armorMat = new THREE.MeshStandardMaterial({ color: primaryColor, roughness: 0.35, metalness: 0.2 });
-  const trimMat = new THREE.MeshStandardMaterial({ color: trimColor, roughness: 0.4, metalness: 0.5 });
-  const darkClothMat = new THREE.MeshStandardMaterial({ color: 0x222226, roughness: 0.8 });
-  const lensMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
-  const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x1f242b, roughness: 0.5, metalness: 0.7 });
+export function buildTauFigure(
+  uType: string,
+  _def: UnitDef,
+  _team: Team,
+  _isLeader: boolean,
+  figBody: THREE.Group,
+  root: THREE.Group,
+  armorMat: THREE.Material,
+  trimMat: THREE.Material,
+  darkJointMat: THREE.Material,
+  eyeGlowMat: THREE.Material
+): void {
+  const cyanEnergyMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 });
+  const gunMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.8 });
 
-  const isBattlesuit = unitDef.tags?.includes('vehicle') || unitDef.tags?.includes('walker') || unitDef.name.toLowerCase().includes('crisis') || unitDef.name.toLowerCase().includes('broadside') || unitDef.name.toLowerCase().includes('stealth');
-  const isTank = unitDef.name.toLowerCase().includes('hammerhead') || unitDef.name.toLowerCase().includes('devilfish') || unitDef.tags?.includes('tank');
+  if (uType === 'tau_commander') {
+    // --- XV8 CRISIS BATTLESUIT COMMANDER (Scale 1.35x) ---
+    figBody.scale.set(1.35, 1.35, 1.35);
 
-  if (isTank) {
-    // Grav-tank chassis
-    const hullGeo = new THREE.BoxGeometry(3.6, 1.2, 5.0);
-    const hull = new THREE.Mesh(hullGeo, armorMat);
-    hull.position.y = 1.4;
-    group.add(hull);
+    const legGeo = new THREE.BoxGeometry(0.26, 0.65, 0.28);
+    const leftLeg = new THREE.Mesh(legGeo, armorMat);
+    leftLeg.position.set(-0.28, 0.32, 0);
+    figBody.add(leftLeg);
+    const rightLeg = new THREE.Mesh(legGeo, armorMat);
+    rightLeg.position.set(0.28, 0.32, 0);
+    figBody.add(rightLeg);
+    root.userData.leftLeg = leftLeg;
+    root.userData.rightLeg = rightLeg;
 
-    // Front nose slope
-    const noseGeo = new THREE.ConeGeometry(1.8, 2.5, 4);
-    const nose = new THREE.Mesh(noseGeo, armorMat);
-    nose.rotation.x = Math.PI / 2;
-    nose.rotation.y = Math.PI / 4;
-    nose.position.set(0, 1.2, 2.8);
-    group.add(nose);
+    const footGeo = new THREE.BoxGeometry(0.28, 0.12, 0.42);
+    const lFoot = new THREE.Mesh(footGeo, darkJointMat);
+    lFoot.position.set(-0.28, 0.06, 0.08);
+    figBody.add(lFoot);
+    const rFoot = new THREE.Mesh(footGeo, darkJointMat);
+    rFoot.position.set(0.28, 0.06, 0.08);
+    figBody.add(rFoot);
 
-    // Jet turbines / grav engines
-    [-1.9, 1.9].forEach(side => {
-      const engGeo = new THREE.CylinderGeometry(0.5, 0.6, 3.2, 12);
-      const eng = new THREE.Mesh(engGeo, darkMetalMat);
-      eng.rotation.x = Math.PI / 2;
-      eng.position.set(side, 1.3, -0.6);
-      group.add(eng);
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.75, 0.48), armorMat);
+    torso.position.y = 0.95;
+    figBody.add(torso);
 
-      const podWingGeo = new THREE.BoxGeometry(0.8, 0.15, 2.0);
-      const podWing = new THREE.Mesh(podWingGeo, trimMat);
-      podWing.position.set(side * 1.1, 1.4, -0.5);
-      group.add(podWing);
-    });
+    const chestEmblem = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 12), trimMat);
+    chestEmblem.position.set(0, 1.0, 0.26);
+    chestEmblem.rotation.x = Math.PI / 2;
+    figBody.add(chestEmblem);
 
-    // Railgun / Ion Cannon Turret
-    const turretGeo = new THREE.CylinderGeometry(0.9, 1.1, 0.8, 12);
-    const turret = new THREE.Mesh(turretGeo, trimMat);
-    turret.position.set(0, 2.2, 0.2);
-    group.add(turret);
+    // Dual Jetpack Thrusters with Cyan Exhaust
+    const jetGeo = new THREE.BoxGeometry(0.22, 0.62, 0.32);
+    const lJet = new THREE.Mesh(jetGeo, trimMat);
+    lJet.position.set(-0.32, 1.15, -0.32);
+    lJet.rotation.x = 0.2;
+    figBody.add(lJet);
+    const rJet = new THREE.Mesh(jetGeo, trimMat);
+    rJet.position.set(0.32, 1.15, -0.32);
+    rJet.rotation.x = 0.2;
+    figBody.add(rJet);
 
-    const cannonGeo = new THREE.CylinderGeometry(0.18, 0.22, 5.2, 10);
-    const cannon = new THREE.Mesh(cannonGeo, darkMetalMat);
-    cannon.rotation.x = Math.PI / 2;
-    cannon.position.set(0, 2.3, 2.6);
-    group.add(cannon);
+    const nozzleGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.2, 8);
+    const lNoz = new THREE.Mesh(nozzleGeo, cyanEnergyMat);
+    lNoz.position.set(-0.32, 0.8, -0.36);
+    figBody.add(lNoz);
+    const rNoz = new THREE.Mesh(nozzleGeo, cyanEnergyMat);
+    rNoz.position.set(0.32, 0.8, -0.36);
+    figBody.add(rNoz);
 
-    const railTip = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.8), lensMat);
-    railTip.position.set(0, 2.3, 5.2);
-    group.add(railTip);
+    // Commander Sensor Dome Head
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.24, 0.32, 10), armorMat);
+    head.position.set(0, 1.45, 0);
+    figBody.add(head);
 
-  } else if (isBattlesuit) {
-    // Crisis / Broadside / Stealth battlesuit
-    const isHeavy = unitDef.name.toLowerCase().includes('broadside');
-    const scale = isHeavy ? 1.4 : 1.15;
+    const sensorL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeGlowMat);
+    sensorL.position.set(0.1, 1.48, 0.22);
+    figBody.add(sensorL);
 
-    // Torso blocky high-tech
-    const torsoGeo = new THREE.BoxGeometry(1.6 * scale, 1.8 * scale, 1.3 * scale);
-    const torso = new THREE.Mesh(torsoGeo, armorMat);
-    torso.position.y = 2.0 * scale;
-    group.add(torso);
+    const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.45, 4), trimMat);
+    antenna.position.set(-0.25, 1.7, 0);
+    antenna.rotation.z = -0.25;
+    figBody.add(antenna);
 
-    // Jetpack on back
-    const jetpackGeo = new THREE.BoxGeometry(1.8 * scale, 1.2 * scale, 0.8 * scale);
-    const jetpack = new THREE.Mesh(jetpackGeo, trimMat);
-    jetpack.position.set(0, 2.3 * scale, -0.9 * scale);
-    group.add(jetpack);
-
-    // Jet thrusters
-    [-0.7 * scale, 0.7 * scale].forEach(side => {
-      const thrusterGeo = new THREE.CylinderGeometry(0.3 * scale, 0.22 * scale, 0.9 * scale, 8);
-      const thruster = new THREE.Mesh(thrusterGeo, darkMetalMat);
-      thruster.position.set(side, 2.3 * scale, -1.3 * scale);
-      thruster.rotation.x = -0.3;
-      group.add(thruster);
-    });
-
-    // Sensor head
-    const headGeo = new THREE.CylinderGeometry(0.45 * scale, 0.5 * scale, 0.5 * scale, 8);
-    const head = new THREE.Mesh(headGeo, armorMat);
-    head.position.set(0, 2.9 * scale, 0.1 * scale);
-    group.add(head);
-
-    const sensorGeo = new THREE.BoxGeometry(0.25 * scale, 0.15 * scale, 0.25 * scale);
-    const sensor = new THREE.Mesh(sensorGeo, lensMat);
-    sensor.position.set(0.2 * scale, 3.0 * scale, 0.4 * scale);
-    group.add(sensor);
-
-    // Heavy Pauldrons
-    [-1.1 * scale, 1.1 * scale].forEach(side => {
-      const padGeo = new THREE.BoxGeometry(0.6 * scale, 0.8 * scale, 0.9 * scale);
-      const pad = new THREE.Mesh(padGeo, trimMat);
-      pad.position.set(side, 2.4 * scale, 0);
-      group.add(pad);
-    });
-
-    // Legs
-    [-0.55 * scale, 0.55 * scale].forEach(side => {
-      const legGeo = new THREE.CylinderGeometry(0.32 * scale, 0.38 * scale, 1.6 * scale, 8);
-      const leg = new THREE.Mesh(legGeo, armorMat);
-      leg.position.set(side, 0.9 * scale, 0);
-      group.add(leg);
-
-      const footGeo = new THREE.BoxGeometry(0.6 * scale, 0.35 * scale, 1.0 * scale);
-      const foot = new THREE.Mesh(footGeo, trimMat);
-      foot.position.set(side, 0.2 * scale, 0.2 * scale);
-      group.add(foot);
-    });
-
-    // Arm Weapons (Plasma rifle, Burst cannon or Heavy Rail rifle)
-    const armGeo = new THREE.CylinderGeometry(0.22 * scale, 0.28 * scale, 1.2 * scale, 8);
-    const armR = new THREE.Mesh(armGeo, darkClothMat);
-    armR.position.set(1.1 * scale, 1.6 * scale, 0.4 * scale);
-    armR.rotation.x = Math.PI / 4;
-    group.add(armR);
-
-    const weaponGeo = new THREE.BoxGeometry(0.45 * scale, 0.6 * scale, 2.2 * scale);
-    const weapon = new THREE.Mesh(weaponGeo, darkMetalMat);
-    weapon.position.set(1.3 * scale, 1.7 * scale, 1.1 * scale);
-    group.add(weapon);
-
-    const muzzleGeo = new THREE.CylinderGeometry(0.12 * scale, 0.12 * scale, 0.4 * scale, 8);
-    const muzzle = new THREE.Mesh(muzzleGeo, lensMat);
-    muzzle.rotation.x = Math.PI / 2;
-    muzzle.position.set(1.3 * scale, 1.7 * scale, 2.2 * scale);
-    group.add(muzzle);
-
-    if (isHeavy) {
-      // Shoulder-mounted Heavy Rail Rifles
-      const railRifle = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 3.2), darkMetalMat);
-      railRifle.position.set(-1.0, 3.1, 0.6);
-      group.add(railRifle);
+    // Right Arm: Triple-barrel Rotary Burst Cannon
+    const cannonBase = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.5), darkJointMat);
+    cannonBase.position.set(0.55, 0.95, 0.25);
+    figBody.add(cannonBase);
+    for (let b = 0; b < 3; b++) {
+      const bAng = (b * Math.PI * 2) / 3;
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.6, 6), gunMetalMat);
+      barrel.position.set(0.55 + Math.cos(bAng) * 0.07, 0.95 + Math.sin(bAng) * 0.07, 0.75);
+      barrel.rotation.x = Math.PI / 2;
+      figBody.add(barrel);
     }
 
+    // Left Arm: Heavy Fusion Blaster + Shield Guard
+    const fusionGun = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.8), gunMetalMat);
+    fusionGun.position.set(-0.55, 0.95, 0.35);
+    figBody.add(fusionGun);
+    const shieldPlate = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.5, 0.4), trimMat);
+    shieldPlate.position.set(-0.7, 1.0, 0.15);
+    figBody.add(shieldPlate);
+  } else if (uType === 'tau_stealth') {
+    // --- XV25 STEALTH BATTLESUIT TEAM ---
+    figBody.scale.set(1.05, 1.05, 1.05);
+
+    const legGeo = new THREE.BoxGeometry(0.22, 0.55, 0.22);
+    const leftLeg = new THREE.Mesh(legGeo, armorMat);
+    leftLeg.position.set(-0.22, 0.28, 0);
+    figBody.add(leftLeg);
+    const rightLeg = new THREE.Mesh(legGeo, armorMat);
+    rightLeg.position.set(0.22, 0.28, 0);
+    figBody.add(rightLeg);
+    root.userData.leftLeg = leftLeg;
+    root.userData.rightLeg = rightLeg;
+
+    // Distinct Bulbous Egg-Shaped Stealth Torso
+    const eggTorso = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 10), armorMat);
+    eggTorso.position.set(0, 0.88, 0);
+    eggTorso.scale.set(1, 1.25, 0.9);
+    figBody.add(eggTorso);
+
+    const domeHelm = new THREE.Mesh(new THREE.SphereGeometry(0.24, 8, 8), trimMat);
+    domeHelm.position.set(0, 1.3, 0.05);
+    figBody.add(domeHelm);
+    const stealthEye = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.06, 0.06), eyeGlowMat);
+    stealthEye.position.set(0, 1.3, 0.24);
+    figBody.add(stealthEye);
+
+    // Rounded stealth thruster pack with glowing field ring
+    const pack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.45, 0.25), darkJointMat);
+    pack.position.set(0, 0.95, -0.28);
+    figBody.add(pack);
+    const node = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), cyanEnergyMat);
+    node.position.set(0, 1.05, -0.4);
+    figBody.add(node);
+
+    // Underslung Burst Cannon
+    const bc = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.8), gunMetalMat);
+    bc.position.set(0.42, 0.8, 0.35);
+    figBody.add(bc);
+  } else if (uType === 'tau_pathfinders') {
+    // --- PATHFINDER SNIPERS (Rail Rifles) ---
+    const legGeo = new THREE.BoxGeometry(0.16, 0.55, 0.18);
+    const leftLeg = new THREE.Mesh(legGeo, armorMat);
+    leftLeg.position.set(-0.18, 0.28, 0);
+    figBody.add(leftLeg);
+    const rightLeg = new THREE.Mesh(legGeo, armorMat);
+    rightLeg.position.set(0.18, 0.28, 0);
+    figBody.add(rightLeg);
+    root.userData.leftLeg = leftLeg;
+    root.userData.rightLeg = rightLeg;
+
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.58, 0.32), armorMat);
+    torso.position.y = 0.82;
+    figBody.add(torso);
+
+    // Scout Helmet with External Rangefinder
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.18, 0.28, 8), armorMat);
+    head.position.set(0, 1.25, 0);
+    figBody.add(head);
+    const opticVisor = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.08, 0.12), cyanEnergyMat);
+    opticVisor.position.set(0.04, 1.28, 0.18);
+    figBody.add(opticVisor);
+
+    // Scout Recon Sat-Uplink Dish on Pack
+    const pack = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.2), darkJointMat);
+    pack.position.set(0, 0.88, -0.22);
+    figBody.add(pack);
+    const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.04, 8), trimMat);
+    dish.position.set(0.18, 1.15, -0.25);
+    dish.rotation.x = 0.5;
+    figBody.add(dish);
+
+    // Massive Long-range Hyper-Velocity Rail Rifle
+    const railStock = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14, 0.5), darkJointMat);
+    railStock.position.set(0.28, 0.8, 0.25);
+    figBody.add(railStock);
+    const railBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 1.1), gunMetalMat);
+    railBarrel.position.set(0.28, 0.8, 0.95);
+    figBody.add(railBarrel);
+    const railCoil = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.4), cyanEnergyMat);
+    railCoil.position.set(0.28, 0.8, 0.8);
+    figBody.add(railCoil);
+    const bipod = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.04), trimMat);
+    bipod.position.set(0.28, 0.68, 1.35);
+    figBody.add(bipod);
+  } else if (uType === 'tau_broadside') {
+    // --- XV88 BROADSIDE BATTLESUIT (Scale 1.45x Heavy Fire Support) ---
+    figBody.scale.set(1.45, 1.45, 1.45);
+
+    const legGeo = new THREE.BoxGeometry(0.3, 0.68, 0.32);
+    const leftLeg = new THREE.Mesh(legGeo, armorMat);
+    leftLeg.position.set(-0.32, 0.34, 0);
+    figBody.add(leftLeg);
+    const rightLeg = new THREE.Mesh(legGeo, armorMat);
+    rightLeg.position.set(0.32, 0.34, 0);
+    figBody.add(rightLeg);
+    root.userData.leftLeg = leftLeg;
+    root.userData.rightLeg = rightLeg;
+
+    // Recoil Stabilizer Anchors on Heels
+    const stabGeo = new THREE.BoxGeometry(0.12, 0.35, 0.35);
+    const lStab = new THREE.Mesh(stabGeo, darkJointMat);
+    lStab.position.set(-0.32, 0.18, -0.26);
+    lStab.rotation.x = -0.3;
+    figBody.add(lStab);
+    const rStab = new THREE.Mesh(stabGeo, darkJointMat);
+    rStab.position.set(0.32, 0.18, -0.26);
+    rStab.rotation.x = -0.3;
+    figBody.add(rStab);
+
+    // Reinforced Heavy Torso
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.8, 0.55), armorMat);
+    torso.position.y = 0.98;
+    figBody.add(torso);
+
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.22, 0.28, 8), armorMat);
+    head.position.set(0, 1.45, 0.05);
+    figBody.add(head);
+    const optic = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), cyanEnergyMat);
+    optic.position.set(0, 1.48, 0.25);
+    figBody.add(optic);
+
+    // Twin Over-Shoulder Heavy Railguns
+    const lRail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 1.45), gunMetalMat);
+    lRail.position.set(-0.45, 1.42, 0.45);
+    figBody.add(lRail);
+    const rRail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 1.45), gunMetalMat);
+    rRail.position.set(0.45, 1.42, 0.45);
+    figBody.add(rRail);
+
+    const lRailCoil = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.5), cyanEnergyMat);
+    lRailCoil.position.set(-0.45, 1.42, 0.35);
+    figBody.add(lRailCoil);
+    const rRailCoil = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.18, 0.5), cyanEnergyMat);
+    rRailCoil.position.set(0.45, 1.42, 0.35);
+    figBody.add(rRailCoil);
+
+    // Arm-Mounted Smart Missile Pods
+    const podGeo = new THREE.BoxGeometry(0.28, 0.32, 0.42);
+    const lPod = new THREE.Mesh(podGeo, trimMat);
+    lPod.position.set(-0.62, 0.88, 0.25);
+    figBody.add(lPod);
+    const rPod = new THREE.Mesh(podGeo, trimMat);
+    rPod.position.set(0.62, 0.88, 0.25);
+    figBody.add(rPod);
+  } else if (uType === 'tau_hammerhead') {
+    // --- TX7 HAMMERHEAD GUNSHIP: HEAVY HOVER TANK (Scale 1.6x) ---
+    figBody.scale.set(1.6, 1.6, 1.6);
+    figBody.position.y = 0.15; // Hovering altitude
+
+    // Main Hover Tank Carapace / Hull
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.32, 1.5), armorMat);
+    hull.position.set(0, 0.35, 0);
+    figBody.add(hull);
+    root.userData.leftLeg = hull;
+    root.userData.rightLeg = hull;
+
+    // Sloped Nose Prow & Sensor Array
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.65, 4), armorMat);
+    nose.position.set(0, 0.32, 0.95);
+    nose.rotation.x = Math.PI / 2;
+    nose.rotation.y = Math.PI / 4;
+    figBody.add(nose);
+    const sensorNose = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), cyanEnergyMat);
+    sensorNose.position.set(0, 0.35, 1.25);
+    figBody.add(sensorNose);
+
+    // Forward Jet Winglets with Engines
+    const wingGeo = new THREE.BoxGeometry(0.45, 0.08, 0.55);
+    const lWing = new THREE.Mesh(wingGeo, trimMat);
+    lWing.position.set(-0.75, 0.32, 0.2);
+    lWing.rotation.y = 0.25;
+    figBody.add(lWing);
+    const rWing = new THREE.Mesh(wingGeo, trimMat);
+    rWing.position.set(0.75, 0.32, 0.2);
+    rWing.rotation.y = -0.25;
+    figBody.add(rWing);
+
+    const engGeo = new THREE.CylinderGeometry(0.14, 0.16, 0.65, 8);
+    const lEng = new THREE.Mesh(engGeo, darkJointMat);
+    lEng.position.set(-0.85, 0.32, 0.1);
+    lEng.rotation.x = Math.PI / 2;
+    figBody.add(lEng);
+    const rEng = new THREE.Mesh(engGeo, darkJointMat);
+    rEng.position.set(0.85, 0.32, 0.1);
+    rEng.rotation.x = Math.PI / 2;
+    figBody.add(rEng);
+
+    const lJetGlow = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), cyanEnergyMat);
+    lJetGlow.position.set(-0.85, 0.32, -0.26);
+    figBody.add(lJetGlow);
+    const rJetGlow = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), cyanEnergyMat);
+    rJetGlow.position.set(0.85, 0.32, -0.26);
+    figBody.add(rJetGlow);
+
+    // Heavy Railgun Rotating Turret
+    const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 0.28, 10), trimMat);
+    turret.position.set(0, 0.6, -0.15);
+    figBody.add(turret);
+
+    const railgunHousing = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.24, 0.65), darkJointMat);
+    railgunHousing.position.set(0, 0.72, 0.15);
+    figBody.add(railgunHousing);
+
+    // Ultra-Long Heavy Solid Railgun Barrel (extends 2.2 units forward)
+    const longRail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 2.2), gunMetalMat);
+    longRail.position.set(0, 0.72, 1.25);
+    figBody.add(longRail);
+    const muzzleBrake = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.3), trimMat);
+    muzzleBrake.position.set(0, 0.72, 2.35);
+    figBody.add(muzzleBrake);
+    const railCoil = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.8), cyanEnergyMat);
+    railCoil.position.set(0, 0.72, 0.9);
+    figBody.add(railCoil);
   } else {
-    // Fire Warrior / Pathfinder Infantry
-    // Torso with Tau chest plate
-    const torsoGeo = new THREE.BoxGeometry(0.75, 0.95, 0.5);
-    const torso = new THREE.Mesh(torsoGeo, darkClothMat);
-    torso.position.y = 1.45;
-    group.add(torso);
+    // --- STRIKE TEAM FIRE WARRIORS (Pulse Rifles) ---
+    const legGeo = new THREE.BoxGeometry(0.18, 0.55, 0.2);
+    const leftLeg = new THREE.Mesh(legGeo, armorMat);
+    leftLeg.position.set(-0.2, 0.28, 0);
+    figBody.add(leftLeg);
+    const rightLeg = new THREE.Mesh(legGeo, armorMat);
+    rightLeg.position.set(0.2, 0.28, 0);
+    figBody.add(rightLeg);
+    root.userData.leftLeg = leftLeg;
+    root.userData.rightLeg = rightLeg;
 
-    const chestPlate = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.55, 0.25), armorMat);
-    chestPlate.position.set(0, 1.6, 0.2);
-    group.add(chestPlate);
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.6, 0.35), armorMat);
+    torso.position.y = 0.82;
+    figBody.add(torso);
 
-    // Tau curved helmet
-    const helmGeo = new THREE.CylinderGeometry(0.35, 0.25, 0.5, 8);
-    const helm = new THREE.Mesh(helmGeo, armorMat);
-    helm.position.set(0, 2.15, 0);
-    helm.rotation.x = 0.2;
-    group.add(helm);
+    // Iconic Asymmetrical Large Shoulder Guard on Left Shoulder
+    const shoulderGuard = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.48, 0.42), trimMat);
+    shoulderGuard.position.set(-0.38, 1.02, 0);
+    shoulderGuard.rotation.z = -0.2;
+    figBody.add(shoulderGuard);
 
-    // Single cyclopean eye lens
-    const lensGeo = new THREE.SphereGeometry(0.1, 8, 8);
-    const lens = new THREE.Mesh(lensGeo, lensMat);
-    lens.position.set(0.12, 2.2, 0.3);
-    group.add(lens);
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.3, 8), armorMat);
+    head.position.set(0, 1.25, 0);
+    figBody.add(head);
+    const sensor = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), eyeGlowMat);
+    sensor.position.set(0.08, 1.28, 0.18);
+    figBody.add(sensor);
 
-    // Left shoulder large Tau guard
-    const shoulderGuard = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.65, 0.65), trimMat);
-    shoulderGuard.position.set(-0.55, 1.6, 0);
-    group.add(shoulderGuard);
+    const pack = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.4, 0.2), darkJointMat);
+    pack.position.set(0, 0.88, -0.24);
+    figBody.add(pack);
 
-    // Tau emblem insignia circle
-    const badge = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.05, 12), lensMat);
-    badge.rotation.z = Math.PI / 2;
-    badge.position.set(-0.71, 1.6, 0);
-    group.add(badge);
-
-    // Legs
-    [-0.22, 0.22].forEach(side => {
-      const legGeo = new THREE.CylinderGeometry(0.15, 0.18, 1.1, 8);
-      const leg = new THREE.Mesh(legGeo, darkClothMat);
-      leg.position.set(side, 0.6, 0);
-      group.add(leg);
-
-      const shin = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.5, 0.25), armorMat);
-      shin.position.set(side, 0.45, 0.1);
-      group.add(shin);
-
-      // Hoof feet
-      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.2, 0.35), darkMetalMat);
-      foot.position.set(side, 0.1, 0.08);
-      group.add(foot);
-    });
-
-    // Pulse Rifle / Carbine
-    const rifleGeo = new THREE.BoxGeometry(0.15, 0.22, 1.8);
-    const rifle = new THREE.Mesh(rifleGeo, armorMat);
-    rifle.position.set(0.3, 1.3, 0.7);
-    rifle.rotation.x = 0.1;
-    group.add(rifle);
-
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.8, 8), darkMetalMat);
+    // Long 2-Handed Pulse Rifle
+    const rifle = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14, 1.15), darkJointMat);
+    rifle.position.set(0.32, 0.82, 0.45);
+    figBody.add(rifle);
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 6), trimMat);
+    barrel.position.set(0.32, 0.82, 1.1);
     barrel.rotation.x = Math.PI / 2;
-    barrel.position.set(0.3, 1.3, 1.6);
-    group.add(barrel);
+    figBody.add(barrel);
   }
-
-  return group;
 }
