@@ -1,11 +1,11 @@
-import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld } from '../data/constants';
+import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld, key } from '../data/constants';
 import { FACTIONS } from '../data/factions';
 import { UNIT_ROSTER } from '../data/units';
 import { buildFactionRosters } from '../data/rosters';
 import { updateFogOfWar, hasLineOfSight, updatePlayerAwareness, playerAwareTiles, enemyAwareTiles } from './awareness';
 import { resolveAttack } from './combat';
 import { rallyUnit } from './morale';
-import { pathTo } from './pathfinding';
+import { pathTo, bfsReach } from './pathfinding';
 import { PhysicsEngine } from './physics';
 import { animateMovePath } from './movement';
 import { clearTweens } from './effects';
@@ -28,6 +28,7 @@ export class GameEngine {
   public physics: PhysicsEngine;
 
   public selectedUnitId: number | null = null;
+  public currentReach: { dist: Map<string, number>; parent: Map<string, string> } | null = null;
   public actionMode: 'idle' | 'move' | 'shoot' = 'idle';
   public isExecutingAiTurn: boolean = false;
   private nextUnitId: number = 1;
@@ -340,6 +341,7 @@ export class GameEngine {
 
   public selectUnit(unitId: number | null): void {
     this.selectedUnitId = unitId;
+    this.currentReach = null;
     this.actionMode = 'idle';
     this.scene.clearHighlights();
 
@@ -350,7 +352,7 @@ export class GameEngine {
     });
 
     if (unitId !== null) {
-      const unit = this.state.units.find(u => u.id === unitId);
+      const unit = this.state.units.find(u => u.id === unitId && !u.dead);
       if (unit) {
         const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
         const mesh = this.scene.unitMeshes.get(unit.id);
@@ -361,12 +363,37 @@ export class GameEngine {
 
         this.datasheet.showUnit(unit, unitDef);
 
-        // If player unit and can act, highlight range
+        // If player unit, simultaneously compute and highlight reach (cyan) and attack targets (red)
         if (unit.player === 1 && !unit.isVip) {
+          const reachTiles: Array<{ c: number; r: number }> = [];
           if (!unit.hasMoved) {
-            this.enterMoveMode();
-          } else if (!unit.hasAttacked) {
-            this.enterShootMode();
+            this.currentReach = bfsReach(unit, this.state.units);
+            this.currentReach.dist.forEach((d, k) => {
+              if (d > 0) {
+                const [cx, rz] = k.split(',').map(Number);
+                reachTiles.push({ c: cx, r: rz });
+              }
+            });
+          }
+
+          const targetTiles: Array<{ c: number; r: number }> = [];
+          if (!unit.hasAttacked) {
+            const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
+            this.state.units.forEach(enemy => {
+              if (enemy.player !== 1 && !enemy.dead && playerAwareTiles.has(`${enemy.c},${enemy.r}`)) {
+                const dist = chebyshevDist(unit.c, unit.r, enemy.c, enemy.r);
+                if (dist <= maxRange && hasLineOfSight(unit.c, unit.r, enemy.c, enemy.r, this.state.theme)) {
+                  targetTiles.push({ c: enemy.c, r: enemy.r });
+                }
+              }
+            });
+          }
+
+          if (reachTiles.length > 0) {
+            this.scene.highlightTiles(reachTiles, 0x00f3ff, 0.35);
+          }
+          if (targetTiles.length > 0) {
+            this.scene.highlightTiles(targetTiles, 0xff2a6d, 0.55);
           }
         }
         return;
@@ -377,59 +404,14 @@ export class GameEngine {
   }
 
   public enterMoveMode(): void {
-    if (this.selectedUnitId === null) return;
-    const unit = this.state.units.find(u => u.id === this.selectedUnitId);
-    if (!unit || unit.hasMoved || unit.isVip) return;
-
-    this.actionMode = 'move';
-    const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
-    const moveRange = unitDef.movement || unit.m || 6;
-    const reachTiles: Array<{ c: number; r: number }> = [];
-
-    for (let dr = -moveRange; dr <= moveRange; dr++) {
-      for (let dc = -moveRange; dc <= moveRange; dc++) {
-        const nc = unit.c + dc;
-        const nr = unit.r + dr;
-        if (nc >= 0 && nc < GRID_COLS && nr >= 0 && nr < GRID_ROWS) {
-          if (chebyshevDist(unit.c, unit.r, nc, nr) <= moveRange) {
-            if (!this.state.units.some(u => u.c === nc && u.r === nr && u.id !== unit.id)) {
-              reachTiles.push({ c: nc, r: nr });
-            }
-          }
-        }
-      }
+    if (this.selectedUnitId !== null) {
+      this.selectUnit(this.selectedUnitId);
     }
-
-    this.scene.clearHighlights();
-    this.scene.highlightTiles(reachTiles, 0x00f3ff, 0.4);
-    this.log.log(`[TACTICAL] Select destination tile for ${unitDef.name} (${moveRange}" movement).`, 'info');
   }
 
   public enterShootMode(): void {
-    if (this.selectedUnitId === null) return;
-    const unit = this.state.units.find(u => u.id === this.selectedUnitId);
-    if (!unit || unit.hasAttacked || unit.isVip) return;
-
-    this.actionMode = 'shoot';
-    const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
-    const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
-
-    const targetTiles: Array<{ c: number; r: number }> = [];
-    this.state.units.forEach(enemy => {
-      if (enemy.player !== unit.player && !enemy.dead) {
-        const dist = chebyshevDist(unit.c, unit.r, enemy.c, enemy.r);
-        if (dist <= maxRange && hasLineOfSight(unit.c, unit.r, enemy.c, enemy.r, this.state.theme)) {
-          targetTiles.push({ c: enemy.c, r: enemy.r });
-        }
-      }
-    });
-
-    this.scene.clearHighlights();
-    if (targetTiles.length > 0) {
-      this.scene.highlightTiles(targetTiles, 0xff2a6d, 0.5);
-      this.log.log(`[TARGETING] Hostiles in Line of Sight for ${unitDef.name}. Click red target to fire.`, 'combat');
-    } else {
-      this.log.log(`No valid hostiles in weapon range/Line of Sight for ${unitDef.name}.`, 'info');
+    if (this.selectedUnitId !== null) {
+      this.selectUnit(this.selectedUnitId);
     }
   }
 
@@ -439,45 +421,80 @@ export class GameEngine {
 
     const clickedUnit = this.state.units.find(u => u.c === c && u.r === r && !u.dead);
 
-    if (this.actionMode === 'move' && this.selectedUnitId !== null && !clickedUnit) {
-      this.executeMove(this.selectedUnitId, c, r);
+    // 1. If an enemy unit was clicked
+    if (clickedUnit && clickedUnit.player !== 1) {
+      if (this.selectedUnitId !== null) {
+        const selected = this.state.units.find(u => u.id === this.selectedUnitId && !u.dead);
+        if (selected && selected.player === 1 && !selected.hasAttacked && !selected.isVip) {
+          const selectedDef = UNIT_ROSTER[selected.unitDefId] || selected.def;
+          const maxRange = Math.max(...(selectedDef.weapons?.map(w => w.range) || [selected.range || 18]));
+          const dist = chebyshevDist(selected.c, selected.r, clickedUnit.c, clickedUnit.r);
+          const los = hasLineOfSight(selected.c, selected.r, clickedUnit.c, clickedUnit.r, this.state.theme);
+
+          if (dist <= maxRange && los) {
+            this.executeAttack(selected.id, clickedUnit.id);
+            return;
+          } else if (dist > maxRange) {
+            this.log.log(`[OUT OF RANGE] Target is ${dist}" away (Max range: ${maxRange}").`, 'alert');
+            return;
+          } else if (!los) {
+            this.log.log('[LINE OF SIGHT BLOCKED] Target obstructed by ruins/obstacles.', 'alert');
+            return;
+          }
+        }
+      }
+      this.selectUnit(clickedUnit.id);
       return;
     }
 
-    if (this.actionMode === 'shoot' && this.selectedUnitId !== null && clickedUnit) {
-      if (clickedUnit.player !== 1) {
-        this.executeAttack(this.selectedUnitId, clickedUnit.id);
-        return;
+    // 2. If a player unit was clicked
+    if (clickedUnit && clickedUnit.player === 1) {
+      this.selectUnit(clickedUnit.id);
+      sfx('footsteps');
+      return;
+    }
+
+    // 3. If an empty ground tile was clicked while a player unit is selected
+    if (this.selectedUnitId !== null && this.currentReach) {
+      const selected = this.state.units.find(u => u.id === this.selectedUnitId && !u.dead);
+      const targetKey = key(c, r);
+      if (selected && selected.player === 1 && !selected.hasMoved && this.currentReach.dist.has(targetKey)) {
+        const fromK = key(selected.c, selected.r);
+        const path = pathTo(this.currentReach.parent, fromK, targetKey);
+        if (path && path.length > 0) {
+          this.executeMove(selected.id, c, r, path);
+          return;
+        }
       }
     }
 
-    if (clickedUnit) {
-      this.selectUnit(clickedUnit.id);
-    } else {
-      this.selectUnit(null);
-    }
+    // Otherwise deselect
+    this.selectUnit(null);
   }
 
-  public executeMove(unitId: number, targetC: number, targetR: number): void {
+  public executeMove(unitId: number, targetC: number, targetR: number, precomputedPath?: any[]): void {
     const unit = this.state.units.find(u => u.id === unitId);
     if (!unit) return;
     const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
-    const moveRange = unitDef.movement || unit.m || 6;
 
-    const dist = chebyshevDist(unit.c, unit.r, targetC, targetR);
-    if (dist > moveRange) {
-      this.log.log('Target tile is out of movement range!', 'alert');
-      return;
+    let path = precomputedPath;
+    if (!path || path.length === 0) {
+      const fromK = key(unit.c, unit.r);
+      const reach = this.currentReach || bfsReach(unit, this.state.units);
+      if (reach.dist.has(key(targetC, targetR))) {
+        path = pathTo(reach.parent, fromK, key(targetC, targetR));
+      } else {
+        path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units, unit);
+      }
     }
 
-    const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units, unit);
     if (!path || path.length === 0) {
       this.log.log('Path blocked by terrain or units!', 'alert');
       return;
     }
 
     unit.hasMoved = true;
-    this.actionMode = 'idle';
+    this.currentReach = null;
     this.scene.clearHighlights();
     sfx('footsteps');
 
@@ -489,11 +506,6 @@ export class GameEngine {
         this.refreshAwareness();
         this.selectUnit(unit.id);
         this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
-
-        // Automatically transition to shoot mode if targets exist
-        if (!unit.hasAttacked) {
-          this.enterShootMode();
-        }
         this.checkVictoryConditions();
       },
       () => {
@@ -530,7 +542,11 @@ export class GameEngine {
       this.refreshAwareness();
     }
 
-    this.selectUnit(attacker.id);
+    if (attacker.hasMoved && attacker.hasAttacked) {
+      this.selectUnit(null);
+    } else {
+      this.selectUnit(attacker.id);
+    }
     this.checkVictoryConditions();
   }
 
@@ -590,58 +606,98 @@ export class GameEngine {
     const enemyUnits = this.state.units.filter(u => u.player === 2 && !u.dead);
 
     for (const unit of enemyUnits) {
-      await new Promise(r => setTimeout(r, 600));
+      if (unit.wounds <= 0 || unit.dead) continue;
+      await new Promise(r => setTimeout(r, 450));
       if (unit.wounds <= 0 || unit.dead) continue;
 
-      // Find closest visible player unit (AI cannot target units in FoW)
-      let closestTarget: Unit | null = null;
-      let minDist = 999;
+      const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
+      const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
 
-      this.state.units.forEach(pUnit => {
-        if (pUnit.player === 1 && !pUnit.dead) {
-          const isPlayerInEnemyAwareness = enemyAwareTiles.has(`${pUnit.c},${pUnit.r}`);
-          const d = chebyshevDist(unit.c, unit.r, pUnit.c, pUnit.r);
-          if (isPlayerInEnemyAwareness && d < minDist) {
-            minDist = d;
-            closestTarget = pUnit;
+      // 1. Can we attack immediately from current position?
+      const inRangeLoS = this.state.units.filter(t =>
+        t.player === 1 &&
+        !t.dead &&
+        enemyAwareTiles.has(`${t.c},${t.r}`) &&
+        chebyshevDist(unit.c, unit.r, t.c, t.r) <= maxRange &&
+        hasLineOfSight(unit.c, unit.r, t.c, t.r, this.state.theme)
+      );
+
+      if (inRangeLoS.length > 0) {
+        inRangeLoS.sort((a, b) => {
+          if (a.isVip && !b.isVip) return -1;
+          if (!a.isVip && b.isVip) return 1;
+          return a.wounds - b.wounds || chebyshevDist(unit.c, unit.r, a.c, a.r) - chebyshevDist(unit.c, unit.r, b.c, b.r);
+        });
+        this.executeAttack(unit.id, inRangeLoS[0].id);
+        continue;
+      }
+
+      // 2. Otherwise advance up to full movement speed along best BFS path
+      const { dist, parent } = bfsReach(unit, this.state.units);
+      const spottedTargets = this.state.units.filter(t => t.player === 1 && !t.dead && enemyAwareTiles.has(`${t.c},${t.r}`));
+
+      let best: string | null = null;
+      let bestScore = Infinity;
+
+      dist.forEach((d, k) => {
+        if (d === 0) return;
+        const [x, z] = k.split(',').map(Number);
+        let score = 0;
+
+        if (spottedTargets.length > 0) {
+          score = Math.min(...spottedTargets.map(p => chebyshevDist(x, z, p.c, p.r)));
+          const hasShot = spottedTargets.some(t =>
+            chebyshevDist(x, z, t.c, t.r) <= maxRange &&
+            hasLineOfSight(x, z, t.c, t.r, this.state.theme)
+          );
+          if (hasShot) score -= 500;
+        } else {
+          if (this.state.mission === 'domination' && this.state.objectives) {
+            score = Math.min(...this.state.objectives.map(obj => Math.hypot(x - obj.c, z - obj.r)));
+          } else if (this.state.mission === 'escort') {
+            score = Math.hypot(x - 20, z - 52);
+          } else {
+            score = Math.hypot(x - 20, z - 48);
           }
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          best = k;
         }
       });
 
-      if (closestTarget) {
-        const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
-        const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
-
-        if (minDist <= maxRange && hasLineOfSight(unit.c, unit.r, (closestTarget as Unit).c, (closestTarget as Unit).r, this.state.theme)) {
-          this.executeAttack(unit.id, (closestTarget as Unit).id);
-        } else {
-          // Advance towards target
-          const dc = Math.sign((closestTarget as Unit).c - unit.c);
-          const dr = Math.sign((closestTarget as Unit).r - unit.r);
-          const targetC = Math.max(0, Math.min(GRID_COLS - 1, unit.c + dc * 2));
-          const targetR = Math.max(0, Math.min(GRID_ROWS - 1, unit.r + dr * 2));
-
-          if (!this.state.units.some(u => u.c === targetC && u.r === targetR && u.id !== unit.id)) {
-            const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units, unit);
-            if (path && path.length > 0) {
-              await new Promise<void>(resolve => {
-                unit.hasMoved = true;
-                sfx('footsteps');
-                animateMovePath(
-                  unit,
-                  path,
-                  this.state.units,
-                  () => {
-                    this.refreshAwareness();
-                    resolve();
-                  },
-                  () => {
-                    this.refreshAwareness();
-                  }
+      if (best) {
+        const fromK = key(unit.c, unit.r);
+        const path = pathTo(parent, fromK, best);
+        if (path && path.length > 0) {
+          await new Promise<void>(resolve => {
+            unit.hasMoved = true;
+            sfx('footsteps');
+            animateMovePath(
+              unit,
+              path,
+              this.state.units,
+              () => {
+                this.refreshAwareness();
+                // After moving full distance, shoot if target in range & LoS
+                const inRangeAfterMove = this.state.units.filter(t =>
+                  t.player === 1 &&
+                  !t.dead &&
+                  enemyAwareTiles.has(`${t.c},${t.r}`) &&
+                  chebyshevDist(unit.c, unit.r, t.c, t.r) <= maxRange &&
+                  hasLineOfSight(unit.c, unit.r, t.c, t.r, this.state.theme)
                 );
-              });
-            }
-          }
+                if (inRangeAfterMove.length > 0 && !unit.hasAttacked) {
+                  this.executeAttack(unit.id, inRangeAfterMove[0].id);
+                }
+                resolve();
+              },
+              () => {
+                this.refreshAwareness();
+              }
+            );
+          });
         }
       }
     }
