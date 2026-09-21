@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { gridToWorld, GRID_COLS } from '../data/constants';
+import { gridToWorld, GRID_COLS, GRID_ROWS, TILE_SIZE, PLAYER_DEPLOY_MIN_Z, PLAYER_DEPLOY_MAX_Z } from '../data/constants';
 
 export interface CameraHistoryEntry {
   position: THREE.Vector3;
@@ -27,12 +27,74 @@ export function setActionCamEnabled(val: boolean): void {
   }
 }
 
-export function animateCameraTo(targetEye: THREE.Vector3 | { x: number; y: number; z: number }, targetLookAt: THREE.Vector3 | { x: number; y: number; z: number }, durationMs: number = 400): void {
-  if (activeCameraController) {
-    const eye = targetEye instanceof THREE.Vector3 ? targetEye : new THREE.Vector3(targetEye.x, targetEye.y, targetEye.z);
-    const lookAt = targetLookAt instanceof THREE.Vector3 ? targetLookAt : new THREE.Vector3(targetLookAt.x, targetLookAt.y, targetLookAt.z);
-    activeCameraController.animateTo(eye, lookAt, durationMs);
-  }
+export function getDeploymentCameraFraming(): { pos: { x: number; y: number; z: number }; target: { x: number; y: number; z: number } } {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const aspect = w / h;
+
+  // Measure UI overlay regions
+  const deployPanel = document.getElementById('deployment-panel');
+  const dockHeight = deployPanel && deployPanel.offsetHeight > 0 ? deployPanel.offsetHeight : 160;
+  const headerBar = document.querySelector('.header-bar');
+  const headerHeight = headerBar && (headerBar as HTMLElement).offsetHeight > 0 ? (headerBar as HTMLElement).offsetHeight : 50;
+
+  // Available vertical pixel height between top header and bottom deployment dock
+  const availableHeight = Math.max(h - dockHeight - headerHeight - 20, 200);
+  const verticalUsableFraction = Math.min(Math.max(availableHeight / h, 0.45), 0.95);
+
+  // Deployment area physical dimensions in world coordinates (Rows 48 to 55)
+  const deployWidth = GRID_COLS * TILE_SIZE; // 240
+  const deployDepth = (PLAYER_DEPLOY_MAX_Z - PLAYER_DEPLOY_MIN_Z + 1) * TILE_SIZE; // 48
+  const deployCenterZ = ((PLAYER_DEPLOY_MIN_Z + PLAYER_DEPLOY_MAX_Z) / 2 - GRID_ROWS / 2 + 0.5) * TILE_SIZE; // 144.0
+
+  // Generous margins so deployment tiles and unit models are comfortably framed
+  const marginX = 40.0;
+  const marginZ = 24.0;
+
+  // 45-degree strategic angle
+  const pitchAngle = Math.PI / 4; // 45°
+  const sinPitch = Math.sin(pitchAngle); // ~0.7071
+  const cosPitch = Math.cos(pitchAngle); // ~0.7071
+
+  // Camera field of view calculations
+  const fovVRad = (45 * Math.PI) / 180; // 45° vertical FOV
+  const fovHRad = 2 * Math.atan(Math.tan(fovVRad / 2) * aspect);
+  const fovVUsableRad = fovVRad * verticalUsableFraction;
+
+  // Required camera distance to fit width
+  const distForWidth = ((deployWidth + marginX) / 2) / Math.tan(fovHRad / 2);
+
+  // Required camera distance to fit depth at 45° pitch within available vertical viewport
+  const projectedDepth = (deployDepth + marginZ) * sinPitch;
+  const distForDepth = (projectedDepth / 2) / Math.tan(fovVUsableRad / 2);
+
+  // Overall required distance with safety clamp
+  const dist = Math.max(distForWidth, distForDepth, 180.0);
+
+  // Offset camera look target slightly North so deployment area is centered in upper viewport above dock
+  const screenCenterOffsetY = ((h - dockHeight) / 2) - (h / 2);
+  const targetOffsetZ = (screenCenterOffsetY / h) * (dist * Math.tan(fovVRad / 2) * 1.8);
+  const targetZ = Math.max(deployCenterZ + targetOffsetZ, 60.0);
+
+  const posX = 0;
+  const posY = dist * sinPitch;
+  const posZ = targetZ + dist * cosPitch;
+
+  return {
+    pos: { x: posX, y: posY, z: posZ },
+    target: { x: 0, y: 0, z: targetZ }
+  };
+}
+
+export function animateCameraTo(
+  targetEye: THREE.Vector3 | { x: number; y: number; z: number } | null | undefined,
+  targetLookAt: THREE.Vector3 | { x: number; y: number; z: number } | null | undefined,
+  durationMs: number = 400
+): void {
+  if (!targetEye || !targetLookAt || !activeCameraController) return;
+  const eye = targetEye instanceof THREE.Vector3 ? targetEye : new THREE.Vector3(targetEye.x, targetEye.y, targetEye.z);
+  const lookAt = targetLookAt instanceof THREE.Vector3 ? targetLookAt : new THREE.Vector3(targetLookAt.x, targetLookAt.y, targetLookAt.z);
+  activeCameraController.animateTo(eye, lookAt, durationMs);
 }
 
 export class CameraController {
@@ -82,39 +144,43 @@ export class CameraController {
 
   /**
    * Sets the initial camera framing for deployment phase:
-   * Angled 45 degrees looking at Player 1's starting zone
+   * Calculated 45 degrees strategic framing looking at Player 1's starting zone
    */
-  public frameDeploymentZone(): void {
-    const p1Center = gridToWorld(Math.floor(GRID_COLS / 2), 48);
-    const target = new THREE.Vector3(p1Center.x, 0, p1Center.z - 10);
-    const eye = new THREE.Vector3(p1Center.x, 55, p1Center.z + 45);
+  public frameDeploymentZone(animate: boolean = false): void {
+    const framing = getDeploymentCameraFraming();
+    const eye = new THREE.Vector3(framing.pos.x, framing.pos.y, framing.pos.z);
+    const target = new THREE.Vector3(framing.target.x, framing.target.y, framing.target.z);
 
-    this.camera.position.copy(eye);
-    this.controls.target.copy(target);
-    this.controls.update();
+    if (animate) {
+      this.animateTo(eye, target, 800);
+    } else {
+      this.camera.position.copy(eye);
+      this.controls.target.copy(target);
+      this.controls.update();
+    }
   }
 
   /**
-   * Switches predefined camera preset angles
+   * Switches predefined camera preset angles matching the original prototype
    */
-  public setPresetView(preset: 'tactical' | 'iso' | 'top' | 'cinematic'): void {
+  public setPresetView(preset: 'tactical' | 'iso' | 'top' | 'cinematic', isDeployment: boolean = false): void {
     this.pushHistory();
-    const currentTarget = this.controls.target.clone();
 
-    switch (preset) {
-      case 'top':
-        this.animateTo(new THREE.Vector3(currentTarget.x, 140, currentTarget.z + 0.1), currentTarget, 500);
-        break;
-      case 'iso':
-        this.animateTo(new THREE.Vector3(currentTarget.x + 60, 70, currentTarget.z + 60), currentTarget, 500);
-        break;
-      case 'cinematic':
-        this.animateTo(new THREE.Vector3(currentTarget.x, 22, currentTarget.z + 28), currentTarget, 500);
-        break;
-      case 'tactical':
-      default:
-        this.animateTo(new THREE.Vector3(currentTarget.x, 80, currentTarget.z + 65), currentTarget, 500);
-        break;
+    if (preset === 'iso') {
+      if (isDeployment) {
+        this.frameDeploymentZone(true);
+      } else {
+        // 45° Strategic view for battle mode
+        this.animateTo(new THREE.Vector3(0, 130, 220), new THREE.Vector3(0, 0, 35), 800);
+      }
+    } else if (preset === 'top') {
+      this.animateTo(new THREE.Vector3(0, 260, 0.1), new THREE.Vector3(0, 0, 0), 800);
+    } else if (preset === 'cinematic') {
+      this.animateTo(new THREE.Vector3(-120, 55, 95), new THREE.Vector3(0, 4, 0), 1000);
+    } else {
+      // Tactical
+      const currentTarget = this.controls.target.clone();
+      this.animateTo(new THREE.Vector3(currentTarget.x, 80, currentTarget.z + 65), currentTarget, 600);
     }
   }
 
@@ -186,3 +252,4 @@ export class CameraController {
     }
   }
 }
+

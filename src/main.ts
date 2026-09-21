@@ -55,6 +55,7 @@ deploymentUi.onStartBattle = () => {
   deploymentUi.show(false);
   scene.clearHighlights();
   engine.finalizeDeployment();
+  scene.cameraController.setPresetView('iso', false);
 };
 
 // Top Bar View Controls
@@ -73,7 +74,7 @@ if (btnCamIso) {
   btnCamIso.addEventListener('click', () => {
     clearCamActive();
     btnCamIso.classList.add('active');
-    scene.cameraController.setPresetView('iso');
+    scene.cameraController.setPresetView('iso', engine.state.phase === 'deployment');
   });
 }
 
@@ -250,6 +251,13 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 
   if (e.key.toLowerCase() === 'm') engine.enterMoveMode();
   if (e.key.toLowerCase() === 'f' || e.key.toLowerCase() === 'a') engine.enterShootMode();
+});
+
+// Window resize deployment framing
+window.addEventListener('resize', () => {
+  if (engine.state.phase === 'deployment') {
+    scene.cameraController.frameDeploymentZone();
+  }
 });
 
 // Render Loop

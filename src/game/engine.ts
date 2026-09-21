@@ -158,7 +158,6 @@ export class GameEngine {
     this.state.phase = 'deployment';
     this.scene.cameraController.frameDeploymentZone();
     updateFogOfWar(this.state);
-    this.scene.fowManager.updateVisibility(this.state.fow);
 
     const p1Name = (FACTIONS[p1Faction] || FACTIONS.marines).name;
     const p2Name = (FACTIONS[p2Faction] || FACTIONS.chaos).name;
@@ -322,7 +321,6 @@ export class GameEngine {
     if (cockpit) cockpit.style.display = 'flex';
 
     updateFogOfWar(this.state);
-    this.scene.fowManager.updateVisibility(this.state.fow);
     this.dom.updateTurnBanner(1, 1, 'battle');
     sfx('horn');
     this.log.log('Deployment complete! Combat commences.', 'alert');
@@ -460,7 +458,7 @@ export class GameEngine {
       return;
     }
 
-    const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units);
+    const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units, unit);
     if (!path || path.length === 0) {
       this.log.log('Path blocked by terrain or units!', 'alert');
       return;
@@ -477,7 +475,6 @@ export class GameEngine {
       this.state.units,
       () => {
         updateFogOfWar(this.state);
-        this.scene.fowManager.updateVisibility(this.state.fow);
         this.selectUnit(unit.id);
         this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');
 
@@ -489,7 +486,6 @@ export class GameEngine {
       },
       () => {
         updateFogOfWar(this.state);
-        this.scene.fowManager.updateVisibility(this.state.fow);
       }
     );
   }
@@ -609,7 +605,7 @@ export class GameEngine {
           const targetR = Math.max(0, Math.min(GRID_ROWS - 1, unit.r + dr * 2));
 
           if (!this.state.units.some(u => u.c === targetC && u.r === targetR && u.id !== unit.id)) {
-            const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units);
+            const path = pathTo(unit.c, unit.r, targetC, targetR, unitDef.size || 1, this.state.theme, this.state.units, unit);
             if (path && path.length > 0) {
               await new Promise<void>(resolve => {
                 unit.hasMoved = true;
@@ -620,12 +616,10 @@ export class GameEngine {
                   this.state.units,
                   () => {
                     updateFogOfWar(this.state);
-                    this.scene.fowManager.updateVisibility(this.state.fow);
                     resolve();
                   },
                   () => {
                     updateFogOfWar(this.state);
-                    this.scene.fowManager.updateVisibility(this.state.fow);
                   }
                 );
               });

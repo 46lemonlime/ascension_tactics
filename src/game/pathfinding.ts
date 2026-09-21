@@ -71,7 +71,8 @@ export function pathTo(
   toR?: number,
   _sz: number = 1,
   _theme?: string,
-  unitsList: Unit[] = []
+  unitsList: Unit[] = [],
+  ignoreUnit: Unit | null = null
 ): any[] {
   if (a instanceof Map) {
     const parent = a;
@@ -108,10 +109,13 @@ export function pathTo(
         const nc = currC + dc;
         const nr = currR + dr;
         const nk = key(nc, nr);
-        if (inBounds(nc, nr) && !visited.has(nk) && canFitUnit(nc, nr, 1, null, unitsList)) {
-          visited.add(nk);
-          parent.set(nk, key(currC, currR));
-          q.push([nc, nr]);
+        if (inBounds(nc, nr) && !visited.has(nk)) {
+          const fit = canFitUnit(nc, nr, 1, ignoreUnit, unitsList);
+          if (fit) {
+            visited.add(nk);
+            parent.set(nk, key(currC, currR));
+            q.push([nc, nr]);
+          }
         }
       }
     }

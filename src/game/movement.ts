@@ -6,7 +6,7 @@ import { PhysicsEngine } from './physics';
 import { FormationSystem } from './formation';
 import { getSurvivingFigures } from './morale';
 import { playerAwareTiles } from './awareness';
-import { animateCameraTo, getActionCamEnabled } from '../renderer/camera';
+import { animateCameraTo, getActionCamEnabled, getActiveCameraController } from '../renderer/camera';
 
 export let currentActionSavedCamPos: THREE.Vector3 | null = null;
 export let currentActionSavedCamTarget: THREE.Vector3 | null = null;
@@ -42,22 +42,30 @@ export function animateMovePath(
 
   const sz = unitSize(unit);
 
-  const startTile = { x: unit.x, z: unit.z };
+  const startTile = { x: unit.c !== undefined ? unit.c : unit.x, z: unit.r !== undefined ? unit.r : unit.z };
   const destTile = path[path.length - 1];
+  const destX = destTile.x !== undefined ? destTile.x : (destTile as any).c;
+  const destZ = destTile.z !== undefined ? destTile.z : (destTile as any).r;
   const startWorld = new THREE.Vector3(unitWorldX(startTile.x, sz), 0, unitWorldZ(startTile.z, sz));
-  const destWorld = new THREE.Vector3(unitWorldX(destTile.x, sz), 0, unitWorldZ(destTile.z, sz));
+  const destWorld = new THREE.Vector3(unitWorldX(destX, sz), 0, unitWorldZ(destZ, sz));
 
   const isMoveVisibleToPlayer =
     unit.team === 'player' ||
     playerAwareTiles.has(`${startTile.x},${startTile.z}`) ||
-    playerAwareTiles.has(`${destTile.x},${destTile.z}`);
+    playerAwareTiles.has(`${destX},${destZ}`);
   const useActionCam = getActionCamEnabled() && isMoveVisibleToPlayer;
 
   let preMoveCamPos: THREE.Vector3 | null = null;
   let preMoveCamTarget: THREE.Vector3 | null = null;
 
   if (useActionCam) {
-    // Need camera and controls position from external or global
+    const ctrl = getActiveCameraController();
+    if (ctrl) {
+      preMoveCamPos = ctrl.camera.position.clone();
+      preMoveCamTarget = ctrl.controls.target.clone();
+      setActionSavedCam(preMoveCamPos, preMoveCamTarget);
+    }
+
     const diff = destWorld.clone().sub(startWorld);
     const moveDist = startWorld.distanceTo(destWorld);
     const moveDir = diff.clone().normalize();

@@ -5,7 +5,6 @@ import type { Theme, Unit, UnitDef, Faction } from '../data/types';
 import { CameraController } from './camera';
 import { createObstacleMeshes } from './terrain';
 import { createBattleMatTexture } from './textures';
-import { FogOfWarMeshManager } from './fow-mesh';
 import { createSquadUnitMesh } from './models';
 
 export class GameScene {
@@ -13,7 +12,6 @@ export class GameScene {
   public camera: THREE.PerspectiveCamera;
   public renderer: THREE.WebGLRenderer;
   public cameraController: CameraController;
-  public fowManager: FogOfWarMeshManager;
   public unitMeshes: Map<number, THREE.Group> = new Map();
 
   private tableMatMesh!: THREE.Mesh;
@@ -45,8 +43,6 @@ export class GameScene {
     container.appendChild(this.renderer.domElement);
 
     this.cameraController = new CameraController(this.camera, this.renderer.domElement);
-    this.fowManager = new FogOfWarMeshManager();
-    this.scene.add(this.fowManager.group);
 
     this.highlightGroup = new THREE.Group();
     this.highlightGroup.name = 'highlight_group';
