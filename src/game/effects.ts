@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Unit, Tween, Floater } from '../data/types';
 import { FACTIONS } from '../data/factions';
-import { rnd } from '../data/constants';
+import { rnd, unitWorldX, unitWorldZ } from '../data/constants';
 import { getSurvivingFigures } from './morale';
 
 export const activeTweens: Tween[] = [];
@@ -66,6 +66,7 @@ export function showWorldText(text: string, pos: THREE.Vector3, color = '#fcd34d
   activeFloaters.push({ el, pos: pos.clone(), age: 0 });
 }
 
+
 export function spawnSquadVolley(
   attacker: Unit,
   target: Unit,
@@ -73,14 +74,24 @@ export function spawnSquadVolley(
   scene: THREE.Scene
 ): void {
   const livingFigures = getSurvivingFigures(attacker);
-  const tracerColor = FACTIONS[attacker.def.factionId]?.laserColor || 0xffd166;
+  if (!livingFigures.length) return;
+
+  const fId = attacker.def?.factionId || (attacker as any).factionId || (attacker.player === 1 ? 'ascendants' : 'forsaken');
+  const faction = FACTIONS[fId] || Object.values(FACTIONS).find(f => f.id === fId || f.name.toLowerCase().includes(fId));
+  const tracerColor = faction?.laserColor || 0xffd166;
+
+  const targetBasePos = target.model ? target.model.position.clone() : new THREE.Vector3(
+    unitWorldX(target.c !== undefined ? target.c : target.x),
+    0,
+    unitWorldZ(target.r !== undefined ? target.r : target.z)
+  );
 
   livingFigures.forEach((fig: any) => {
     const figWorld = new THREE.Vector3();
     fig.root.getWorldPosition(figWorld);
     figWorld.y += 1.3;
 
-    const end = target.model.position.clone().add(
+    const end = targetBasePos.clone().add(
       new THREE.Vector3(
         isHit ? rnd(-0.8, 0.8) : rnd(-3.5, 3.5),
         1.3 + (isHit ? rnd(-0.4, 0.4) : rnd(-1.5, 1.5)),
@@ -88,7 +99,8 @@ export function spawnSquadVolley(
       )
     );
 
-    const geo = new THREE.CylinderGeometry(0.09, 0.09, figWorld.distanceTo(end), 6);
+    const dist = Math.max(figWorld.distanceTo(end), 0.1);
+    const geo = new THREE.CylinderGeometry(0.09, 0.09, dist, 6);
     geo.rotateX(Math.PI / 2);
     const mat = new THREE.MeshBasicMaterial({ color: tracerColor, transparent: true, opacity: 1 });
     const tracer = new THREE.Mesh(geo, mat);

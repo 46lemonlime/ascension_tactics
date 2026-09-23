@@ -1,5 +1,6 @@
-import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld, key } from '../data/constants';
+import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld, unitWorldX, unitWorldZ, key, TILE_SIZE } from '../data/constants';
 import { FACTIONS } from '../data/factions';
+import { THEMES } from '../data/themes';
 import { UNIT_ROSTER } from '../data/units';
 import { buildFactionRosters } from '../data/rosters';
 import { updateFogOfWar, hasLineOfSight, updatePlayerAwareness, playerAwareTiles, enemyAwareTiles } from './awareness';
@@ -8,8 +9,9 @@ import { rallyUnit } from './morale';
 import { pathTo, bfsReach } from './pathfinding';
 import { PhysicsEngine } from './physics';
 import { animateMovePath } from './movement';
-import { clearTweens } from './effects';
+import { clearTweens, spawnTeleportBeam, showWorldText } from './effects';
 import { sfx } from '../audio/synth';
+import { savePlayerCamera, restorePlayerCamera, getActionCamEnabled, getActiveCameraController, animateCameraTo } from '../renderer/camera';
 import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem } from '../data/types';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
@@ -31,6 +33,7 @@ export class GameEngine {
   public currentReach: { dist: Map<string, number>; parent: Map<string, string> } | null = null;
   public actionMode: 'idle' | 'move' | 'shoot' = 'idle';
   public isExecutingAiTurn: boolean = false;
+  public isBusy: boolean = false;
   private nextUnitId: number = 1;
 
   constructor(
@@ -51,8 +54,10 @@ export class GameEngine {
   }
 
   public refreshAwareness(): void {
+    const isDeployment = this.state.phase === 'deployment';
+    this.scene.setFowVisible(!isDeployment);
     updatePlayerAwareness(
-      this.state.phase === 'deployment' ? 'DEPLOYMENT' : 'BATTLE',
+      isDeployment ? 'DEPLOYMENT' : 'BATTLE',
       this.state.units,
       this.scene.fowMeshes
     );
@@ -121,6 +126,8 @@ export class GameEngine {
     p2EscortRole: 'escort' | 'attack' = 'attack'
   ): void {
     this.resetGameSession();
+    this.state.p1Faction = p1Faction;
+    this.state.p2Faction = p2Faction;
     this.state.theme = theme;
     this.state.mission = mission;
     this.state.escortRole = p1EscortRole;
@@ -167,12 +174,14 @@ export class GameEngine {
 
     this.state.phase = 'deployment';
     this.scene.cameraController.frameDeploymentZone();
+    this.scene.updateDeploymentHighlights(this.state.rosterPlayer);
     this.refreshAwareness();
 
     const p1Name = (FACTIONS[p1Faction] || FACTIONS.marines).name;
     const p2Name = (FACTIONS[p2Faction] || FACTIONS.chaos).name;
+    const themeName = (THEMES[theme] || THEMES.jungle).name;
     this.dom.updateMissionHud(mission, `${p1Name} vs ${p2Name}`);
-    this.log.log(`Warzone initialized: ${theme.toUpperCase()} theater. Mission: ${mission.toUpperCase()}. Deploy your strike force.`, 'info');
+    this.log.log(`Warzone initialized: ${themeName.toUpperCase()} theater. Mission: ${mission.toUpperCase()}. Deploy your strike force.`, 'info');
   }
 
   public deployPlayerCard(cardKey: string, c: number, r: number): Unit | null {
@@ -203,6 +212,12 @@ export class GameEngine {
     card.z = r;
     card.unitRef = unit;
 
+    const wPos = gridToWorld(c, r);
+    const beamColor = FACTIONS[this.state.p1Faction || 'marines']?.laserColor || 0x3b82f6;
+    spawnTeleportBeam(new THREE.Vector3(wPos.x, 0, wPos.z), beamColor, this.scene.scene);
+    showWorldText('DEPLOYED!', new THREE.Vector3(wPos.x, 0, wPos.z), '#34d399');
+
+    this.scene.updateDeploymentHighlights(this.state.rosterPlayer);
     this.refreshAwareness();
     sfx('footsteps');
     return unit;
@@ -211,12 +226,19 @@ export class GameEngine {
   public undeployPlayerCard(cardKey: string): void {
     const card = this.state.rosterPlayer?.find(cd => cd.key === cardKey);
     if (card && card.unitRef) {
+      const oldC = card.x !== null ? card.x : 0;
+      const oldR = card.z !== null ? card.z : 0;
+      const wPos = gridToWorld(oldC, oldR);
+
       this.scene.removeUnitMesh(card.unitRef.id);
       this.state.units = this.state.units.filter(u => u.id !== card.unitRef!.id);
       card.placed = false;
       card.x = null;
       card.z = null;
       card.unitRef = null;
+
+      showWorldText('UNDEPLOYED', new THREE.Vector3(wPos.x, 0, wPos.z), '#fcd34d');
+      this.scene.updateDeploymentHighlights(this.state.rosterPlayer);
       this.refreshAwareness();
       sfx('footsteps');
     }
@@ -344,6 +366,10 @@ export class GameEngine {
     this.currentReach = null;
     this.actionMode = 'idle';
     this.scene.clearHighlights();
+    this.scene.setTargetingRay(null, null, 'hidden');
+
+    const callout = document.getElementById('los-callout');
+    if (callout) callout.innerHTML = '';
 
     // Hide all selection rings
     this.scene.unitMeshes.forEach(mesh => {
@@ -363,8 +389,28 @@ export class GameEngine {
 
         this.datasheet.showUnit(unit, unitDef);
 
-        // If player unit, simultaneously compute and highlight reach (cyan) and attack targets (red)
+        // If player unit, simultaneously compute and highlight:
+        // 1. Shooting Range (Amber 0xf59e0b, opacity 0.16) for all valid in-range tiles with LoS
+        // 2. Movement Reach (Blue 0x3b82f6, opacity 0.42)
+        // 3. Attack Targets (Red 0xef4444, opacity 0.70)
         if (unit.player === 1 && !unit.isVip) {
+          const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
+
+          // 1. Shooting Range Overlay
+          const shootingTiles: Array<{ c: number; r: number }> = [];
+          if (!unit.hasAttacked) {
+            for (let rz = 0; rz < GRID_ROWS; rz++) {
+              for (let cx = 0; cx < GRID_COLS; cx++) {
+                if (chebyshevDist(unit.c, unit.r, cx, rz) <= maxRange) {
+                  if (hasLineOfSight(unit.c, unit.r, cx, rz, this.state.theme)) {
+                    shootingTiles.push({ c: cx, r: rz });
+                  }
+                }
+              }
+            }
+          }
+
+          // 2. Movement Reach Overlay
           const reachTiles: Array<{ c: number; r: number }> = [];
           if (!unit.hasMoved) {
             this.currentReach = bfsReach(unit, this.state.units);
@@ -376,9 +422,9 @@ export class GameEngine {
             });
           }
 
+          // 3. Attackable Enemies Overlay
           const targetTiles: Array<{ c: number; r: number }> = [];
           if (!unit.hasAttacked) {
-            const maxRange = Math.max(...(unitDef.weapons?.map(w => w.range) || [unit.range || 18]));
             this.state.units.forEach(enemy => {
               if (enemy.player !== 1 && !enemy.dead && playerAwareTiles.has(`${enemy.c},${enemy.r}`)) {
                 const dist = chebyshevDist(unit.c, unit.r, enemy.c, enemy.r);
@@ -389,11 +435,14 @@ export class GameEngine {
             });
           }
 
+          if (shootingTiles.length > 0) {
+            this.scene.highlightTiles(shootingTiles, 0xf59e0b, 0.16);
+          }
           if (reachTiles.length > 0) {
-            this.scene.highlightTiles(reachTiles, 0x00f3ff, 0.35);
+            this.scene.highlightTiles(reachTiles, 0x3b82f6, 0.42);
           }
           if (targetTiles.length > 0) {
-            this.scene.highlightTiles(targetTiles, 0xff2a6d, 0.55);
+            this.scene.highlightTiles(targetTiles, 0xef4444, 0.70);
           }
         }
         return;
@@ -514,40 +563,57 @@ export class GameEngine {
     );
   }
 
-  public executeAttack(attackerId: number, defenderId: number): void {
+  public executeAttack(attackerId: number, defenderId: number, onDone?: () => void): void {
     const attacker = this.state.units.find(u => u.id === attackerId);
     const defender = this.state.units.find(u => u.id === defenderId);
-    if (!attacker || !defender) return;
-
-    const attackerDef = UNIT_ROSTER[attacker.unitDefId] || attacker.def;
-    const defenderDef = UNIT_ROSTER[defender.unitDefId] || defender.def;
-
-    // Check FoW gating for action camera
-    const isDefenderInFoW = !playerAwareTiles.has(`${defender.c},${defender.r}`);
-    if (!isDefenderInFoW) {
-      const aPos = gridToWorld(attacker.c, attacker.r);
-      const dPos = gridToWorld(defender.c, defender.r);
-      this.scene.cameraController.triggerActionCamera(new THREE.Vector3(aPos.x, 0, aPos.z), new THREE.Vector3(dPos.x, 0, dPos.z));
+    if (!attacker || !defender || this.isBusy) {
+      if (onDone) onDone();
+      return;
     }
 
-    sfx('bolter');
-    const result = resolveAttack(attacker, defender);
-    attacker.hasAttacked = true;
+    // Hide targeting ray during attack
+    this.scene.setTargetingRay(null, null, 'hidden');
 
-    this.log.log(`[COMBAT] ${attackerDef.name} opened fire on ${defenderDef.name}: ${result.totalDamage} Damage dealt! (${result.casualties} casualties)`, 'combat');
+    const ctrl = getActiveCameraController();
+    const camera = this.scene.camera;
+    const controlsTarget = ctrl ? ctrl.controls.target : new THREE.Vector3();
 
-    if (defender.wounds <= 0 || defender.hp <= 0) {
-      this.eliminateUnit(defender);
-    } else {
-      this.refreshAwareness();
-    }
-
-    if (attacker.hasMoved && attacker.hasAttacked) {
-      this.selectUnit(null);
-    } else {
-      this.selectUnit(attacker.id);
-    }
-    this.checkVictoryConditions();
+    resolveAttack(
+      attacker,
+      defender,
+      this.state.units,
+      this.scene.scene,
+      camera,
+      controlsTarget,
+      (b: boolean) => {
+        this.isBusy = b;
+      },
+      () => this.isBusy,
+      () => {
+        if (attacker.player === 1) {
+          if (attacker.hasMoved && attacker.hasAttacked) {
+            this.selectUnit(null);
+          } else {
+            this.selectUnit(attacker.id);
+          }
+        } else {
+          this.selectUnit(null);
+        }
+        this.refreshAwareness();
+        this.checkVictoryConditions();
+        if (onDone) onDone();
+      },
+      () => {
+        const sel = this.state.units.find(u => u.id === this.selectedUnitId);
+        if (sel) {
+          const uDef = UNIT_ROSTER[sel.unitDefId] || sel.def;
+          this.datasheet.showUnit(sel, uDef);
+        }
+      },
+      () => {
+        this.checkVictoryConditions();
+      }
+    );
   }
 
   public handleRally(unit: Unit): void {
@@ -576,9 +642,17 @@ export class GameEngine {
   }
 
   public endTurn(): void {
+    if (this.state.phase !== 'battle') return;
+
     if (this.state.turn === 1) {
+      this.selectUnit(null);
+      savePlayerCamera();
+
       this.state.turn = 2;
+      const btn = document.getElementById('btn-end-turn') as HTMLButtonElement | null;
+      if (btn) btn.disabled = true;
       this.dom.updateTurnBanner(2, this.state.round, 'battle');
+      sfx('horn');
       this.startAiTurn();
     } else {
       this.state.turn = 1;
@@ -586,7 +660,13 @@ export class GameEngine {
       this.resetUnitTurnFlags();
       this.evaluateObjectives();
       this.refreshAwareness();
+      this.selectUnit(null);
+      restorePlayerCamera(650);
+
+      const btn = document.getElementById('btn-end-turn') as HTMLButtonElement | null;
+      if (btn) btn.disabled = false;
       this.dom.updateTurnBanner(1, this.state.round, 'battle');
+      sfx('horn');
       this.checkVictoryConditions();
     }
   }
@@ -628,7 +708,9 @@ export class GameEngine {
           if (!a.isVip && b.isVip) return 1;
           return a.wounds - b.wounds || chebyshevDist(unit.c, unit.r, a.c, a.r) - chebyshevDist(unit.c, unit.r, b.c, b.r);
         });
-        this.executeAttack(unit.id, inRangeLoS[0].id);
+        await new Promise<void>(resolve => {
+          this.executeAttack(unit.id, inRangeLoS[0].id, resolve);
+        });
         continue;
       }
 
@@ -689,9 +771,10 @@ export class GameEngine {
                   hasLineOfSight(unit.c, unit.r, t.c, t.r, this.state.theme)
                 );
                 if (inRangeAfterMove.length > 0 && !unit.hasAttacked) {
-                  this.executeAttack(unit.id, inRangeAfterMove[0].id);
+                  this.executeAttack(unit.id, inRangeAfterMove[0].id, resolve);
+                } else {
+                  resolve();
                 }
-                resolve();
               },
               () => {
                 this.refreshAwareness();

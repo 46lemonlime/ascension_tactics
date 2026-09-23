@@ -8,6 +8,8 @@ export interface CameraHistoryEntry {
 }
 
 let activeCameraController: CameraController | null = null;
+let savedPlayerCameraPos: THREE.Vector3 | null = null;
+let savedPlayerCameraTarget: THREE.Vector3 | null = null;
 
 export function getActiveCameraController(): CameraController | null {
   return activeCameraController;
@@ -27,22 +29,49 @@ export function setActionCamEnabled(val: boolean): void {
   }
 }
 
-export function getDeploymentCameraFraming(): { pos: { x: number; y: number; z: number }; target: { x: number; y: number; z: number } } {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+export function savePlayerCamera(): void {
+  if (activeCameraController) {
+    savedPlayerCameraPos = activeCameraController.camera.position.clone();
+    savedPlayerCameraTarget = activeCameraController.controls.target.clone();
+  }
+}
+
+export function getSavedPlayerCamera(): { pos: THREE.Vector3 | null; target: THREE.Vector3 | null } {
+  return { pos: savedPlayerCameraPos, target: savedPlayerCameraTarget };
+}
+
+export function restorePlayerCamera(durationMs: number = 650, onDone?: () => void): boolean {
+  if (savedPlayerCameraPos && savedPlayerCameraTarget && activeCameraController) {
+    activeCameraController.animateTo(savedPlayerCameraPos.clone(), savedPlayerCameraTarget.clone(), durationMs, onDone);
+    return true;
+  }
+  if (onDone) onDone();
+  return false;
+}
+
+export function clearSavedPlayerCamera(): void {
+  savedPlayerCameraPos = null;
+  savedPlayerCameraTarget = null;
+}
+
+export function getDeploymentCameraFraming(camera?: THREE.PerspectiveCamera): { pos: { x: number; y: number; z: number }; target: { x: number; y: number; z: number } } {
+  const w = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const h = typeof window !== 'undefined' ? window.innerHeight : 720;
   const aspect = w / h;
 
   // Measure UI overlay regions
-  const deployPanel = document.getElementById('deployment-panel');
-  const dockHeight = deployPanel && deployPanel.offsetHeight > 0 ? deployPanel.offsetHeight : 160;
-  const headerBar = document.querySelector('.header-bar');
-  const headerHeight = headerBar && (headerBar as HTMLElement).offsetHeight > 0 ? (headerBar as HTMLElement).offsetHeight : 50;
+  const deployPanel = typeof document !== 'undefined' ? document.getElementById('deployment-panel') : null;
+  const dockHeight = (deployPanel && deployPanel.offsetHeight > 0) ? deployPanel.offsetHeight : 160;
+  const headerBar = typeof document !== 'undefined' ? document.querySelector('.header-bar') as HTMLElement : null;
+  const headerHeight = (headerBar && headerBar.offsetHeight > 0) ? headerBar.offsetHeight : 50;
 
   // Available vertical pixel height between top header and bottom deployment dock
   const availableHeight = Math.max(h - dockHeight - headerHeight - 20, 200);
   const verticalUsableFraction = Math.min(Math.max(availableHeight / h, 0.45), 0.95);
 
   // Deployment area physical dimensions in world coordinates (Rows 48 to 55)
+  // X: -120 to +120 (width = 240)
+  // Z: 120 to 168 (depth = 48, center Z = 144)
   const deployWidth = GRID_COLS * TILE_SIZE; // 240
   const deployDepth = (PLAYER_DEPLOY_MAX_Z - PLAYER_DEPLOY_MIN_Z + 1) * TILE_SIZE; // 48
   const deployCenterZ = ((PLAYER_DEPLOY_MIN_Z + PLAYER_DEPLOY_MAX_Z) / 2 - GRID_ROWS / 2 + 0.5) * TILE_SIZE; // 144.0
@@ -57,22 +86,23 @@ export function getDeploymentCameraFraming(): { pos: { x: number; y: number; z: 
   const cosPitch = Math.cos(pitchAngle); // ~0.7071
 
   // Camera field of view calculations
-  const fovVRad = (45 * Math.PI) / 180; // 45° vertical FOV
+  const fovDeg = camera ? camera.fov : (activeCameraController?.camera.fov || 45);
+  const fovVRad = (fovDeg * Math.PI) / 180;
   const fovHRad = 2 * Math.atan(Math.tan(fovVRad / 2) * aspect);
   const fovVUsableRad = fovVRad * verticalUsableFraction;
 
   // Required camera distance to fit width
   const distForWidth = ((deployWidth + marginX) / 2) / Math.tan(fovHRad / 2);
 
-  // Required camera distance to fit depth at 45° pitch within available vertical viewport
+  // Required camera distance to fit depth at 45° pitch within the available vertical viewport
   const projectedDepth = (deployDepth + marginZ) * sinPitch;
   const distForDepth = (projectedDepth / 2) / Math.tan(fovVUsableRad / 2);
 
   // Overall required distance with safety clamp
   const dist = Math.max(distForWidth, distForDepth, 180.0);
 
-  // Offset camera look target slightly North so deployment area is centered in upper viewport above dock
-  const screenCenterOffsetY = ((h - dockHeight) / 2) - (h / 2);
+  // Offset the camera look target slightly North so the deployment area is centered in the upper/middle viewport above the dock
+  const screenCenterOffsetY = ((h - dockHeight) / 2) - (h / 2); // negative = shifted up on screen
   const targetOffsetZ = (screenCenterOffsetY / h) * (dist * Math.tan(fovVRad / 2) * 1.8);
   const targetZ = Math.max(deployCenterZ + targetOffsetZ, 60.0);
 
@@ -89,12 +119,14 @@ export function getDeploymentCameraFraming(): { pos: { x: number; y: number; z: 
 export function animateCameraTo(
   targetEye: THREE.Vector3 | { x: number; y: number; z: number } | null | undefined,
   targetLookAt: THREE.Vector3 | { x: number; y: number; z: number } | null | undefined,
-  durationMs: number = 400
+  durationMs: number = 400,
+  onDone?: () => void
 ): void {
   if (!targetEye || !targetLookAt || !activeCameraController) return;
   const eye = targetEye instanceof THREE.Vector3 ? targetEye : new THREE.Vector3(targetEye.x, targetEye.y, targetEye.z);
   const lookAt = targetLookAt instanceof THREE.Vector3 ? targetLookAt : new THREE.Vector3(targetLookAt.x, targetLookAt.y, targetLookAt.z);
-  activeCameraController.animateTo(eye, lookAt, durationMs);
+  const actualMs = durationMs <= 10 ? durationMs * 1000 : durationMs;
+  activeCameraController.animateTo(eye, lookAt, actualMs, onDone);
 }
 
 export class CameraController {
@@ -218,10 +250,17 @@ export class CameraController {
     this.animateTo(camPos, midpoint, 450);
   }
 
+  private currentAnimId: number | null = null;
+
   /**
-   * Smooth camera interpolation
+   * Smooth camera interpolation with tween cancellation protection
    */
-  public animateTo(targetEye: THREE.Vector3, targetLookAt: THREE.Vector3, durationMs: number = 400): void {
+  public animateTo(targetEye: THREE.Vector3, targetLookAt: THREE.Vector3, durationMs: number = 400, onDone?: () => void): void {
+    if (this.currentAnimId !== null) {
+      cancelAnimationFrame(this.currentAnimId);
+      this.currentAnimId = null;
+    }
+
     const startEye = this.camera.position.clone();
     const startLookAt = this.controls.target.clone();
     const startTime = performance.now();
@@ -237,13 +276,15 @@ export class CameraController {
       this.controls.update();
 
       if (t < 1) {
-        requestAnimationFrame(step);
+        this.currentAnimId = requestAnimationFrame(step);
       } else {
+        this.currentAnimId = null;
         this.isAnimating = false;
+        if (onDone) onDone();
       }
     };
 
-    requestAnimationFrame(step);
+    this.currentAnimId = requestAnimationFrame(step);
   }
 
   public update(): void {

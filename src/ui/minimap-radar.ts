@@ -1,4 +1,5 @@
 import { GRID_COLS, GRID_ROWS, MAP_OBSTACLES, gridToWorld } from '../data/constants';
+import { THEMES } from '../data/themes';
 import type { GameState, Objective, Obstacle } from '../data/types';
 import type { CameraController } from '../renderer/camera';
 import * as THREE from 'three';
@@ -46,6 +47,12 @@ export class MinimapRadar {
   }
 
   public render(state: GameState): void {
+    const themeObj = THEMES[state.theme] || THEMES.jungle;
+    const titleEl = document.getElementById('minimap-title');
+    if (titleEl && titleEl.textContent !== themeObj.name) {
+      titleEl.textContent = themeObj.name;
+    }
+
     const w = this.canvas.width;
     const h = this.canvas.height;
     const ctx = this.ctx;

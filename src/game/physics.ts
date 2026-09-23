@@ -198,14 +198,22 @@ export class PhysicsEngine {
         fig.worldX += fig.vx * dt;
         fig.worldZ += fig.vz * dt;
 
-        // G. Update 3D Mesh Local Position & Facing
-        fig.root.position.x = fig.worldX - u.model.position.x;
-        fig.root.position.z = fig.worldZ - u.model.position.z;
+        // G. Update 3D Mesh Local Position & Facing (transformed into parent model's local coordinate space)
+        const dx = fig.worldX - u.model.position.x;
+        const dz = fig.worldZ - u.model.position.z;
+        const uAngle = u.model.rotation.y;
+        const cosA = Math.cos(uAngle);
+        const sinA = Math.sin(uAngle);
+
+        fig.root.position.x = dx * cosA + dz * sinA;
+        fig.root.position.z = -dx * sinA + dz * cosA;
 
         const vLen = Math.sqrt(fig.vx * fig.vx + fig.vz * fig.vz);
         if (vLen > 0.25) {
           const desiredWorldHeading = Math.atan2(fig.vx, fig.vz);
-          const desiredLocalHeading = desiredWorldHeading - u.model.rotation.y;
+          let desiredLocalHeading = desiredWorldHeading - u.model.rotation.y;
+          while (desiredLocalHeading > Math.PI) desiredLocalHeading -= Math.PI * 2;
+          while (desiredLocalHeading < -Math.PI) desiredLocalHeading += Math.PI * 2;
           fig.root.rotation.y +=
             (desiredLocalHeading - fig.root.rotation.y) * Math.min(10 * dt, 1.0);
         } else {

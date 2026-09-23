@@ -249,6 +249,8 @@ export interface GameState {
   rosterPlayer?: DeploymentCard[];
   rosterEnemy?: EnemyRosterItem[];
   escortRole?: 'escort' | 'attack';
+  p1Faction?: string;
+  p2Faction?: string;
 }
 
 export interface DeploymentCard {

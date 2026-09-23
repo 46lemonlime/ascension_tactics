@@ -76,6 +76,8 @@ export class DOMManager {
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
     
+    this.selectMapOption(this.selectedTheme || 'random');
+
     // Reset carousel positions
     setTimeout(() => {
       this.updateRaceCarousel(0);
@@ -343,9 +345,7 @@ export class DOMManager {
 
     if (mcardRandom) {
       mcardRandom.addEventListener('click', () => {
-        this.selectedTheme = 'random';
-        this.deselectAllMapCards();
-        mcardRandom.classList.add('selected-map');
+        this.selectMapOption('random');
       });
     }
 
@@ -355,9 +355,7 @@ export class DOMManager {
         card.addEventListener('click', () => {
           const mapId = card.getAttribute('data-map');
           if (!mapId) return;
-          this.selectedTheme = mapId;
-          this.deselectAllMapCards();
-          card.classList.add('selected-map');
+          this.selectMapOption(mapId);
         });
       });
     }
@@ -466,16 +464,38 @@ export class DOMManager {
     }
   }
 
-  private deselectAllMapCards(): void {
-    const mcardRandom = document.getElementById('mcard-random');
-    if (mcardRandom) mcardRandom.classList.remove('selected-map');
+  public selectMapOption(mapId: string): void {
+    this.selectedTheme = mapId;
 
-    const mapTrack = document.getElementById('maps-grid-track');
-    if (mapTrack) {
-      mapTrack.querySelectorAll<HTMLElement>('.map-card').forEach(c => {
-        c.classList.remove('selected-map');
+    // Clear all map selections & badges
+    document.querySelectorAll('.map-card, .sticky-random-map-card').forEach(c => {
+      c.classList.remove('selected-map');
+      const badge = c.querySelector('.map-card-badge');
+      if (badge) badge.remove();
+    });
+
+    if (mapId === 'random') {
+      const card = document.getElementById('mcard-random');
+      if (card) {
+        card.classList.add('selected-map');
+        const badge = document.createElement('div');
+        badge.className = 'map-card-badge';
+        badge.textContent = 'AUTO';
+        card.appendChild(badge);
+      }
+    } else {
+      document.querySelectorAll(`[data-map="${mapId}"]`).forEach(card => {
+        card.classList.add('selected-map');
+        const badge = document.createElement('div');
+        badge.className = 'map-card-badge';
+        badge.textContent = 'SELECTED';
+        card.appendChild(badge);
       });
     }
+  }
+
+  private deselectAllMapCards(): void {
+    this.selectMapOption('random');
   }
 
   private launchSkirmish(): void {

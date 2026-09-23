@@ -9,6 +9,8 @@ import { buildDarkEldarFigure } from './dark_eldar';
 import { buildTyranidFigure } from './tyranids';
 import { buildTauFigure } from './tau';
 import { buildVipCourierFigure } from './vip';
+import { FormationSystem } from '../../game/formation';
+import { unitWorldX, unitWorldZ } from '../../data/constants';
 
 /**
  * Creates a circular bevelled wargaming base (Warhammer 40k style round base)
@@ -178,18 +180,41 @@ export function createSquadUnitMesh(unit: Unit, unitDef: UnitDef, faction: Facti
   const squadSize = unit.squadSize || unitDef.squadSize || 1;
   const figureScale = squadSize > 1 ? 0.68 : (unitDef.size > 1 ? 1.0 + (unitDef.size - 1) * 0.4 : 0.85);
 
+  const fType = (unitDef.formation && unitDef.formation.type) || 'wedge';
+  const spacing = (unitDef.formation && unitDef.formation.spacing) || 1.45;
+  const offsets = FormationSystem.getOffsets(squadSize, fType, spacing, squadSize);
+
+  const anchorX = unitWorldX(unit.c !== undefined ? unit.c : (unit.x || 0), unit.size || unitDef.size || 1);
+  const anchorZ = unitWorldZ(unit.r !== undefined ? unit.r : (unit.z || 0), unit.size || unitDef.size || 1);
+  const angle = unit.rotation || 0;
+
   const figures: Figure[] = [];
 
   for (let i = 0; i < squadSize; i++) {
     const memberRoot = new THREE.Group();
     memberRoot.name = `member_${i}`;
 
-    // Base
+    // 1. Individual circular tabletop base
     const baseRadius = squadSize > 1 ? 0.55 : 0.85 * (unitDef.size > 1 ? unitDef.size * 0.8 : 1.0);
     const base = createWargamingBase(baseRadius, 0.15, unit.player === 1 ? 0x111827 : 0x1f1515);
     memberRoot.add(base);
 
-    // Figure
+    // 2. Individual selection halo ring attached directly around this miniature's base
+    const selRingGeo = new THREE.RingGeometry(baseRadius * 0.95, baseRadius * 1.15, 24);
+    selRingGeo.rotateX(-Math.PI / 2);
+    const selRingMat = new THREE.MeshBasicMaterial({
+      color: unit.player === 1 ? 0x60a5fa : 0xf87171,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    const selRing = new THREE.Mesh(selRingGeo, selRingMat);
+    selRing.position.y = 0.17;
+    memberRoot.add(selRing);
+    memberRoot.userData.selectRing = selRing;
+
+    // 3. Miniature Figure Body
     const figure = createMiniatureFigure(unitDef, faction, i === 0);
     figure.scale.set(figureScale, figureScale, figureScale);
     figure.position.y = 0.15;
@@ -201,58 +226,31 @@ export function createSquadUnitMesh(unit: Unit, unitDef: UnitDef, faction: Facti
     memberRoot.userData.figBody = figure.userData.figBody || figure;
     memberRoot.userData.figure = figure;
 
+    const off = offsets[i] || { x: 0, z: 0 };
+    const slotX = anchorX + (off.x * Math.cos(angle) - off.z * Math.sin(angle));
+    const slotZ = anchorZ + (off.x * Math.sin(angle) + off.z * Math.cos(angle));
+
     const figData: Figure = {
       root: memberRoot,
       alive: true,
       idx: i,
-      offset: { x: (i - (squadSize - 1) / 2) * 1.2, z: 0 },
-      worldX: unit.x || 0,
-      worldZ: unit.z || 0,
+      offset: { ...off },
+      worldX: slotX,
+      worldZ: slotZ,
       vx: 0,
       vz: 0,
-      targetX: unit.x || 0,
-      targetZ: unit.z || 0,
-      radius: unitDef.physical?.radius || 0.65,
-      sepRadius: unitDef.physical?.sepRadius || 1.25,
-      mass: unitDef.physical?.mass || 1.0
+      targetX: slotX,
+      targetZ: slotZ,
+      radius: unitDef.physical?.radius || (unitDef.size >= 2 ? 2.2 : 0.65),
+      sepRadius: unitDef.physical?.sepRadius || (unitDef.size >= 2 ? 3.4 : 1.25),
+      mass: unitDef.physical?.mass || (unitDef.size >= 2 ? 8.0 : 1.0)
     };
 
     figures.push(figData);
-    memberRoot.position.set(figData.offset.x, 0, figData.offset.z);
+    memberRoot.position.set(off.x, 0, off.z);
     rootGroup.add(memberRoot);
   }
 
   rootGroup.userData.figures = figures;
-
-  // Selection indicator ring
-  const ringGeo = new THREE.RingGeometry(1.2 * (unitDef.size || 1), 1.4 * (unitDef.size || 1), 32);
-  ringGeo.rotateX(-Math.PI / 2);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: unit.player === 1 ? 0x00ffff : 0xff3b30,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.8
-  });
-  const selectionRing = new THREE.Mesh(ringGeo, ringMat);
-  selectionRing.name = 'selection_ring';
-  selectionRing.position.y = 0.05;
-  selectionRing.visible = false;
-  rootGroup.add(selectionRing);
-
-  // Target indicator ring
-  const targetRingGeo = new THREE.RingGeometry(1.3 * (unitDef.size || 1), 1.55 * (unitDef.size || 1), 32);
-  targetRingGeo.rotateX(-Math.PI / 2);
-  const targetRingMat = new THREE.MeshBasicMaterial({
-    color: 0xff0044,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.9
-  });
-  const targetRing = new THREE.Mesh(targetRingGeo, targetRingMat);
-  targetRing.name = 'target_ring';
-  targetRing.position.y = 0.06;
-  targetRing.visible = false;
-  rootGroup.add(targetRing);
-
   return rootGroup;
 }
