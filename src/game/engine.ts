@@ -131,6 +131,7 @@ export class GameEngine {
     this.state.theme = theme;
     this.state.mission = mission;
     this.state.escortRole = p1EscortRole;
+    this.state.p2EscortRole = p2EscortRole;
 
     // Initialize board terrain
     this.scene.initBoard(theme);

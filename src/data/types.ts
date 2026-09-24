@@ -249,6 +249,7 @@ export interface GameState {
   rosterPlayer?: DeploymentCard[];
   rosterEnemy?: EnemyRosterItem[];
   escortRole?: 'escort' | 'attack';
+  p2EscortRole?: 'escort' | 'attack';
   p1Faction?: string;
   p2Faction?: string;
 }

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GRIMDARK TACTICS 3D — Warhammer 40k Tabletop Skirmish</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -710,17 +713,71 @@
     </div>
   </div>
 
-  <div id="ui-layer">
-    <!-- TOP BAR -->
+    <!-- TOP-RIGHT IN-BATTLE NAVIGATION -->
     <div class="header-bar">
-      <div class="view-controls interactive">
-        <button class="btn-cam active" id="cam-iso">Command</button>
-        <button class="btn-cam" id="cam-top">Top-Down</button>
-        <button class="btn-cam" id="cam-cinematic">Cinematic</button>
-        <button class="btn-cam" id="cam-action-toggle" title="Auto zoom on attack">Action Cam: ON</button>
-        <button class="btn-cam" id="btn-fullscreen" title="Toggle Fullscreen">⛶ Fullscreen</button>
-        <button class="btn-cam" id="btn-debug-movement" title="Toggle SC2 Movement, Collisions & Morale Debug Overlay (F2/D)">Debug: OFF</button>
-        <button class="btn-cam" id="btn-change-match" style="color:var(--gold-bright);">Change Match</button>
+      <div id="top-nav-bar" class="top-nav-bar interactive">
+        <button class="nav-btn active" id="nav-btn-logs" title="Combat Logs" aria-label="Combat Logs" aria-pressed="true">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+            <line x1="13" y1="19" x2="19" y2="13"></line>
+            <line x1="16" y1="16" x2="20" y2="20"></line>
+            <line x1="19" y1="21" x2="21" y2="19"></line>
+            <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline>
+            <line x1="5" y1="14" x2="11" y2="20"></line>
+            <line x1="3" y1="21" x2="7" y2="17"></line>
+          </svg>
+        </button>
+
+        <button class="nav-btn" id="nav-btn-camera" title="Camera Options" aria-label="Camera Options">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+        </button>
+
+        <button class="nav-btn" id="nav-btn-fullscreen" title="Fullscreen" aria-label="Fullscreen">
+          <svg class="nav-icon nav-icon-fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <polyline points="21 15 21 21 15 21"></polyline>
+            <polyline points="3 9 3 3 9 3"></polyline>
+          </svg>
+          <svg class="nav-icon nav-icon-fs-exit" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 14 10 14 10 20"></polyline>
+            <polyline points="20 10 14 10 14 4"></polyline>
+            <polyline points="14 20 14 14 20 14"></polyline>
+            <polyline points="10 4 10 10 4 10"></polyline>
+          </svg>
+        </button>
+
+        <button class="nav-btn" id="nav-btn-menu" title="Menu Options" aria-label="Menu Options">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- CAMERA OPTIONS POPUP PANEL -->
+        <div id="camera-options-popup" class="nav-popup-panel" style="display:none;">
+          <div class="nav-popup-header">
+            <span class="nav-popup-title">CAMERA</span>
+          </div>
+          <div class="nav-popup-content">
+            <div class="nav-camera-presets">
+              <button class="nav-popup-btn active" id="pop-cam-command">Command</button>
+              <button class="nav-popup-btn" id="pop-cam-top">Top-Down</button>
+              <button class="nav-popup-btn" id="pop-cam-cinematic">Cinematic</button>
+            </div>
+            <div class="nav-popup-divider"></div>
+            <div class="nav-toggle-row">
+              <span class="nav-toggle-label">Action Camera</span>
+              <button class="nav-toggle-switch active" id="pop-action-cam-toggle">
+                <span class="nav-toggle-state" id="pop-action-cam-state">ON</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -756,15 +813,12 @@
     </div>
 
     <!-- COMBAT LOG PANEL -->
-    <div id="combat-log-wrapper" class="interactive">
+    <div id="combat-log-wrapper" class="interactive" role="region" aria-label="Combat Log" aria-hidden="false">
       <div id="combat-log-header">
         <div class="log-header-left">
           <span class="log-header-icon">&#9876;</span>
           <span class="log-header-title">BATTLE LOG</span>
           <span id="log-unread-badge" class="log-unread-badge">0</span>
-        </div>
-        <div class="log-header-right">
-          <button id="btn-toggle-log" class="log-toggle-btn" title="Collapse Battle Log">&#9660;</button>
         </div>
       </div>
       <div id="combat-log-container">
@@ -827,6 +881,60 @@
       <div class="modal-title" id="go-title">VICTORY</div>
       <div class="modal-desc" id="go-desc">The battlefield is cleansed in righteous fire.</div>
       <button class="btn-action" id="btn-play-again" style="width:100%;">Play Again</button>
+    </div>
+  </div>
+
+  <!-- CENTERED GAME MENU MODAL -->
+  <div id="game-menu-modal" class="interactive" style="display:none;" role="dialog" aria-modal="true" aria-label="Game Menu">
+    <div class="game-menu-dialog">
+      <div class="game-menu-header">
+        <div class="game-menu-title-group">
+          <span class="game-menu-icon">&#9876;</span>
+          <h2 class="game-menu-title">GAME MENU</h2>
+        </div>
+        <button id="btn-close-game-menu" class="game-menu-close-btn" title="Resume Battle" aria-label="Close Game Menu">&times;</button>
+      </div>
+      <div class="game-menu-body">
+        <button class="game-menu-action-btn" id="pop-menu-restart">
+          <span class="game-menu-action-icon">🔄</span>
+          <div class="game-menu-action-text">
+            <span class="game-menu-action-label">Restart Game</span>
+            <span class="game-menu-action-sub">Restart current battle with same factions & map</span>
+          </div>
+        </button>
+        <button class="game-menu-action-btn" id="pop-menu-rematch">
+          <span class="game-menu-action-icon">⚔️</span>
+          <div class="game-menu-action-text">
+            <span class="game-menu-action-label">Rematch</span>
+            <span class="game-menu-action-sub">Choose new factions, map & mission</span>
+          </div>
+        </button>
+        <button class="game-menu-action-btn danger" id="pop-menu-exit">
+          <span class="game-menu-action-icon">🚪</span>
+          <div class="game-menu-action-text">
+            <span class="game-menu-action-label">Exit to Main Menu</span>
+            <span class="game-menu-action-sub">Return to the title screen</span>
+          </div>
+        </button>
+      </div>
+      <div class="game-menu-footer">
+        <button id="btn-resume-game" class="btn-action btn-primary" style="width:100%;">RESUME BATTLE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN-GAME CONFIRMATION MODAL -->
+  <div id="confirm-dialog-modal" class="interactive" style="display:none;">
+    <div class="confirm-dialog-box">
+      <div class="confirm-dialog-header">
+        <span class="confirm-dialog-icon" id="confirm-icon">⚠️</span>
+        <h3 class="confirm-dialog-title" id="confirm-title">Confirm Action</h3>
+      </div>
+      <p class="confirm-dialog-message" id="confirm-message">Are you sure you want to proceed? Current progress will be lost.</p>
+      <div class="confirm-dialog-actions">
+        <button class="btn-action" id="btn-confirm-cancel">Cancel</button>
+        <button class="btn-action btn-primary" id="btn-confirm-accept">Confirm</button>
+      </div>
     </div>
   </div>
 

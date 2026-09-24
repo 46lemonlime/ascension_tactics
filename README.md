@@ -66,22 +66,46 @@ A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirm
 
 ---
 
-## 🕹️ Controls & Camera Navigation
+## 🕹️ Controls & Keyboard Shortcuts
 
-### Mouse & Keyboard
+### Mouse Interactions
 | Action | Input | Description |
 | :--- | :--- | :--- |
-| **Select / Move / Attack** | Left Click | Select unit, target movement tile (blue), or engage enemy (red). |
-| **Inspect / Camera Pan** | Left Click + Drag | Pan the tactical camera across the battlefield. |
-| **Camera Orbit** | Right Click + Drag | Orbit the camera around the target point. |
-| **In-Place Camera Rotation** | `Ctrl` / `Shift` / `Alt` + Right Click + Drag | Rotate camera orientation in place without changing camera position ($X, Y, Z$). |
+| **Select / Move / Attack** | Left Click | Select friendly unit, target valid movement tile (cyan), or engage enemy (red). |
+| **Inspect / Pan Camera** | Left Click + Drag | Pan the tactical camera across the battlefield. |
+| **Orbit Camera** | Right Click + Drag | Orbit and pitch the camera around the focus point. |
+| **In-Place Rotation** | `Shift` + Left Drag / `Ctrl` + Right Drag | Rotate orientation on the spot without translating position. |
 | **Camera Zoom** | Mouse Wheel | Smoothly zoom in / out. |
-| **On-the-Spot Camera Height** | `Ctrl` / `Shift` / `Alt` + Mouse Wheel | Adjust camera vertical height ($Y$) on the spot without changing pitch or horizontal position. |
-| **Camera Preset Angles** | Tactical / Iso / Top / Cinematic | Quick preset buttons on the UI for tactical overview, 45° isometric, top-down, or cinematic framing. |
+| **Vertical Height Adjustment** | `Ctrl` + Mouse Wheel | Adjust camera vertical altitude ($Y$) without altering pitch or position. |
+| **Undeploy Unit** | Right Click (Deployment) | Recall placed squad card back to the deployment dock. |
+
+### Keyboard Shortcuts
+| Key | Action | Description |
+| :--- | :--- | :--- |
+| **`F11`** | **Toggle Fullscreen** | Toggle fullscreen mode on/off seamlessly (with keyboard lock support). |
+| **`ESC`** | **Game Menu / Dismiss** | Open or close the centered Game Menu modal, confirmation dialogs, or camera popup. |
+| **`Space`** | **End Turn** | Advance to the enemy turn during player battle phase. |
+| **`Ctrl + Z`** | **Camera Undo** | Restore previous camera position and orientation. |
+| **`1` / `2` / `3`** | **Camera Presets** | Switch camera between Command (Isometric 45°), Top-Down (90°), and Cinematic. |
+| **`Q` / `E`** | **Rotate Camera** | Rotate the camera view left / right in 22.5° increments. |
+| **`M`** | **Move Mode** | Enter squad movement mode for the currently selected unit. |
+| **`F` / `A`** | **Shoot / Attack Mode** | Enter targeting mode for the currently selected unit. |
 
 ---
 
-## ⚙️ Engine Architecture & Key Features
+## ⚙️ Engine Architecture & UI Systems
+
+* **Top-Right In-Battle Navigation Bar**:
+  * **Combat Log**: Toggle battle telemetry and dice roll history panel.
+  * **Camera Options**: Switch camera presets (Command / Top / Cinematic) and toggle Action Camera tracking.
+  * **Fullscreen**: Dedicated button and `F11` shortcut with live state icon sync and `ESC` isolation.
+  * **Game Menu**: Centered dialog for restarting matches, returning to faction select, and accessing manual/codex.
+
+* **Screen-Space Anchored HUD**:
+  * **End Turn Button**: Fixed to the bottom-right corner of the viewport, independent of camera state.
+  * **Unit Datasheet**: Fixed to the bottom-left corner with high-visibility squad stats, HP bars, and model counts.
+  * **Tactical Minimap**: Anchored to top-left with collapsible radar, compass, FoW shroud, and live unit blips.
+  * **Gothic Aesthetic Theme**: Custom scrollbars, glowing gold borders, and dark crystalline glassmorphism backdrops.
 
 * **Deterministic Action Camera**:
   * The camera smoothly interpolates into dramatic over-the-shoulder framing and **fully settles before the unit begins moving or attacking**.
@@ -94,9 +118,6 @@ A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirm
 
 * **Geometry & Material Cache**:
   * Shared geometry and material caching system minimizing WebGL draw calls and eliminating per-frame instantiation garbage collection pauses.
-
-* **Screen-Space Anchored HUD**:
-  * Round banner and mission info remain cleanly anchored at the top edge of the screen regardless of camera transformations or viewport resizing.
 
 ---
 

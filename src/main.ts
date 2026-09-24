@@ -67,69 +67,329 @@ deploymentUi.onStartBattle = () => {
   scene.cameraController.setPresetView('iso', false);
 };
 
-// Top Bar View Controls
-const btnCamIso = document.getElementById('cam-iso');
-const btnCamTop = document.getElementById('cam-top');
-const btnCamCinematic = document.getElementById('cam-cinematic');
-const btnActionCamToggle = document.getElementById('cam-action-toggle');
-const btnFullscreen = document.getElementById('btn-fullscreen');
-const btnChangeMatch = document.getElementById('btn-change-match');
+// ================== TOP-RIGHT IN-BATTLE NAVIGATION & MENUS ==================
+const navBtnLogs = document.getElementById('nav-btn-logs');
+const navBtnCamera = document.getElementById('nav-btn-camera');
+const navBtnFullscreen = document.getElementById('nav-btn-fullscreen');
+const navBtnMenu = document.getElementById('nav-btn-menu');
 
-const clearCamActive = () => {
-  [btnCamIso, btnCamTop, btnCamCinematic].forEach(b => b?.classList.remove('active'));
+const cameraOptionsPopup = document.getElementById('camera-options-popup');
+const menuOptionsPopup = document.getElementById('menu-options-popup');
+
+const popCamCommand = document.getElementById('pop-cam-command');
+const popCamTop = document.getElementById('pop-cam-top');
+const popCamCinematic = document.getElementById('pop-cam-cinematic');
+const popActionCamToggle = document.getElementById('pop-action-cam-toggle');
+const popActionCamState = document.getElementById('pop-action-cam-state');
+
+const gameMenuModal = document.getElementById('game-menu-modal');
+const btnCloseGameMenu = document.getElementById('btn-close-game-menu');
+const btnResumeGame = document.getElementById('btn-resume-game');
+const popMenuRestart = document.getElementById('pop-menu-restart');
+const popMenuRematch = document.getElementById('pop-menu-rematch');
+const popMenuExit = document.getElementById('pop-menu-exit');
+
+const confirmModal = document.getElementById('confirm-dialog-modal');
+const confirmTitle = document.getElementById('confirm-title');
+const confirmMsg = document.getElementById('confirm-message');
+const confirmIcon = document.getElementById('confirm-icon');
+const confirmAcceptBtn = document.getElementById('btn-confirm-accept');
+const confirmCancelBtn = document.getElementById('btn-confirm-cancel');
+
+// Centered Game Menu State & Lifecycle
+let isGameMenuOpen = false;
+
+const setGameMenuOpen = (open: boolean) => {
+  isGameMenuOpen = open;
+  if (gameMenuModal) {
+    gameMenuModal.style.display = open ? 'flex' : 'none';
+    gameMenuModal.setAttribute('aria-hidden', open ? 'false' : 'true');
+  }
+  navBtnMenu?.classList.toggle('active', open);
+  if (open) {
+    // Close camera popup when Game Menu opens
+    if (cameraOptionsPopup) cameraOptionsPopup.style.display = 'none';
+    navBtnCamera?.classList.remove('active');
+  }
 };
 
-if (btnCamIso) {
-  btnCamIso.addEventListener('click', () => {
-    clearCamActive();
-    btnCamIso.classList.add('active');
+const toggleGameMenu = () => {
+  setGameMenuOpen(!isGameMenuOpen);
+};
+
+// Popup Visibility Management
+const closePopups = () => {
+  if (cameraOptionsPopup) cameraOptionsPopup.style.display = 'none';
+  navBtnCamera?.classList.remove('active');
+};
+
+const togglePopup = (popup: HTMLElement | null, btn: HTMLElement | null) => {
+  if (!popup) return;
+  const isCurrentlyOpen = popup.style.display === 'block';
+  closePopups();
+  if (isGameMenuOpen) setGameMenuOpen(false);
+  if (!isCurrentlyOpen) {
+    popup.style.display = 'block';
+    btn?.classList.add('active');
+  }
+};
+
+// 1. COMBAT LOG VISIBILITY CONTROL
+const logWrapper = document.getElementById('combat-log-wrapper');
+
+const setCombatLogVisible = (visible: boolean) => {
+  if (logWrapper) {
+    logWrapper.style.display = visible ? 'block' : 'none';
+    logWrapper.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  }
+  if (navBtnLogs) {
+    navBtnLogs.classList.toggle('active', visible);
+    navBtnLogs.setAttribute('aria-pressed', visible ? 'true' : 'false');
+  }
+};
+
+if (navBtnLogs) {
+  navBtnLogs.addEventListener('click', () => {
+    const isVisible = logWrapper ? logWrapper.style.display !== 'none' : true;
+    setCombatLogVisible(!isVisible);
+  });
+}
+
+// 2. CAMERA OPTIONS
+const setCamPresetActive = (preset: 'command' | 'top' | 'cinematic') => {
+  [popCamCommand, popCamTop, popCamCinematic].forEach(b => b?.classList.remove('active'));
+  if (preset === 'command') popCamCommand?.classList.add('active');
+  if (preset === 'top') popCamTop?.classList.add('active');
+  if (preset === 'cinematic') popCamCinematic?.classList.add('active');
+};
+
+if (navBtnCamera) {
+  navBtnCamera.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePopup(cameraOptionsPopup, navBtnCamera);
+  });
+}
+
+if (popCamCommand) {
+  popCamCommand.addEventListener('click', () => {
+    setCamPresetActive('command');
     scene.cameraController.setPresetView('iso', engine.state.phase === 'deployment');
   });
 }
 
-if (btnCamTop) {
-  btnCamTop.addEventListener('click', () => {
-    clearCamActive();
-    btnCamTop.classList.add('active');
+if (popCamTop) {
+  popCamTop.addEventListener('click', () => {
+    setCamPresetActive('top');
     scene.cameraController.setPresetView('top');
   });
 }
 
-if (btnCamCinematic) {
-  btnCamCinematic.addEventListener('click', () => {
-    clearCamActive();
-    btnCamCinematic.classList.add('active');
+if (popCamCinematic) {
+  popCamCinematic.addEventListener('click', () => {
+    setCamPresetActive('cinematic');
     scene.cameraController.setPresetView('cinematic');
   });
 }
 
-if (btnActionCamToggle) {
-  btnActionCamToggle.addEventListener('click', () => {
+if (popActionCamToggle) {
+  popActionCamToggle.addEventListener('click', () => {
     scene.cameraController.actionCamEnabled = !scene.cameraController.actionCamEnabled;
-    btnActionCamToggle.textContent = `Action Cam: ${scene.cameraController.actionCamEnabled ? 'ON' : 'OFF'}`;
-    btnActionCamToggle.classList.toggle('active', scene.cameraController.actionCamEnabled);
+    const isEnabled = scene.cameraController.actionCamEnabled;
+    if (popActionCamState) popActionCamState.textContent = isEnabled ? 'ON' : 'OFF';
+    popActionCamToggle.classList.toggle('active', isEnabled);
   });
 }
 
-if (btnFullscreen) {
-  btnFullscreen.addEventListener('click', () => {
+// 3. FULLSCREEN TOGGLE
+const fsEnterIcon = document.querySelector('.nav-icon-fs-enter') as HTMLElement | null;
+const fsExitIcon = document.querySelector('.nav-icon-fs-exit') as HTMLElement | null;
+
+const syncFullscreenState = () => {
+  const isFs = !!document.fullscreenElement;
+  navBtnFullscreen?.classList.toggle('active', isFs);
+  if (navBtnFullscreen) {
+    navBtnFullscreen.title = isFs ? 'Exit Fullscreen' : 'Fullscreen';
+  }
+  if (fsEnterIcon) fsEnterIcon.style.display = isFs ? 'none' : 'block';
+  if (fsExitIcon) fsExitIcon.style.display = isFs ? 'block' : 'none';
+};
+
+const toggleFullscreen = async () => {
+  try {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      await document.documentElement.requestFullscreen();
+      if ('keyboard' in navigator && typeof (navigator as any).keyboard?.lock === 'function') {
+        try {
+          await (navigator as any).keyboard.lock(['Escape']);
+        } catch {
+          // ignore if keyboard lock is not permitted by host environment
+        }
+      }
     } else {
-      document.exitFullscreen().catch(() => {});
+      if ('keyboard' in navigator && typeof (navigator as any).keyboard?.unlock === 'function') {
+        try {
+          (navigator as any).keyboard.unlock();
+        } catch {
+          // ignore
+        }
+      }
+      await document.exitFullscreen();
+    }
+  } catch {
+    // fullscreen request error fallback
+  }
+};
+
+if (navBtnFullscreen) {
+  navBtnFullscreen.addEventListener('click', () => {
+    toggleFullscreen();
+  });
+}
+
+document.addEventListener('fullscreenchange', () => {
+  syncFullscreenState();
+  if (!document.fullscreenElement) {
+    if ('keyboard' in navigator && typeof (navigator as any).keyboard?.unlock === 'function') {
+      try {
+        (navigator as any).keyboard.unlock();
+      } catch {
+        // ignore
+      }
+    }
+  }
+});
+
+// 4. CENTERED GAME MENU & CONFIRMATION MODALS
+let pendingConfirmAction: (() => void) | null = null;
+
+const showConfirmModal = (
+  title: string,
+  message: string,
+  icon: string,
+  confirmLabel: string,
+  onConfirm: () => void,
+  isDanger = false
+) => {
+  closePopups();
+  if (!confirmModal || !confirmTitle || !confirmMsg || !confirmIcon || !confirmAcceptBtn) return;
+  confirmTitle.textContent = title;
+  confirmMsg.textContent = message;
+  confirmIcon.textContent = icon;
+  confirmAcceptBtn.textContent = confirmLabel;
+  confirmAcceptBtn.className = isDanger ? 'btn-action btn-danger' : 'btn-action btn-primary';
+  pendingConfirmAction = onConfirm;
+  confirmModal.style.display = 'flex';
+};
+
+const hideConfirmModal = () => {
+  if (confirmModal) confirmModal.style.display = 'none';
+  pendingConfirmAction = null;
+};
+
+if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmModal);
+if (confirmAcceptBtn) {
+  confirmAcceptBtn.addEventListener('click', () => {
+    const action = pendingConfirmAction;
+    hideConfirmModal();
+    if (action) action();
+  });
+}
+
+if (navBtnMenu) {
+  navBtnMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleGameMenu();
+  });
+}
+
+if (btnCloseGameMenu) {
+  btnCloseGameMenu.addEventListener('click', () => setGameMenuOpen(false));
+}
+
+if (btnResumeGame) {
+  btnResumeGame.addEventListener('click', () => setGameMenuOpen(false));
+}
+
+if (gameMenuModal) {
+  gameMenuModal.addEventListener('click', (e) => {
+    if (e.target === gameMenuModal) {
+      setGameMenuOpen(false);
     }
   });
 }
 
-if (btnChangeMatch) {
-  btnChangeMatch.addEventListener('click', () => {
-    engine.resetGameSession();
-    deploymentUi.show(false);
-    dom.showRaceModal();
+if (popMenuRestart) {
+  popMenuRestart.addEventListener('click', () => {
+    showConfirmModal(
+      'Restart Battle',
+      'Restart this battle from the beginning with the same factions, map, and mission?',
+      '🔄',
+      'Restart',
+      () => {
+        setGameMenuOpen(false);
+        const p1Faction = engine.state.p1Faction || 'space_marines';
+        const p2Faction = engine.state.p2Faction || 'chaos';
+        const theme = engine.state.theme || 'desert';
+        const mission = engine.state.mission || 'extermination';
+        const p1EscortRole = engine.state.escortRole || 'escort';
+        const p2EscortRole = engine.state.p2EscortRole || 'attack';
+        engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
+        deploymentUi.show(true);
+        const initialKey = engine.state.rosterPlayer?.[0]?.key || null;
+        deploymentUi.renderRoster(engine.state.rosterPlayer || [], initialKey);
+        scene.cameraController.frameDeploymentZone(false);
+        scene.updateDeploymentHighlights(engine.state.rosterPlayer || []);
+        setCamPresetActive('command');
+      }
+    );
   });
 }
 
-// Minimap & Log Collapsibles
+if (popMenuRematch) {
+  popMenuRematch.addEventListener('click', () => {
+    showConfirmModal(
+      'Rematch',
+      'Abandon current match and return to faction & battlefield selection?',
+      '⚔️',
+      'Rematch',
+      () => {
+        setGameMenuOpen(false);
+        engine.resetGameSession();
+        deploymentUi.show(false);
+        dom.showRaceModal();
+      }
+    );
+  });
+}
+
+if (popMenuExit) {
+  popMenuExit.addEventListener('click', () => {
+    showConfirmModal(
+      'Exit to Main Menu',
+      'Abandon current match and return to the main title screen?',
+      '🚪',
+      'Exit Game',
+      () => {
+        setGameMenuOpen(false);
+        engine.resetGameSession();
+        deploymentUi.show(false);
+        dom.showHomeScreen();
+      },
+      true
+    );
+  });
+}
+
+// Close popups on click outside
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement | null;
+  if (!target) return;
+  if (!target.closest('#top-nav-bar') && !target.closest('#camera-options-popup')) {
+    closePopups();
+  }
+});
+
+// Minimap Collapsible
 const btnToggleMinimap = document.getElementById('btn-toggle-minimap');
 const minimapBody = document.getElementById('minimap-body');
 if (btnToggleMinimap && minimapBody) {
@@ -137,16 +397,6 @@ if (btnToggleMinimap && minimapBody) {
     const isCollapsed = minimapBody.style.display === 'none';
     minimapBody.style.display = isCollapsed ? 'block' : 'none';
     btnToggleMinimap.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
-  });
-}
-
-const btnToggleLog = document.getElementById('btn-toggle-log');
-const logContainer = document.getElementById('combat-log-container');
-if (btnToggleLog && logContainer) {
-  btnToggleLog.addEventListener('click', () => {
-    const isCollapsed = logContainer.style.display === 'none';
-    logContainer.style.display = isCollapsed ? 'flex' : 'none';
-    btnToggleLog.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
   });
 }
 
@@ -163,9 +413,17 @@ if (btnEndTurn) {
 const btnRestart = document.getElementById('btn-restart');
 if (btnRestart) {
   btnRestart.addEventListener('click', () => {
-    engine.resetGameSession();
-    deploymentUi.show(false);
-    dom.showRaceModal();
+    showConfirmModal(
+      'New Match',
+      'Abandon current battle and return to faction selection?',
+      '⚔️',
+      'New Match',
+      () => {
+        engine.resetGameSession();
+        deploymentUi.show(false);
+        dom.showRaceModal();
+      }
+    );
   });
 }
 
@@ -279,6 +537,30 @@ container.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Keyboard shortcuts
 window.addEventListener('keydown', (e: KeyboardEvent) => {
+  // F11 -> Toggle Fullscreen mode
+  if (e.key === 'F11') {
+    e.preventDefault();
+    toggleFullscreen();
+    return;
+  }
+
+  // ESC -> Toggle Centered Game Menu or close modal/popups (does NOT exit fullscreen)
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    if (confirmModal && confirmModal.style.display === 'flex') {
+      hideConfirmModal();
+      return;
+    }
+    if (cameraOptionsPopup && cameraOptionsPopup.style.display === 'block') {
+      closePopups();
+      return;
+    }
+    if (engine.state.phase === 'deployment' || engine.state.phase === 'battle') {
+      toggleGameMenu();
+      return;
+    }
+  }
+
   // Ctrl + Z -> Camera Undo
   if (e.ctrlKey && e.key.toLowerCase() === 'z') {
     e.preventDefault();
@@ -288,18 +570,15 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 
   // Camera presets
   if (e.key === '1') {
-    clearCamActive();
-    btnCamIso?.classList.add('active');
-    scene.cameraController.setPresetView('iso');
+    setCamPresetActive('command');
+    scene.cameraController.setPresetView('iso', engine.state.phase === 'deployment');
   }
   if (e.key === '2') {
-    clearCamActive();
-    btnCamTop?.classList.add('active');
+    setCamPresetActive('top');
     scene.cameraController.setPresetView('top');
   }
   if (e.key === '3') {
-    clearCamActive();
-    btnCamCinematic?.classList.add('active');
+    setCamPresetActive('cinematic');
     scene.cameraController.setPresetView('cinematic');
   }
 
