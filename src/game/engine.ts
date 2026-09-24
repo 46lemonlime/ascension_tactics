@@ -465,6 +465,7 @@ export class GameEngine {
   }
 
   public handleTileClick(c: number, r: number): void {
+    if (this.isBusy) return;
     if (this.state.phase === 'deployment') return;
     if (this.state.turn !== 1 || this.isExecutingAiTurn) return;
 
@@ -522,6 +523,7 @@ export class GameEngine {
   }
 
   public executeMove(unitId: number, targetC: number, targetR: number, precomputedPath?: any[]): void {
+    if (this.isBusy) return;
     const unit = this.state.units.find(u => u.id === unitId);
     if (!unit) return;
     const unitDef = UNIT_ROSTER[unit.unitDefId] || unit.def;
@@ -542,6 +544,7 @@ export class GameEngine {
       return;
     }
 
+    this.isBusy = true;
     unit.hasMoved = true;
     this.currentReach = null;
     this.scene.clearHighlights();
@@ -552,6 +555,7 @@ export class GameEngine {
       path,
       this.state.units,
       () => {
+        this.isBusy = false;
         this.refreshAwareness();
         this.selectUnit(unit.id);
         this.log.log(`${unitDef.name} advanced to coordinates [${targetC}, ${targetR}].`, 'info');

@@ -57,6 +57,8 @@ export function animateMovePath(
 
   let preMoveCamPos: THREE.Vector3 | null = null;
   let preMoveCamTarget: THREE.Vector3 | null = null;
+  let camPos: THREE.Vector3 | null = null;
+  let camTarget: THREE.Vector3 | null = null;
 
   if (useActionCam) {
     const ctrl = getActiveCameraController();
@@ -82,28 +84,33 @@ export function animateMovePath(
     const sideDist = Math.min(Math.max(moveDist * 0.25, 7.5), 16.0);
     const camHeight = Math.min(Math.max(moveDist * 0.22, 7.5), 16.0);
 
-    const camPos = startWorld
+    camPos = startWorld
       .clone()
       .sub(moveDir.clone().multiplyScalar(behindDist))
       .add(sideDir.clone().multiplyScalar(sideDist));
     camPos.y = camHeight;
 
-    const camTarget = startWorld.clone().lerp(destWorld, 0.45);
+    camTarget = startWorld.clone().lerp(destWorld, 0.45);
     camTarget.y = 1.8;
-
-    animateCameraTo(camPos, camTarget, 0.6);
   }
 
+  const living = getSurvivingFigures(unit);
   const isLarge = sz >= 2 || unit.squadSize === 1;
   const isHover = unit.type === 'tau_hammerhead' || unit.type === 'de_ravager';
-  const isWalker = isLarge && !isHover;
-
-  const living = getSurvivingFigures(unit);
+  const isVehicleTracked =
+    unit.type === 'dir_battle_tank' ||
+    unit.type === 'dir_basilisk' ||
+    unit.type === 'sm_predator' ||
+    unit.type === 'c_predator' ||
+    unit.type === 'orc_battlewagon' ||
+    living.some((fig: any) => (fig.root?.userData?.animProfile || fig.root?.userData?.figure?.userData?.animProfile) === 'vehicle_tracked');
+  const isWalker = isLarge && !isHover && !isVehicleTracked;
   const isSingleModel = unit.squadSize === 1 || sz >= 2 || living.length <= 1;
 
   const getLeftLeg = (fig: any) => fig.root?.userData?.leftLeg || fig.root?.userData?.figure?.userData?.leftLeg;
   const getRightLeg = (fig: any) => fig.root?.userData?.rightLeg || fig.root?.userData?.figure?.userData?.rightLeg;
   const getFigBody = (fig: any) => fig.root?.userData?.figBody || fig.root?.userData?.figure?.userData?.figBody;
+  const getWheels = (fig: any): THREE.Mesh[] => fig.root?.userData?.wheels || fig.root?.userData?.figure?.userData?.wheels || [];
 
   let stepIdx = 0;
 
@@ -172,11 +179,10 @@ export function animateMovePath(
       }
 
       if (useActionCam && preMoveCamPos && preMoveCamTarget && unit.team === 'player') {
-        setTimeout(() => {
-          animateCameraTo(preMoveCamPos!, preMoveCamTarget!, 0.45);
+        animateCameraTo(preMoveCamPos, preMoveCamTarget, 0.45, () => {
           clearActionSavedCam();
           onDone();
-        }, 100);
+        });
       } else {
         clearActionSavedCam();
         onDone();
@@ -210,7 +216,8 @@ export function animateMovePath(
     addTween(
       runDuration,
       (p: number) => {
-        const dtTween = Math.max((p - lastP) * runDuration, 0.016);
+        const dp = p - lastP;
+        const dtTween = Math.max(dp * runDuration, 0.016);
         lastP = p;
 
         unit.model.position.lerpVectors(startPos, endPos, p);
@@ -222,7 +229,19 @@ export function animateMovePath(
         PhysicsEngine.step(dtTween, [unit], unit);
 
         // Stride & bobbing animations
-        if (isHover) {
+        if (isVehicleTracked) {
+          const deltaDist = dp * segmentDist;
+          const wheelRadius = 0.20;
+          const deltaAngle = deltaDist / wheelRadius;
+          living.forEach((fig: any) => {
+            const body = getFigBody(fig);
+            if (body) body.position.y = 0.20;
+            const wheels = getWheels(fig);
+            wheels.forEach(w => {
+              w.rotation.x += deltaAngle;
+            });
+          });
+        } else if (isHover) {
           const hoverFloat = Math.sin(p * Math.PI * 4) * 0.12;
           living.forEach((fig: any) => {
             const body = getFigBody(fig);
@@ -260,5 +279,11 @@ export function animateMovePath(
     );
   }
 
-  runNextSegment();
+  if (useActionCam && camPos && camTarget) {
+    animateCameraTo(camPos, camTarget, 0.45, () => {
+      runNextSegment();
+    });
+  } else {
+    runNextSegment();
+  }
 }

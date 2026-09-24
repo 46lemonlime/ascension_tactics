@@ -1,6 +1,6 @@
 import { GRID_COLS, GRID_ROWS, MAP_OBSTACLES, gridToWorld } from '../data/constants';
 import { THEMES } from '../data/themes';
-import type { GameState, Objective, Obstacle } from '../data/types';
+import type { GameState } from '../data/types';
 import type { CameraController } from '../renderer/camera';
 import * as THREE from 'three';
 
@@ -8,6 +8,10 @@ export class MinimapRadar {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private cameraController: CameraController;
+  private bgCanvas: HTMLCanvasElement;
+  private bgCtx: CanvasRenderingContext2D;
+  private currentTheme: string = '';
+  private titleEl: HTMLElement | null = null;
 
   constructor(cameraController: CameraController) {
     let el = document.getElementById('minimap-canvas') as HTMLCanvasElement;
@@ -23,6 +27,14 @@ export class MinimapRadar {
     this.canvas.height = 224; // 40x56 aspect ratio
     this.ctx = this.canvas.getContext('2d')!;
     this.cameraController = cameraController;
+
+    // Pre-rendered offscreen background cache
+    this.bgCanvas = document.createElement('canvas');
+    this.bgCanvas.width = this.canvas.width;
+    this.bgCanvas.height = this.canvas.height;
+    this.bgCtx = this.bgCanvas.getContext('2d')!;
+
+    this.titleEl = document.getElementById('minimap-title');
 
     this.setupInteractions();
   }
@@ -46,16 +58,16 @@ export class MinimapRadar {
     this.canvas.addEventListener('click', handleMinimapClick);
   }
 
-  public render(state: GameState): void {
-    const themeObj = THEMES[state.theme] || THEMES.jungle;
-    const titleEl = document.getElementById('minimap-title');
-    if (titleEl && titleEl.textContent !== themeObj.name) {
-      titleEl.textContent = themeObj.name;
+  private updateBackground(themeId: string): void {
+    this.currentTheme = themeId;
+    const themeObj = THEMES[themeId] || THEMES.jungle;
+    if (this.titleEl && this.titleEl.textContent !== themeObj.name) {
+      this.titleEl.textContent = themeObj.name;
     }
 
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-    const ctx = this.ctx;
+    const w = this.bgCanvas.width;
+    const h = this.bgCanvas.height;
+    const ctx = this.bgCtx;
 
     // Background
     ctx.fillStyle = '#060a12';
@@ -80,15 +92,30 @@ export class MinimapRadar {
       ctx.stroke();
     }
 
-    // Draw Obstacles
-    const obstacles: string[] = (MAP_OBSTACLES[state.theme] || MAP_OBSTACLES.jungle) as string[];
+    // Draw Obstacles once onto offscreen background canvas
+    const obstacles: string[] = (MAP_OBSTACLES[themeId] || MAP_OBSTACLES.jungle) as string[];
     ctx.fillStyle = '#1e293b';
     obstacles.forEach(k => {
       const [ox, oz] = k.split(',').map(Number);
       ctx.fillRect(ox * cellW + 1, oz * cellH + 1, cellW - 2, cellH - 2);
     });
+  }
 
-    // Draw Objectives / Extraction
+  public render(state: GameState): void {
+    if (state.theme !== this.currentTheme) {
+      this.updateBackground(state.theme);
+    }
+
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const ctx = this.ctx;
+    const cellW = w / GRID_COLS;
+    const cellH = h / GRID_ROWS;
+
+    // 1. Fast blit of pre-rendered background
+    ctx.drawImage(this.bgCanvas, 0, 0);
+
+    // 2. Draw Objectives / Extraction
     if (state.mission === 'domination' && state.objectives) {
       state.objectives.forEach(obj => {
         ctx.fillStyle = obj.controlledBy === 1 ? '#00f3ff' : (obj.controlledBy === 2 ? '#ff2a6d' : '#ffcc00');
@@ -103,7 +130,7 @@ export class MinimapRadar {
       ctx.fillRect((state.escortTargetC - 1) * cellW, (state.escortTargetR - 1) * cellH, 3 * cellW, 3 * cellH);
     }
 
-    // Draw Units
+    // 3. Draw Units
     state.units.forEach(u => {
       // If enemy is hidden in Fog of War, do NOT draw on minimap!
       if (u.player === 2 && state.fow[u.r]?.[u.c] !== 2) {
@@ -120,9 +147,9 @@ export class MinimapRadar {
       ctx.fillRect(u.c * cellW, u.r * cellH, Math.max(3, size), Math.max(3, size));
     });
 
-    // Draw Camera Viewport Frustum on Minimap
+    // 4. Draw Camera Viewport Frustum on Minimap
     const camTarget = this.cameraController.controls.target;
-    // rough projection of camera target to minimap
+    // projection of camera target to minimap
     const centerC = (camTarget.x / 6.0) + (GRID_COLS / 2);
     const centerR = (camTarget.z / 6.0) + (GRID_ROWS / 2);
 

@@ -8,9 +8,12 @@ import { buildEldarFigure } from './eldar';
 import { buildDarkEldarFigure } from './dark_eldar';
 import { buildTyranidFigure } from './tyranids';
 import { buildTauFigure } from './tau';
+import { buildDirectorateFigure } from './directorate';
+import { buildRiftbornFigure } from './riftborn';
 import { buildVipCourierFigure } from './vip';
 import { FormationSystem } from '../../game/formation';
 import { unitWorldX, unitWorldZ } from '../../data/constants';
+import { getCachedCylinder, getCachedRing, getCachedStandardMaterial, getCachedBasicMaterial } from './cache';
 
 /**
  * Creates a circular bevelled wargaming base (Warhammer 40k style round base)
@@ -19,8 +22,8 @@ export function createWargamingBase(radius: number = 0.85, height: number = 0.18
   const group = new THREE.Group();
 
   // Base rim
-  const baseGeo = new THREE.CylinderGeometry(radius * 0.95, radius, height, 24);
-  const baseMat = new THREE.MeshStandardMaterial({
+  const baseGeo = getCachedCylinder(radius * 0.95, radius, height, 28);
+  const baseMat = getCachedStandardMaterial({
     color,
     roughness: 0.85,
     metalness: 0.1
@@ -32,8 +35,8 @@ export function createWargamingBase(radius: number = 0.85, height: number = 0.18
   group.add(baseMesh);
 
   // Textured top surface
-  const topGeo = new THREE.CylinderGeometry(radius * 0.92, radius * 0.92, 0.04, 24);
-  const topMat = new THREE.MeshStandardMaterial({
+  const topGeo = getCachedCylinder(radius * 0.92, radius * 0.92, 0.04, 28);
+  const topMat = getCachedStandardMaterial({
     color: 0x3a3630,
     roughness: 0.95,
     metalness: 0.05
@@ -85,6 +88,14 @@ export function createChaosFigure(unitDef: UnitDef, primaryColor: number = 0x991
   return buildFigureWithBuilder(buildChaosFigure, unitDef, primaryColor, trimColor, isLeader);
 }
 
+export function createDirectorateFigure(unitDef: UnitDef, primaryColor: number = 0x3f6212, trimColor: number = 0xd97706, isLeader = false): THREE.Group {
+  return buildFigureWithBuilder(buildDirectorateFigure, unitDef, primaryColor, trimColor, isLeader);
+}
+
+export function createRiftbornFigure(unitDef: UnitDef, primaryColor: number = 0x4c1d95, trimColor: number = 0xf43f5e, isLeader = false): THREE.Group {
+  return buildFigureWithBuilder(buildRiftbornFigure, unitDef, primaryColor, trimColor, isLeader);
+}
+
 export function createOrcFigure(unitDef: UnitDef, primaryColor: number = 0x15803d, trimColor: number = 0xd97706, isLeader = false): THREE.Group {
   return buildFigureWithBuilder(buildOrcFigure, unitDef, primaryColor, trimColor, isLeader);
 }
@@ -127,13 +138,17 @@ export function createMiniatureFigure(unitDef: UnitDef, faction: Faction | undef
   const factionId = faction?.id || unitDef.factionId || 'space_marines';
 
   switch (factionId) {
-    case 'forsaken':
-    case 'chaos':
-    case 'chaos_marines':
-      return createChaosFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'directorate':
+    case 'guard':
+    case 'astra_militarum':
+      return createDirectorateFigure(unitDef, primaryColor, trimColor, isLeader);
     case 'riftborn':
     case 'daemons':
     case 'chaos_daemons':
+      return createRiftbornFigure(unitDef, primaryColor, trimColor, isLeader);
+    case 'forsaken':
+    case 'chaos':
+    case 'chaos_marines':
       return createChaosFigure(unitDef, primaryColor, trimColor, isLeader);
     case 'ghar':
     case 'orcs':
@@ -157,10 +172,6 @@ export function createMiniatureFigure(unitDef: UnitDef, faction: Faction | undef
     case 'concordat':
     case 'tau':
       return createTauFigure(unitDef, primaryColor, trimColor, isLeader);
-    case 'directorate':
-    case 'guard':
-    case 'astra_militarum':
-      return createMarineFigure(unitDef, primaryColor, trimColor, isLeader);
     case 'ascendants':
     case 'marines':
     case 'space_marines':
@@ -200,9 +211,8 @@ export function createSquadUnitMesh(unit: Unit, unitDef: UnitDef, faction: Facti
     memberRoot.add(base);
 
     // 2. Individual selection halo ring attached directly around this miniature's base
-    const selRingGeo = new THREE.RingGeometry(baseRadius * 0.95, baseRadius * 1.15, 24);
-    selRingGeo.rotateX(-Math.PI / 2);
-    const selRingMat = new THREE.MeshBasicMaterial({
+    const selRingGeo = getCachedRing(baseRadius * 0.95, baseRadius * 1.15, 28);
+    const selRingMat = getCachedBasicMaterial({
       color: unit.player === 1 ? 0x60a5fa : 0xf87171,
       transparent: true,
       opacity: 0,
@@ -225,6 +235,8 @@ export function createSquadUnitMesh(unit: Unit, unitDef: UnitDef, faction: Facti
     memberRoot.userData.rightLeg = figure.userData.rightLeg;
     memberRoot.userData.figBody = figure.userData.figBody || figure;
     memberRoot.userData.figure = figure;
+    memberRoot.userData.animProfile = figure.userData.animProfile;
+    memberRoot.userData.wheels = figure.userData.wheels;
 
     const off = offsets[i] || { x: 0, z: 0 };
     const slotX = anchorX + (off.x * Math.cos(angle) - off.z * Math.sin(angle));

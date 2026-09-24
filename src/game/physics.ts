@@ -4,53 +4,127 @@ import { MoraleSystem } from './morale';
 import { OBSTACLES } from '../data/themes';
 import { COLS, ROWS, TILE_SIZE, worldX, worldZ } from '../data/constants';
 
+interface CachedObstacle {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+
+interface FigureEntry {
+  fig: Figure;
+  unit: Unit;
+}
+
 export class PhysicsEngine {
+  private static _allFiguresPool: FigureEntry[] = [];
+  private static _cachedObstacles: CachedObstacle[] = [];
+  private static _lastObstaclesVersion: string = '';
+
+  private static updateObstacleCache(): void {
+    if (typeof OBSTACLES === 'undefined' || OBSTACLES.size === 0) {
+      PhysicsEngine._cachedObstacles.length = 0;
+      return;
+    }
+
+    PhysicsEngine._cachedObstacles.length = 0;
+    OBSTACLES.forEach(k => {
+      const commaIdx = k.indexOf(',');
+      const ox = Number(k.substring(0, commaIdx));
+      const oz = Number(k.substring(commaIdx + 1));
+      const wx = worldX(ox);
+      const wz = worldZ(oz);
+      PhysicsEngine._cachedObstacles.push({
+        minX: wx - 3.0,
+        maxX: wx + 3.0,
+        minZ: wz - 3.0,
+        maxZ: wz + 3.0
+      });
+    });
+  }
+
   public static step(dt: number, unitsList: Unit[], targetUnit: Unit | null = null): void {
     const activeUnits = targetUnit ? [targetUnit] : unitsList.filter(u => u.alive && !u.dead);
     if (!activeUnits.length) return;
 
-    // Gather all living figures across all units for collision / separation checks
-    const allFigures: { fig: Figure; unit: Unit }[] = [];
-    unitsList
-      .filter(u => u.alive && !u.dead)
-      .forEach(u => {
-        const figures = u.model?.userData?.figures as Figure[] | undefined;
-        if (!figures) return;
-        const living = figures.filter(f => f.alive);
-        living.forEach(fig => {
-          allFigures.push({ fig, unit: u });
-        });
-      });
+    // Refresh obstacle numeric cache if needed
+    const currentObstaclesCount = typeof OBSTACLES !== 'undefined' ? OBSTACLES.size : 0;
+    const currentVersionKey = `${currentObstaclesCount}_${typeof OBSTACLES !== 'undefined' ? Array.from(OBSTACLES)[0] : ''}`;
+    if (currentVersionKey !== PhysicsEngine._lastObstaclesVersion) {
+      PhysicsEngine._lastObstaclesVersion = currentVersionKey;
+      PhysicsEngine.updateObstacleCache();
+    }
 
-    activeUnits.forEach(u => {
+    // Reuse persistent figure pool to eliminate per-frame GC allocations
+    let poolIndex = 0;
+    const pool = PhysicsEngine._allFiguresPool;
+
+    for (let i = 0; i < unitsList.length; i++) {
+      const u = unitsList[i];
+      if (!u.alive || u.dead) continue;
       const figures = u.model?.userData?.figures as Figure[] | undefined;
-      if (!figures) return;
-      const living = figures.filter(f => f.alive);
-      if (!living.length) return;
+      if (!figures) continue;
+      for (let f = 0; f < figures.length; f++) {
+        const fig = figures[f];
+        if (fig.alive) {
+          if (poolIndex < pool.length) {
+            pool[poolIndex].fig = fig;
+            pool[poolIndex].unit = u;
+          } else {
+            pool.push({ fig, unit: u });
+          }
+          poolIndex++;
+        }
+      }
+    }
+    const allFiguresCount = poolIndex;
 
-      const isSingleModel = u.squadSize === 1 || u.size >= 2 || living.length === 1;
+    const obstacles = PhysicsEngine._cachedObstacles;
+    const obstacleCount = obstacles.length;
+    const halfW = (COLS * TILE_SIZE) / 2 - 2.0;
+    const halfH = (ROWS * TILE_SIZE) / 2 - 2.0;
+
+    for (let uIdx = 0; uIdx < activeUnits.length; uIdx++) {
+      const u = activeUnits[uIdx];
+      const figures = u.model?.userData?.figures as Figure[] | undefined;
+      if (!figures) continue;
+
+      let livingCount = 0;
+      for (let f = 0; f < figures.length; f++) {
+        if (figures[f].alive) livingCount++;
+      }
+      if (livingCount === 0) continue;
+
+      const isSingleModel = u.squadSize === 1 || u.size >= 2 || livingCount === 1;
 
       // 1. Single Model Entities (Vehicles, Walkers, Monsters, Characters)
       if (isSingleModel) {
-        const fig = living[0];
-        if (fig) {
-          fig.offset = { x: 0, z: 0 };
-          fig.worldX = u.model.position.x;
-          fig.worldZ = u.model.position.z;
-          fig.targetX = u.model.position.x;
-          fig.targetZ = u.model.position.z;
-          fig.vx = 0;
-          fig.vz = 0;
-          fig.root.position.set(0, 0, 0);
-          fig.root.rotation.y = 0;
+        let firstFig: Figure | null = null;
+        for (let f = 0; f < figures.length; f++) {
+          if (figures[f].alive) {
+            firstFig = figures[f];
+            break;
+          }
         }
-        return;
+        if (firstFig) {
+          firstFig.offset.x = 0;
+          firstFig.offset.z = 0;
+          firstFig.worldX = u.model.position.x;
+          firstFig.worldZ = u.model.position.z;
+          firstFig.targetX = u.model.position.x;
+          firstFig.targetZ = u.model.position.z;
+          firstFig.vx = 0;
+          firstFig.vz = 0;
+          firstFig.root.position.set(0, 0, 0);
+          firstFig.root.rotation.y = 0;
+        }
+        continue;
       }
 
       // 2. Multi-Model Squads (Infantry Formations & Swarms)
       const fType = (u.def?.formation && u.def.formation.type) || 'wedge';
       const spacing = (u.def?.formation && u.def.formation.spacing) || 1.45;
-      const offsets = FormationSystem.getOffsets(u.squadSize, fType, spacing, living.length);
+      const offsets = FormationSystem.getOffsets(u.squadSize, fType, spacing, livingCount);
       const cohesionWeight = (u.def?.formation && u.def.formation.cohesionWeight) || 1.0;
       const moraleState = typeof u.morale === 'object' ? u.morale.state : (u.moraleState.toUpperCase() as any);
       const moraleFactor = moraleState ? MoraleSystem.getCohesionFactor(moraleState) : 1.0;
@@ -59,14 +133,21 @@ export class PhysicsEngine {
       const anchorX = u.model.position.x;
       const anchorZ = u.model.position.z;
       const angle = u.model.rotation.y;
+      const cosAngle = Math.cos(angle);
+      const sinAngle = Math.sin(angle);
 
-      living.forEach((fig, idx) => {
-        const off = offsets[idx] || { x: 0, z: 0 };
+      let livingIndex = 0;
+      for (let f = 0; f < figures.length; f++) {
+        const fig = figures[f];
+        if (!fig.alive) continue;
+
+        const off = offsets[livingIndex] || { x: 0, z: 0 };
+        livingIndex++;
         fig.offset = off;
 
         // Dynamic slot in continuous world space
-        const slotX = anchorX + (off.x * Math.cos(angle) - off.z * Math.sin(angle));
-        const slotZ = anchorZ + (off.x * Math.sin(angle) + off.z * Math.cos(angle));
+        const slotX = anchorX + (off.x * cosAngle - off.z * sinAngle);
+        const slotZ = anchorZ + (off.x * sinAngle + off.z * cosAngle);
         fig.targetX = slotX;
         fig.targetZ = slotZ;
 
@@ -92,8 +173,8 @@ export class PhysicsEngine {
         }
 
         // C. Soft Separation & Hard Penetration Resolution with other figures
-        for (let j = 0; j < allFigures.length; j++) {
-          const other = allFigures[j];
+        for (let j = 0; j < allFiguresCount; j++) {
+          const other = pool[j];
           if (other.fig === fig) continue;
 
           const dx = fig.worldX - other.fig.worldX;
@@ -122,59 +203,48 @@ export class PhysicsEngine {
           }
         }
 
-        // D. Obstacle Avoidance & Hard Collision Pushout
-        if (typeof OBSTACLES !== 'undefined' && OBSTACLES.size > 0) {
-          OBSTACLES.forEach(k => {
-            const [ox, oz] = k.split(',').map(Number);
-            const minX = worldX(ox) - 3.0;
-            const maxX = worldX(ox) + 3.0;
-            const minZ = worldZ(oz) - 3.0;
-            const maxZ = worldZ(oz) + 3.0;
+        // D. Obstacle Avoidance & Hard Collision Pushout (Using pre-parsed bounding boxes)
+        for (let o = 0; o < obstacleCount; o++) {
+          const obs = obstacles[o];
+          const cx = Math.max(obs.minX, Math.min(fig.worldX, obs.maxX));
+          const cz = Math.max(obs.minZ, Math.min(fig.worldZ, obs.maxZ));
 
-            const cx = Math.max(minX, Math.min(fig.worldX, maxX));
-            const cz = Math.max(minZ, Math.min(fig.worldZ, maxZ));
+          const dx = fig.worldX - cx;
+          const dz = fig.worldZ - cz;
+          const distSq = dx * dx + dz * dz;
+          const avoidDist = fig.radius + 1.0;
 
-            const dx = fig.worldX - cx;
-            const dz = fig.worldZ - cz;
-            const distSq = dx * dx + dz * dz;
-            const avoidDist = fig.radius + 1.0;
+          if (distSq < avoidDist * avoidDist) {
+            const dist = Math.sqrt(distSq);
+            if (dist > 0.001) {
+              const norm = dist / avoidDist;
+              const obsForce = Math.pow(1.0 - norm, 2) * 50.0;
+              fx += (dx / dist) * obsForce;
+              fz += (dz / dist) * obsForce;
 
-            if (distSq < avoidDist * avoidDist) {
-              const dist = Math.sqrt(distSq);
-              if (dist > 0.001) {
-                const norm = dist / avoidDist;
-                const obsForce = Math.pow(1.0 - norm, 2) * 50.0;
-                fx += (dx / dist) * obsForce;
-                fz += (dz / dist) * obsForce;
-
-                if (dist < fig.radius) {
-                  fig.worldX = cx + (dx / dist) * fig.radius;
-                  fig.worldZ = cz + (dz / dist) * fig.radius;
-                }
-              } else {
-                fig.worldX += 0.3;
-                fig.worldZ += 0.3;
+              if (dist < fig.radius) {
+                fig.worldX = cx + (dx / dist) * fig.radius;
+                fig.worldZ = cz + (dz / dist) * fig.radius;
               }
+            } else {
+              fig.worldX += 0.3;
+              fig.worldZ += 0.3;
             }
-          });
+          }
         }
 
         // E. Table Boundary Clamping
-        const halfW = (COLS * TILE_SIZE) / 2 - 2.0;
-        const halfH = (ROWS * TILE_SIZE) / 2 - 2.0;
         if (fig.worldX < -halfW) {
           fig.worldX = -halfW;
           fig.vx = 0;
-        }
-        if (fig.worldX > halfW) {
+        } else if (fig.worldX > halfW) {
           fig.worldX = halfW;
           fig.vx = 0;
         }
         if (fig.worldZ < -halfH) {
           fig.worldZ = -halfH;
           fig.vz = 0;
-        }
-        if (fig.worldZ > halfH) {
+        } else if (fig.worldZ > halfH) {
           fig.worldZ = halfH;
           fig.vz = 0;
         }
@@ -198,20 +268,17 @@ export class PhysicsEngine {
         fig.worldX += fig.vx * dt;
         fig.worldZ += fig.vz * dt;
 
-        // G. Update 3D Mesh Local Position & Facing (transformed into parent model's local coordinate space)
-        const dx = fig.worldX - u.model.position.x;
-        const dz = fig.worldZ - u.model.position.z;
-        const uAngle = u.model.rotation.y;
-        const cosA = Math.cos(uAngle);
-        const sinA = Math.sin(uAngle);
+        // G. Update 3D Mesh Local Position & Facing
+        const ldx = fig.worldX - u.model.position.x;
+        const ldz = fig.worldZ - u.model.position.z;
 
-        fig.root.position.x = dx * cosA + dz * sinA;
-        fig.root.position.z = -dx * sinA + dz * cosA;
+        fig.root.position.x = ldx * cosAngle + ldz * sinAngle;
+        fig.root.position.z = -ldx * sinAngle + ldz * cosAngle;
 
-        const vLen = Math.sqrt(fig.vx * fig.vx + fig.vz * fig.vz);
-        if (vLen > 0.25) {
+        const vLenSq = fig.vx * fig.vx + fig.vz * fig.vz;
+        if (vLenSq > 0.0625) {
           const desiredWorldHeading = Math.atan2(fig.vx, fig.vz);
-          let desiredLocalHeading = desiredWorldHeading - u.model.rotation.y;
+          let desiredLocalHeading = desiredWorldHeading - angle;
           while (desiredLocalHeading > Math.PI) desiredLocalHeading -= Math.PI * 2;
           while (desiredLocalHeading < -Math.PI) desiredLocalHeading += Math.PI * 2;
           fig.root.rotation.y +=
@@ -219,8 +286,8 @@ export class PhysicsEngine {
         } else {
           fig.root.rotation.y += (0 - fig.root.rotation.y) * Math.min(5 * dt, 1.0);
         }
-      });
-    });
+      }
+    }
   }
 
   public step(dt: number, unitsList: Unit[], targetUnit: Unit | null = null): void {

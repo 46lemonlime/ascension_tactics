@@ -196,6 +196,8 @@ export function resolveAttack(
     playerAwareTiles.has(key(ux, uz)) ||
     playerAwareTiles.has(key(tx, tz));
   const useActionCam = getActionCamEnabled() && isAttackVisibleToPlayer;
+  let camPos: THREE.Vector3 | null = null;
+  let camTarget: THREE.Vector3 | null = null;
 
   if (useActionCam) {
     const diff = targetWorld.clone().sub(attackerWorld);
@@ -214,16 +216,14 @@ export function resolveAttack(
     const sideDist = isMeleeCombat ? 7.5 : Math.min(Math.max(dist * 0.26, 8.0), 16.0);
     const camHeight = isMeleeCombat ? 6.5 : Math.min(Math.max(dist * 0.22, 7.5), 16.0);
 
-    const camPos = attackerWorld
+    camPos = attackerWorld
       .clone()
       .sub(fireDir.clone().multiplyScalar(behindDist))
       .add(sideDir.clone().multiplyScalar(sideDist));
     camPos.y = camHeight;
 
-    const camTarget = attackerWorld.clone().lerp(targetWorld, 0.38);
+    camTarget = attackerWorld.clone().lerp(targetWorld, 0.38);
     camTarget.y = 1.8;
-
-    animateCameraTo(camPos, camTarget, 0.6);
   }
 
   const finishAttack = (delay = 700) => {
@@ -231,13 +231,16 @@ export function resolveAttack(
       const shouldReturnCamera =
         useActionCam && preActionCamPos && preActionCamTarget && (attacker.team === 'player' || attacker.player === 1);
       if (shouldReturnCamera) {
-        animateCameraTo(preActionCamPos, preActionCamTarget, 0.65);
-      }
-      clearActionSavedCam();
-      setTimeout(() => {
+        animateCameraTo(preActionCamPos, preActionCamTarget, 0.45, () => {
+          clearActionSavedCam();
+          setBusy(false);
+          if (onComplete) onComplete();
+        });
+      } else {
+        clearActionSavedCam();
         setBusy(false);
         if (onComplete) onComplete();
-      }, shouldReturnCamera ? 350 : 100);
+      }
     }, delay);
   };
 
@@ -323,8 +326,13 @@ export function resolveAttack(
     }
   };
 
-  const camArrivalDelay = useActionCam ? 1900 : 50;
-  setTimeout(startCombatAction, camArrivalDelay);
+  if (useActionCam && camPos && camTarget) {
+    animateCameraTo(camPos, camTarget, 0.45, () => {
+      startCombatAction();
+    });
+  } else {
+    startCombatAction();
+  }
 
   return { totalDamage: attackDamage, casualties: 0 };
 }

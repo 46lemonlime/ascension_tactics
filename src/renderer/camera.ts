@@ -122,7 +122,10 @@ export function animateCameraTo(
   durationMs: number = 400,
   onDone?: () => void
 ): void {
-  if (!targetEye || !targetLookAt || !activeCameraController) return;
+  if (!targetEye || !targetLookAt || !activeCameraController) {
+    if (onDone) onDone();
+    return;
+  }
   const eye = targetEye instanceof THREE.Vector3 ? targetEye : new THREE.Vector3(targetEye.x, targetEye.y, targetEye.z);
   const lookAt = targetLookAt instanceof THREE.Vector3 ? targetLookAt : new THREE.Vector3(targetLookAt.x, targetLookAt.y, targetLookAt.z);
   const actualMs = durationMs <= 10 ? durationMs * 1000 : durationMs;
@@ -146,6 +149,11 @@ export class CameraController {
     this.controls.minDistance = 15;
     this.controls.maxDistance = 280;
     this.controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    this.controls.mouseButtons = {
+      LEFT: THREE.MOUSE.PAN,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.ROTATE
+    };
 
     activeCameraController = this;
 
@@ -153,6 +161,114 @@ export class CameraController {
     this.controls.addEventListener('start', () => {
       this.pushHistory();
     });
+
+    // Modifier (Ctrl / Shift / Alt) + Right Mouse Button + Drag: In-place camera rotation
+    // Position remains strictly fixed (X, Y, Z unchanged), only rotation changes.
+    let isModifierRightDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    const fixedCamPos = new THREE.Vector3();
+    const startSpherical = new THREE.Spherical();
+    let lookDist = 50;
+
+    domElement.addEventListener(
+      'pointerdown',
+      (e: PointerEvent) => {
+        const hasModifier = e.ctrlKey || e.shiftKey || e.altKey;
+        if (e.button === 2 && hasModifier) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          isModifierRightDragging = true;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          fixedCamPos.copy(this.camera.position);
+
+          const lookDir = this.controls.target.clone().sub(this.camera.position).normalize();
+          startSpherical.setFromVector3(lookDir);
+          lookDist = Math.max(this.camera.position.distanceTo(this.controls.target), 20);
+
+          this.pushHistory();
+        }
+      },
+      { capture: true }
+    );
+
+    window.addEventListener(
+      'pointermove',
+      (e: PointerEvent) => {
+        if (!isModifierRightDragging) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        const rotateSpeed = 0.0035;
+
+        const theta = startSpherical.theta - dx * rotateSpeed;
+        const phi = Math.max(0.08, Math.min(Math.PI - 0.08, startSpherical.phi - dy * rotateSpeed));
+
+        const newLookDir = new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, phi, theta));
+
+        this.camera.position.copy(fixedCamPos);
+        this.controls.target.copy(fixedCamPos).addScaledVector(newLookDir, lookDist);
+        this.controls.update();
+        this.camera.position.copy(fixedCamPos);
+      },
+      { capture: true }
+    );
+
+    window.addEventListener(
+      'pointerup',
+      (e: PointerEvent) => {
+        if (isModifierRightDragging && (e.button === 2 || (e.buttons & 2) === 0)) {
+          isModifierRightDragging = false;
+        }
+      },
+      { capture: true }
+    );
+
+    // Intercept wheel events when modifier keys (Ctrl, Shift, Alt) are active
+    domElement.addEventListener(
+      'wheel',
+      (e: WheelEvent) => {
+        if (e.ctrlKey || e.shiftKey || e.altKey) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.adjustCameraHeight(e.deltaY);
+        }
+      },
+      { capture: true, passive: false }
+    );
+  }
+
+  private heightHistoryDebounceTimer: number | null = null;
+
+  /**
+   * Adjusts camera vertical height (Y axis) on the spot:
+   * Translates camera position and target vertically by the exact same delta,
+   * keeping X, Z, rotation, pitch, yaw, roll, viewing angle, and distance to target strictly identical.
+   */
+  public adjustCameraHeight(deltaY: number): void {
+    if (this.heightHistoryDebounceTimer === null) {
+      this.pushHistory();
+    } else {
+      window.clearTimeout(this.heightHistoryDebounceTimer);
+    }
+    this.heightHistoryDebounceTimer = window.setTimeout(() => {
+      this.heightHistoryDebounceTimer = null;
+    }, 400);
+
+    const step = 4.5;
+    const direction = deltaY < 0 ? 1 : -1; // Wheel Up (<0) increases height, Wheel Down (>0) decreases height
+    const currentY = this.camera.position.y;
+    const newY = Math.min(Math.max(currentY + direction * step, 8), 260);
+    const actualDeltaY = newY - currentY;
+
+    if (Math.abs(actualDeltaY) > 0.0001) {
+      this.camera.position.y = newY;
+      this.controls.target.y += actualDeltaY;
+      this.controls.update();
+    }
   }
 
   public pushHistory(): void {

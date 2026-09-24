@@ -949,22 +949,22 @@ body {
 
 /* ================== MISSION HUD STATUS BAR ================== */
 #mission-hud-bar {
-  position: absolute;
-  top: 50px;
+  position: fixed;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(13, 18, 27, 0.94);
+  background: rgba(13, 18, 27, 0.95);
   border: 1px solid var(--gold-dim);
   border-top: none;
   border-radius: 0 0 8px 8px;
-  padding: 6px 20px;
+  padding: 6px 22px;
   display: flex;
   align-items: center;
   gap: 18px;
   font-size: 12px;
   letter-spacing: 1px;
   color: var(--text-bright);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(212, 175, 55, 0.2);
   z-index: 100;
   pointer-events: auto;
 }
