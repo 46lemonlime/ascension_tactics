@@ -215,6 +215,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Devourers adapt bio-traits based on enemy composition, mutating defenses against heavy armor or anti-infantry.'
     },
     image: '/assets/factions/devourers.jpg',
+    emblem: '/assets/emblems/devourers.jpg',
     roster: getFactionRoster('tyranids')
   },
 
@@ -251,6 +252,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Destroyed synthetic units have a chance to reassemble their metallic frames and resume battle.'
     },
     image: '/assets/factions/revenant.jpg',
+    emblem: '/assets/emblems/revenant.jpg',
     roster: getFactionRoster('necros')
   },
 
@@ -287,6 +289,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Units gain accuracy and fire-support bonuses when operating within sensor and communication ranges of friendly squads.'
     },
     image: '/assets/factions/concordat.jpg',
+    emblem: '/assets/emblems/concordat.jpg',
     roster: getFactionRoster('tau')
   },
 
@@ -323,6 +326,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Can open dimensional portals across the battlefield to teleport squads, summon warp creatures, and distort terrain.'
     },
     image: '/assets/factions/riftborn.jpg',
+    emblem: '/assets/emblems/riftborn.jpg',
     roster: getFactionRoster('riftborn')
   },
 
@@ -359,6 +363,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Units can push weapons and bodies beyond normal limits for immense temporary power, accumulating risk of corruption.'
     },
     image: '/assets/factions/forsaken.jpg',
+    emblem: '/assets/emblems/forsaken.jpg',
     roster: getFactionRoster('chaos')
   },
 
