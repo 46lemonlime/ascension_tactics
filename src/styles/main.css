@@ -1394,12 +1394,223 @@ body,
 }
 
 .factions-grid,
-.maps-grid {
+.maps-grid,
+.factions-emblems-track {
   display: flex;
   gap: 12px;
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  width: 100%;
+  width: max-content;
   will-change: transform;
+}
+
+/* EMBLEM CAROUSEL WRAPPER */
+.sp-emblem-carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+}
+
+/* EMBLEM-ONLY FACTION CARDS */
+.sp-emblem-card {
+  position: relative;
+  background: linear-gradient(180deg, #151d2a 0%, #0d131c 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.25);
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  flex: 0 0 100px;
+  width: 100px;
+  height: 110px;
+  user-select: none;
+}
+
+.sp-emblem-card:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: var(--gold-bright);
+  background: linear-gradient(180deg, #1d283a 0%, #111824 100%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7), 0 0 14px rgba(212, 175, 55, 0.3);
+}
+
+.sp-emblem-card.selected-player {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(14, 25, 40, 0.95) 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), inset 0 0 10px rgba(56, 189, 248, 0.2);
+  transform: scale(1.08);
+}
+
+.sp-emblem-card.selected-ai {
+  border-color: #f87171;
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.22) 0%, rgba(35, 14, 18, 0.95) 100%);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 0 10px rgba(239, 68, 68, 0.2);
+  transform: scale(1.08);
+}
+
+.sp-emblem-frame {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.sp-emblem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+}
+
+.sp-emblem-icon {
+  font-size: 30px;
+}
+
+.sp-emblem-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--gold-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
+
+.sp-emblem-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--gold-bright);
+  color: #000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  z-index: 5;
+}
+
+.selected-player .sp-emblem-badge {
+  background: #38bdf8;
+  color: #000;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+}
+
+.selected-ai .sp-emblem-badge {
+  background: #f87171;
+  color: #000;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}
+
+/* DEDICATED FACTION INFO BOX */
+.sp-faction-infobox {
+  width: 100%;
+  margin-top: 14px;
+  background: rgba(10, 15, 24, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  min-height: 135px;
+}
+
+.sp-faction-infobox.player-infobox {
+  border-left: 3.5px solid #38bdf8;
+}
+
+.sp-faction-infobox.ai-infobox {
+  border-left: 3.5px solid #f87171;
+}
+
+.sp-infobox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 5px;
+}
+
+.sp-infobox-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-infobox-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--gold-bright);
+  margin: 0;
+}
+
+.player-infobox .sp-infobox-title {
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.ai-infobox .sp-infobox-title {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.sp-infobox-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.sp-infobox-desc {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.sp-infobox-doctrine {
+  font-size: 11px;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 5px 9px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sp-infobox-doctrine strong {
+  color: var(--gold-bright);
+  letter-spacing: 0.8px;
+}
+
+.sp-infobox-roster {
+  font-size: 10.5px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
 }
 
 /* 3. UNIFIED SELECTION CARDS */

@@ -355,273 +355,205 @@
             <h3 class="sp-wheel-title">YOUR FACTION</h3>
           </div>
 
-          <div class="sp-carousel-wrapper sp-wheel-wrapper">
-            <!-- STICKY RANDOM ARMY CARD -->
-            <div class="sp-selection-card faction-card sticky-random-card selected-player" id="fcard-player-random">
-              <div class="sp-card-badge faction-card-badge" id="fbadge-player-random" style="display:block;">AUTO</div>
-              <div class="faction-icon">🎲</div>
-              <div class="faction-name">Random Army</div>
-              <div class="faction-sub">Dynamic Mystery Force</div>
-              <div class="faction-desc">Roll a dynamic mystery army upon deployment. Test your mastery across all 10 warhosts.</div>
-              <div class="faction-units-preview">Mystery Selection • Adapt & Conquer</div>
-            </div>
+          <!-- EMBLEM CAROUSEL WRAPPER -->
+          <div class="sp-emblem-carousel-wrapper">
+            <button id="btn-player-carousel-prev" class="sp-carousel-nav-btn" title="Previous Faction" aria-label="Previous Faction">&#10094;</button>
 
-            <!-- PREV ARROW -->
-            <button id="btn-player-carousel-prev" class="sp-carousel-nav-btn" title="Previous Factions" aria-label="Previous Factions">&#10094;</button>
-
-            <!-- VIEWPORT -->
             <div class="sp-carousel-viewport sp-wheel-viewport" id="viewport-player-wheel">
-              <div class="factions-grid" id="factions-track-player">
-                <!-- SET 1 (CLONES) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+              <div class="factions-emblems-track" id="factions-track-player">
+                <!-- SET 0 (CLONES) -->
+                <div class="sp-emblem-card selected-player" data-race="random" data-index="0" title="Random Army">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="1" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="2" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="3" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="4" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="5" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="6" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="7" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="8" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="9" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="10" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
 
-                <!-- SET 2 (MAIN ACTIVE SET) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+                <!-- SET 1 (MIDDLE MAIN SET - DEFAULT FOCUS AT INDEX 11) -->
+                <div class="sp-emblem-card selected-player" data-race="random" data-index="11" title="Random Army">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="12" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="13" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="14" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="15" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="16" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="17" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="18" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="19" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="20" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="21" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
 
-                <!-- SET 3 (CLONES) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+                <!-- SET 2 (CLONES) -->
+                <div class="sp-emblem-card selected-player" data-race="random" data-index="22" title="Random Army">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="23" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="24" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="25" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="26" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="27" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="28" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="29" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="30" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="31" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="32" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
               </div>
             </div>
 
-            <!-- NEXT ARROW -->
-            <button id="btn-player-carousel-next" class="sp-carousel-nav-btn" title="Next Factions" aria-label="Next Factions">&#10095;</button>
+            <button id="btn-player-carousel-next" class="sp-carousel-nav-btn" title="Next Faction" aria-label="Next Faction">&#10095;</button>
+          </div>
+
+          <!-- DEDICATED PLAYER FACTION INFO BOX -->
+          <div class="sp-faction-infobox player-infobox" id="player-faction-infobox">
+            <div class="sp-infobox-header">
+              <div class="sp-infobox-title-group">
+                <h4 class="sp-infobox-title" id="player-info-title">🎲 RANDOM ARMY</h4>
+                <div class="sp-infobox-sub" id="player-info-sub">DYNAMIC MYSTERY FORCE</div>
+              </div>
+            </div>
+            <div class="sp-infobox-desc" id="player-info-desc">
+              Roll an unpredictable strike force dynamically upon tactical deployment. Test your command mastery across all 10 warhost factions.
+            </div>
+            <div class="sp-infobox-doctrine" id="player-info-doctrine">
+              <strong>DOCTRINE:</strong> Dynamic tactical flexibility • Adapt & Conquer
+            </div>
+            <div class="sp-infobox-roster" id="player-info-roster">
+              <span>Mystery Selection</span> • <span>All 10 Warhosts</span> • <span>Tactical Versatility</span>
+            </div>
           </div>
         </div>
 
@@ -639,273 +571,205 @@
             <h3 class="sp-wheel-title">AI FACTION</h3>
           </div>
 
-          <div class="sp-carousel-wrapper sp-wheel-wrapper">
-            <!-- STICKY RANDOM RIVAL CARD -->
-            <div class="sp-selection-card faction-card sticky-random-card selected-ai" id="fcard-ai-random">
-              <div class="sp-card-badge faction-card-badge" id="fbadge-ai-random" style="display:block;">AUTO</div>
-              <div class="faction-icon">🎲</div>
-              <div class="faction-name">Random Rival</div>
-              <div class="faction-sub">Dynamic Mystery Force</div>
-              <div class="faction-desc">The AI overseer selects an unpredictable rival faction dynamically upon tactical deployment.</div>
-              <div class="faction-units-preview">Dynamic Rival • Adapt & Overcome</div>
-            </div>
+          <!-- EMBLEM CAROUSEL WRAPPER -->
+          <div class="sp-emblem-carousel-wrapper">
+            <button id="btn-ai-carousel-prev" class="sp-carousel-nav-btn" title="Previous Faction" aria-label="Previous Faction">&#10094;</button>
 
-            <!-- PREV ARROW -->
-            <button id="btn-ai-carousel-prev" class="sp-carousel-nav-btn" title="Previous Factions" aria-label="Previous Factions">&#10094;</button>
-
-            <!-- VIEWPORT -->
             <div class="sp-carousel-viewport sp-wheel-viewport" id="viewport-ai-wheel">
-              <div class="factions-grid" id="factions-track-ai">
-                <!-- SET 1 (CLONES) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+              <div class="factions-emblems-track" id="factions-track-ai">
+                <!-- SET 0 (CLONES) -->
+                <div class="sp-emblem-card selected-ai" data-race="random" data-index="0" title="Random Rival">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="1" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="2" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="3" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="4" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="5" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="6" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="7" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="8" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="9" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="10" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
 
-                <!-- SET 2 (MAIN ACTIVE SET) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+                <!-- SET 1 (MIDDLE MAIN SET - DEFAULT FOCUS AT INDEX 11) -->
+                <div class="sp-emblem-card selected-ai" data-race="random" data-index="11" title="Random Rival">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="12" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="13" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="14" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="15" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="16" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="17" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="18" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="19" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="20" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="21" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
 
-                <!-- SET 3 (CLONES) -->
-                <div class="sp-selection-card faction-card" data-race="ascendants">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ascendants</div>
-                  <div class="faction-sub">Elite Super-Warriors</div>
-                  <div class="faction-desc">Genetically rebuilt super-soldiers with heavy armor and devastator batteries.</div>
-                  <div class="faction-units-preview">Commander • Vanguard • Devastators • Centurions • Dreadnought</div>
+                <!-- SET 2 (CLONES) -->
+                <div class="sp-emblem-card selected-ai" data-race="random" data-index="22" title="Random Rival">
+                  <div class="sp-emblem-badge">AUTO</div>
+                  <div class="sp-emblem-frame"><span class="sp-emblem-icon">🎲</span></div>
+                  <div class="sp-emblem-label">Random</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="directorate">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Directorate</div>
-                  <div class="faction-sub">Mass Combined Arms</div>
-                  <div class="faction-desc">Conventional mass military power deploying shock troopers and heavy artillery.</div>
-                  <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Basilisk</div>
+                <div class="sp-emblem-card" data-race="ascendants" data-index="23" title="The Ascendants">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ascendants</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="elyri">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Elyri</div>
-                  <div class="faction-sub">Speed & Precision</div>
-                  <div class="faction-desc">Ancient psychic civilization wielding high mobility and titan spirit constructs.</div>
-                  <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • Spirit Titan</div>
+                <div class="sp-emblem-card" data-race="directorate" data-index="24" title="The Directorate">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Directorate</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="veykari">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Veykari</div>
-                  <div class="faction-sub">Predatory Raiders</div>
-                  <div class="faction-desc">Ruthless void raiders with toxic splinter rifles and objective looting mechanics.</div>
-                  <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine</div>
+                <div class="sp-emblem-card" data-race="elyri" data-index="25" title="The Elyri">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Elyri</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="ghar">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Ghar</div>
-                  <div class="faction-sub">Aggressive Horde</div>
-                  <div class="faction-desc">Brutal alien war clans with high toughness, scrap artillery, and War Momentum.</div>
-                  <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz</div>
+                <div class="sp-emblem-card" data-race="veykari" data-index="26" title="The Veykari">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Veykari</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="devourers">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Devourers</div>
-                  <div class="faction-sub">Adaptive Swarm</div>
-                  <div class="faction-desc">Distributed biological intelligence featuring chittering swarms and Carnifexes.</div>
-                  <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunts • Carnifex</div>
+                <div class="sp-emblem-card" data-race="ghar" data-index="27" title="The Ghar">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Ghar</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="revenant">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Revenant</div>
-                  <div class="faction-sub">Synthetic Dynasties</div>
-                  <div class="faction-desc">Immortal metallic warriors with Gauss weapons, self-repair, and beam walkers.</div>
-                  <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Doomstalker</div>
+                <div class="sp-emblem-card" data-race="devourers" data-index="28" title="The Devourers">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Devourers</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="concordat">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Concordat</div>
-                  <div class="faction-sub">Networked Firepower</div>
-                  <div class="faction-desc">Multi-species federation combining pulse volleys, railguns, and battlesuits.</div>
-                  <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside</div>
+                <div class="sp-emblem-card" data-race="revenant" data-index="29" title="The Revenant">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Revenant</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="riftborn">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Riftborn</div>
-                  <div class="faction-sub">Reality Shifters</div>
-                  <div class="faction-desc">Extra-dimensional entities opening dimensional rifts and warping space.</div>
-                  <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Void Avatar</div>
+                <div class="sp-emblem-card" data-race="concordat" data-index="30" title="The Concordat">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Concordat</div>
                 </div>
-                <div class="sp-selection-card faction-card" data-race="forsaken">
-                  <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
-                  <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
-                  <div class="faction-name">The Forsaken</div>
-                  <div class="faction-sub">Corrupted Ascendants</div>
-                  <div class="faction-desc">Rebel super-soldiers pushing power beyond limits via dark Corruption and daemon axes.</div>
-                  <div class="faction-units-preview">Lord Malakar • Legionaries • Raptors • Cultists • Defiler</div>
+                <div class="sp-emblem-card" data-race="riftborn" data-index="31" title="The Riftborn">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Riftborn</div>
+                </div>
+                <div class="sp-emblem-card" data-race="forsaken" data-index="32" title="The Forsaken">
+                  <div class="sp-emblem-badge" style="display:none;">SELECTED</div>
+                  <div class="sp-emblem-frame"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="sp-emblem-img" /></div>
+                  <div class="sp-emblem-label">Forsaken</div>
                 </div>
               </div>
             </div>
 
-            <!-- NEXT ARROW -->
-            <button id="btn-ai-carousel-next" class="sp-carousel-nav-btn" title="Next Factions" aria-label="Next Factions">&#10095;</button>
+            <button id="btn-ai-carousel-next" class="sp-carousel-nav-btn" title="Next Faction" aria-label="Next Faction">&#10095;</button>
+          </div>
+
+          <!-- DEDICATED AI FACTION INFO BOX -->
+          <div class="sp-faction-infobox ai-infobox" id="ai-faction-infobox">
+            <div class="sp-infobox-header">
+              <div class="sp-infobox-title-group">
+                <h4 class="sp-infobox-title" id="ai-info-title">🎲 RANDOM RIVAL</h4>
+                <div class="sp-infobox-sub" id="ai-info-sub">DYNAMIC MYSTERY FORCE</div>
+              </div>
+            </div>
+            <div class="sp-infobox-desc" id="ai-info-desc">
+              The AI overseer selects an unpredictable rival faction dynamically upon tactical deployment.
+            </div>
+            <div class="sp-infobox-doctrine" id="ai-info-doctrine">
+              <strong>DOCTRINE:</strong> Dynamic tactical flexibility • Adapt & Overcome
+            </div>
+            <div class="sp-infobox-roster" id="ai-info-roster">
+              <span>Mystery Selection</span> • <span>All 10 Warhosts</span> • <span>Tactical Versatility</span>
+            </div>
           </div>
         </div>
       </div>
