@@ -24,7 +24,8 @@ export class DOMManager {
   // Single Player Flow Stage
   public currentSinglePlayerStage: 1 | 2 | 3 = 1;
 
-  private raceCarouselIndex: number = 10;
+  private playerCarouselIndex: number = 10;
+  private aiCarouselIndex: number = 10;
   private mapCarouselIndex: number = 10;
 
   public onStartGame?: (
@@ -107,7 +108,8 @@ export class DOMManager {
 
     // Reset carousel positions
     setTimeout(() => {
-      this.updateRaceCarousel(0);
+      this.updatePlayerCarousel(0);
+      this.updateAiCarousel(0);
       this.updateMapCarousel(0);
     }, 50);
   }
@@ -370,18 +372,38 @@ export class DOMManager {
 
     // Re-align carousels when entering stage
     setTimeout(() => {
-      if (stage === 1) this.updateRaceCarousel(0);
-      if (stage === 2) this.updateMapCarousel(0);
+      if (stage === 1) {
+        this.updatePlayerCarousel(0);
+        this.updateAiCarousel(0);
+      }
+      if (stage === 2) {
+        this.updateMapCarousel(0);
+      }
     }, 40);
   }
 
   public updateSinglePlayerSummary(): void {
-    const summaryFaction = document.getElementById('sp-summary-faction');
+    const summaryPlayer = document.getElementById('sp-summary-player-faction');
+    const summaryAi = document.getElementById('sp-summary-ai-faction');
     const summaryMap = document.getElementById('sp-summary-map');
     const summaryMission = document.getElementById('sp-summary-mission');
 
     const factionNames: Record<string, string> = {
       random: 'Random Army',
+      ascendants: 'The Ascendants',
+      directorate: 'The Directorate',
+      elyri: 'The Elyri',
+      veykari: 'The Veykari',
+      ghar: 'The Ghar',
+      devourers: 'The Devourers',
+      revenant: 'The Revenant',
+      concordat: 'The Concordat',
+      riftborn: 'The Riftborn',
+      forsaken: 'The Forsaken'
+    };
+
+    const aiFactionNames: Record<string, string> = {
+      random: 'Random Rival',
       ascendants: 'The Ascendants',
       directorate: 'The Directorate',
       elyri: 'The Elyri',
@@ -414,8 +436,11 @@ export class DOMManager {
       domination: 'Domination'
     };
 
-    if (summaryFaction) {
-      summaryFaction.textContent = factionNames[this.selectedP1Faction] || 'The Ascendants';
+    if (summaryPlayer) {
+      summaryPlayer.textContent = factionNames[this.selectedP1Faction] || 'Random Army';
+    }
+    if (summaryAi) {
+      summaryAi.textContent = aiFactionNames[this.selectedP2Faction] || 'Random Rival';
     }
     if (summaryMap) {
       summaryMap.textContent = mapNames[this.selectedTheme] || 'Random Biome';
@@ -426,55 +451,107 @@ export class DOMManager {
   }
 
   private initRaceModal(): void {
-    // 1. FACTION CAROUSEL
-    const raceTrack = document.getElementById('factions-grid-track');
-    const btnRacePrev = document.getElementById('btn-race-carousel-prev');
-    const btnRaceNext = document.getElementById('btn-race-carousel-next');
-    const fcardRandom = document.getElementById('fcard-random');
-    const fbadgeRandom = document.getElementById('fbadge-random');
+    // 1. PLAYER FACTION CAROUSEL
+    const playerTrack = document.getElementById('factions-track-player');
+    const btnPlayerPrev = document.getElementById('btn-player-carousel-prev');
+    const btnPlayerNext = document.getElementById('btn-player-carousel-next');
+    const fcardPlayerRandom = document.getElementById('fcard-player-random');
+    const fbadgePlayerRandom = document.getElementById('fbadge-player-random');
 
-    if (btnRacePrev) {
-      btnRacePrev.addEventListener('click', () => {
+    if (btnPlayerPrev) {
+      btnPlayerPrev.addEventListener('click', () => {
         sfx('click');
-        this.updateRaceCarousel(-1);
+        this.updatePlayerCarousel(-1);
       });
     }
-    if (btnRaceNext) {
-      btnRaceNext.addEventListener('click', () => {
+    if (btnPlayerNext) {
+      btnPlayerNext.addEventListener('click', () => {
         sfx('click');
-        this.updateRaceCarousel(1);
+        this.updatePlayerCarousel(1);
       });
     }
 
-    if (fcardRandom) {
-      fcardRandom.addEventListener('click', () => {
+    if (fcardPlayerRandom) {
+      fcardPlayerRandom.addEventListener('click', () => {
         sfx('click');
         this.selectedP1Faction = 'random';
-        this.deselectAllFactionCards();
-        fcardRandom.classList.add('selected-player');
-        if (fbadgeRandom) fbadgeRandom.style.display = 'block';
+        this.deselectAllPlayerFactionCards();
+        fcardPlayerRandom.classList.add('selected-player');
+        if (fbadgePlayerRandom) fbadgePlayerRandom.style.display = 'block';
         this.updateSinglePlayerSummary();
       });
     }
 
-    if (raceTrack) {
-      const factionCards = raceTrack.querySelectorAll<HTMLElement>('.faction-card');
+    if (playerTrack) {
+      const factionCards = playerTrack.querySelectorAll<HTMLElement>('.faction-card');
       factionCards.forEach(card => {
         card.addEventListener('click', () => {
           const race = card.getAttribute('data-race');
           if (!race) return;
           sfx('click');
           this.selectedP1Faction = race;
-          this.deselectAllFactionCards();
-          card.classList.add('selected-player');
-          const badge = card.querySelector<HTMLElement>('.faction-card-badge');
-          if (badge) badge.style.display = 'block';
+          this.deselectAllPlayerFactionCards();
+          playerTrack.querySelectorAll<HTMLElement>(`[data-race="${race}"]`).forEach(c => {
+            c.classList.add('selected-player');
+            const badge = c.querySelector<HTMLElement>('.faction-card-badge');
+            if (badge) badge.style.display = 'block';
+          });
           this.updateSinglePlayerSummary();
         });
       });
     }
 
-    // 2. MAP CAROUSEL
+    // 2. AI FACTION CAROUSEL
+    const aiTrack = document.getElementById('factions-track-ai');
+    const btnAiPrev = document.getElementById('btn-ai-carousel-prev');
+    const btnAiNext = document.getElementById('btn-ai-carousel-next');
+    const fcardAiRandom = document.getElementById('fcard-ai-random');
+    const fbadgeAiRandom = document.getElementById('fbadge-ai-random');
+
+    if (btnAiPrev) {
+      btnAiPrev.addEventListener('click', () => {
+        sfx('click');
+        this.updateAiCarousel(-1);
+      });
+    }
+    if (btnAiNext) {
+      btnAiNext.addEventListener('click', () => {
+        sfx('click');
+        this.updateAiCarousel(1);
+      });
+    }
+
+    if (fcardAiRandom) {
+      fcardAiRandom.addEventListener('click', () => {
+        sfx('click');
+        this.selectedP2Faction = 'random';
+        this.deselectAllAiFactionCards();
+        fcardAiRandom.classList.add('selected-ai');
+        if (fbadgeAiRandom) fbadgeAiRandom.style.display = 'block';
+        this.updateSinglePlayerSummary();
+      });
+    }
+
+    if (aiTrack) {
+      const aiFactionCards = aiTrack.querySelectorAll<HTMLElement>('.faction-card');
+      aiFactionCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const race = card.getAttribute('data-race');
+          if (!race) return;
+          sfx('click');
+          this.selectedP2Faction = race;
+          this.deselectAllAiFactionCards();
+          aiTrack.querySelectorAll<HTMLElement>(`[data-race="${race}"]`).forEach(c => {
+            c.classList.add('selected-ai');
+            const badge = c.querySelector<HTMLElement>('.faction-card-badge');
+            if (badge) badge.style.display = 'block';
+          });
+          this.updateSinglePlayerSummary();
+        });
+      });
+    }
+
+    // 3. MAP CAROUSEL
     const mapTrack = document.getElementById('maps-grid-track');
     const btnMapPrev = document.getElementById('btn-map-carousel-prev');
     const btnMapNext = document.getElementById('btn-map-carousel-next');
@@ -512,7 +589,7 @@ export class DOMManager {
       });
     }
 
-    // 3. MISSION SELECTION
+    // 4. MISSION SELECTION
     const mcardExtermination = document.getElementById('mcard-extermination');
     const mcardEscort = document.getElementById('mcard-escort');
     const mcardDomination = document.getElementById('mcard-domination');
@@ -543,7 +620,7 @@ export class DOMManager {
     if (mcardEscort) mcardEscort.addEventListener('click', () => selectMission('escort'));
     if (mcardDomination) mcardDomination.addEventListener('click', () => selectMission('domination'));
 
-    // 4. ESCORT CONFIG
+    // 5. ESCORT CONFIG
     const playerEscortSelect = document.getElementById('player-escort-role') as HTMLSelectElement;
     const enemyEscortSelect = document.getElementById('enemy-escort-role') as HTMLSelectElement;
 
@@ -558,7 +635,7 @@ export class DOMManager {
       });
     }
 
-    // 5. STEPPER PILL NAVIGATION
+    // 6. STEPPER PILL NAVIGATION
     const pill1 = document.getElementById('sp-step-pill-1');
     const pill2 = document.getElementById('sp-step-pill-2');
     const pill3 = document.getElementById('sp-step-pill-3');
@@ -567,7 +644,7 @@ export class DOMManager {
     if (pill2) pill2.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(2); });
     if (pill3) pill3.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(3); });
 
-    // 6. TOP CLOSE BUTTON & SHARED FOOTER BUTTONS
+    // 7. TOP CLOSE BUTTON & SHARED FOOTER BUTTONS
     const btnSpClose = document.getElementById('btn-sp-close');
     if (btnSpClose) {
       btnSpClose.addEventListener('click', () => {
@@ -616,18 +693,32 @@ export class DOMManager {
     }
   }
 
-  private updateRaceCarousel(delta: number): void {
-    const raceTrack = document.getElementById('factions-grid-track');
-    if (!raceTrack) return;
+  private updatePlayerCarousel(delta: number): void {
+    const playerTrack = document.getElementById('factions-track-player');
+    if (!playerTrack) return;
 
-    this.raceCarouselIndex += delta;
-    if (this.raceCarouselIndex < 0) this.raceCarouselIndex = 19;
-    if (this.raceCarouselIndex > 20) this.raceCarouselIndex = 10;
+    this.playerCarouselIndex += delta;
+    if (this.playerCarouselIndex < 0) this.playerCarouselIndex = 19;
+    if (this.playerCarouselIndex > 20) this.playerCarouselIndex = 10;
 
-    const firstCard = raceTrack.querySelector<HTMLElement>('.faction-card');
-    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 220;
-    const offset = this.raceCarouselIndex * (cardWidth + 12);
-    raceTrack.style.transform = `translateX(-${offset}px)`;
+    const firstCard = playerTrack.querySelector<HTMLElement>('.faction-card');
+    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 160;
+    const offset = this.playerCarouselIndex * (cardWidth + 12);
+    playerTrack.style.transform = `translateX(-${offset}px)`;
+  }
+
+  private updateAiCarousel(delta: number): void {
+    const aiTrack = document.getElementById('factions-track-ai');
+    if (!aiTrack) return;
+
+    this.aiCarouselIndex += delta;
+    if (this.aiCarouselIndex < 0) this.aiCarouselIndex = 19;
+    if (this.aiCarouselIndex > 20) this.aiCarouselIndex = 10;
+
+    const firstCard = aiTrack.querySelector<HTMLElement>('.faction-card');
+    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 160;
+    const offset = this.aiCarouselIndex * (cardWidth + 12);
+    aiTrack.style.transform = `translateX(-${offset}px)`;
   }
 
   private updateMapCarousel(delta: number): void {
@@ -644,16 +735,32 @@ export class DOMManager {
     mapTrack.style.transform = `translateX(-${offset}px)`;
   }
 
-  private deselectAllFactionCards(): void {
-    const fcardRandom = document.getElementById('fcard-random');
-    const fbadgeRandom = document.getElementById('fbadge-random');
+  private deselectAllPlayerFactionCards(): void {
+    const fcardRandom = document.getElementById('fcard-player-random');
+    const fbadgeRandom = document.getElementById('fbadge-player-random');
     if (fcardRandom) fcardRandom.classList.remove('selected-player');
     if (fbadgeRandom) fbadgeRandom.style.display = 'none';
 
-    const raceTrack = document.getElementById('factions-grid-track');
-    if (raceTrack) {
-      raceTrack.querySelectorAll<HTMLElement>('.faction-card').forEach(c => {
+    const playerTrack = document.getElementById('factions-track-player');
+    if (playerTrack) {
+      playerTrack.querySelectorAll<HTMLElement>('.faction-card').forEach(c => {
         c.classList.remove('selected-player');
+        const b = c.querySelector<HTMLElement>('.faction-card-badge');
+        if (b) b.style.display = 'none';
+      });
+    }
+  }
+
+  private deselectAllAiFactionCards(): void {
+    const fcardRandom = document.getElementById('fcard-ai-random');
+    const fbadgeRandom = document.getElementById('fbadge-ai-random');
+    if (fcardRandom) fcardRandom.classList.remove('selected-ai');
+    if (fbadgeRandom) fbadgeRandom.style.display = 'none';
+
+    const aiTrack = document.getElementById('factions-track-ai');
+    if (aiTrack) {
+      aiTrack.querySelectorAll<HTMLElement>('.faction-card').forEach(c => {
+        c.classList.remove('selected-ai');
         const b = c.querySelector<HTMLElement>('.faction-card-badge');
         if (b) b.style.display = 'none';
       });
@@ -729,8 +836,7 @@ export class DOMManager {
     }
 
     // Resolve AI Faction
-    const aiSelect = document.getElementById('ai-race-select') as HTMLSelectElement;
-    let finalP2Faction = aiSelect ? aiSelect.value : 'random';
+    let finalP2Faction = this.selectedP2Faction;
     if (finalP2Faction === 'random') {
       const candidates = factionKeys.filter(f => f !== finalP1Faction);
       finalP2Faction = candidates[Math.floor(Math.random() * candidates.length)] || 'forsaken';
