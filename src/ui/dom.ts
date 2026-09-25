@@ -2,6 +2,7 @@ import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { UNIT_DEFS } from '../data/units';
 import type { MissionType } from '../data/types';
+import { sfx } from '../audio/synth';
 
 export class DOMManager {
   // Screens & Modals
@@ -21,7 +22,7 @@ export class DOMManager {
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
 
   private raceCarouselIndex: number = 10;
-  private mapCarouselIndex: number = 5;
+  private mapCarouselIndex: number = 10;
 
   public onStartGame?: (
     p1Faction: string,
@@ -49,6 +50,7 @@ export class DOMManager {
     const btnSinglePlayer = document.getElementById('btn-start-singleplayer');
     if (btnSinglePlayer) {
       btnSinglePlayer.addEventListener('click', () => {
+        sfx('click');
         this.showRaceModal();
       });
     }
@@ -56,7 +58,27 @@ export class DOMManager {
     const btnLearnMore = document.getElementById('btn-start-learn');
     if (btnLearnMore) {
       btnLearnMore.addEventListener('click', () => {
+        sfx('click');
         this.showLearnModal();
+      });
+    }
+
+    const btnAudioToggle = document.getElementById('btn-audio-toggle');
+    const audioIcon = document.getElementById('home-audio-icon');
+    let isMuted = false;
+    if (btnAudioToggle) {
+      btnAudioToggle.addEventListener('click', () => {
+        isMuted = !isMuted;
+        sfx('click');
+        if (audioIcon) audioIcon.textContent = isMuted ? '🔇' : '🔊';
+        const vBars = btnAudioToggle.querySelectorAll('.v-bar');
+        vBars.forEach((bar) => {
+          if (isMuted) {
+            bar.classList.remove('active');
+          } else {
+            bar.classList.add('active');
+          }
+        });
       });
     }
   }
@@ -439,8 +461,8 @@ export class DOMManager {
     if (!mapTrack) return;
 
     this.mapCarouselIndex += delta;
-    if (this.mapCarouselIndex < 0) this.mapCarouselIndex = 9;
-    if (this.mapCarouselIndex > 10) this.mapCarouselIndex = 5;
+    if (this.mapCarouselIndex < 0) this.mapCarouselIndex = 19;
+    if (this.mapCarouselIndex > 20) this.mapCarouselIndex = 10;
 
     const firstCard = mapTrack.querySelector<HTMLElement>('.map-card');
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 180;
@@ -511,7 +533,18 @@ export class DOMManager {
       'riftborn',
       'forsaken'
     ];
-    const themeKeys = ['jungle', 'desert', 'snow', 'city', 'tech'];
+    const themeKeys = [
+      'jungle',
+      'snow',
+      'desert',
+      'city',
+      'tech',
+      'astral',
+      'corrupted',
+      'devoured',
+      'tomb',
+      'rift'
+    ];
 
     // Resolve Player Faction
     let finalP1Faction = this.selectedP1Faction;

@@ -300,6 +300,61 @@ export class GameScene {
         colArr[i * 3] = 1.0;
         colArr[i * 3 + 1] = 1.0;
         colArr[i * 3 + 2] = 1.0;
+      } else if (theme.particleType === 'astral') {
+        // Floating cosmic shimmer / crystal motes
+        this.weatherVelocities[i] = { vx: rnd(-0.03, 0.03), vy: rnd(0.02, 0.07), vz: rnd(-0.03, 0.03) };
+        posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+        posArr[i * 3 + 1] = rnd(0.5, 34);
+        posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+        if (i % 2 === 0) {
+          colArr[i * 3] = 0.4;
+          colArr[i * 3 + 1] = 0.9;
+          colArr[i * 3 + 2] = 1.0;
+        } else {
+          colArr[i * 3] = 0.8;
+          colArr[i * 3 + 1] = 0.4;
+          colArr[i * 3 + 2] = 1.0;
+        }
+      } else if (theme.particleType === 'corruption') {
+        // Dark crimson daemon spores & toxic miasma
+        this.weatherVelocities[i] = { vx: rnd(-0.04, 0.04), vy: rnd(-0.03, 0.02), vz: rnd(-0.04, 0.04) };
+        posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 10, COLS * TILE_SIZE / 2 + 10);
+        posArr[i * 3 + 1] = rnd(0.5, 32);
+        posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 10, ROWS * TILE_SIZE / 2 + 10);
+        colArr[i * 3] = rnd(0.8, 1.0);
+        colArr[i * 3 + 1] = rnd(0.05, 0.2);
+        colArr[i * 3 + 2] = rnd(0.2, 0.5);
+      } else if (theme.particleType === 'acid') {
+        // Rising digestion mist & toxic bile vapors
+        this.weatherVelocities[i] = { vx: rnd(-0.02, 0.02), vy: rnd(0.03, 0.08), vz: rnd(-0.02, 0.02) };
+        posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+        posArr[i * 3 + 1] = rnd(0.5, 26);
+        posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+        colArr[i * 3] = rnd(0.45, 0.65);
+        colArr[i * 3 + 1] = rnd(0.85, 1.0);
+        colArr[i * 3 + 2] = rnd(0.05, 0.25);
+      } else if (theme.particleType === 'gauss') {
+        // Living-metal electromagnetic spark motes
+        this.weatherVelocities[i] = { vx: rnd(-0.05, 0.05), vy: rnd(0.03, 0.10), vz: rnd(-0.05, 0.05) };
+        posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+        posArr[i * 3 + 1] = rnd(0.5, 30);
+        posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+        colArr[i * 3] = rnd(0.15, 0.45);
+        colArr[i * 3 + 1] = 1.0;
+        colArr[i * 3 + 2] = rnd(0.4, 0.7);
+      } else if (theme.particleType === 'rift') {
+        // Rising embers and warp fire motes
+        this.weatherVelocities[i] = { vx: rnd(-0.05, 0.05), vy: rnd(0.08, 0.22), vz: rnd(-0.05, 0.05) };
+        posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+        posArr[i * 3 + 1] = rnd(0.5, 36);
+        posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+        if (i % 3 === 0) {
+          colArr[i * 3] = 1.0; colArr[i * 3 + 1] = 0.35; colArr[i * 3 + 2] = 0.05;
+        } else if (i % 3 === 1) {
+          colArr[i * 3] = 0.85; colArr[i * 3 + 1] = 0.2; colArr[i * 3 + 2] = 0.85;
+        } else {
+          colArr[i * 3] = 1.0; colArr[i * 3 + 1] = 0.75; colArr[i * 3 + 2] = 0.1;
+        }
       } else if (theme.particleType === 'stars') {
         // Natural 3-tier speed distribution: 40% slow subtle drift, 35% medium transit, 25% fast streaks
         const tierRoll = Math.random();
@@ -547,6 +602,36 @@ export class GameScene {
               posArr[i * 3 + 1] = rnd(26, 35);
               posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 5, COLS * TILE_SIZE / 2 + 5);
               posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 5, ROWS * TILE_SIZE / 2 + 5);
+            }
+          } else if (theme.particleType === 'astral') {
+            if (posArr[i * 3 + 1] > 36) {
+              posArr[i * 3 + 1] = 0.5;
+              posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+              posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+            }
+          } else if (theme.particleType === 'corruption') {
+            if (posArr[i * 3 + 1] < 0 || posArr[i * 3 + 1] > 34) {
+              posArr[i * 3 + 1] = rnd(2, 32);
+              posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+              posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+            }
+          } else if (theme.particleType === 'acid') {
+            if (posArr[i * 3 + 1] > 28) {
+              posArr[i * 3 + 1] = 0.5;
+              posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+              posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+            }
+          } else if (theme.particleType === 'gauss') {
+            if (posArr[i * 3 + 1] > 32) {
+              posArr[i * 3 + 1] = 0.5;
+              posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+              posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
+            }
+          } else if (theme.particleType === 'rift') {
+            if (posArr[i * 3 + 1] > 38) {
+              posArr[i * 3 + 1] = 0.5;
+              posArr[i * 3] = rnd(-COLS * TILE_SIZE / 2 - 8, COLS * TILE_SIZE / 2 + 8);
+              posArr[i * 3 + 2] = rnd(-ROWS * TILE_SIZE / 2 - 8, ROWS * TILE_SIZE / 2 + 8);
             }
           } else if (theme.particleType === 'stars') {
             if (posArr[i * 3] > 120) posArr[i * 3] = -120;

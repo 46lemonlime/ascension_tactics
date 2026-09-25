@@ -58,6 +58,43 @@ A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirm
 
 ---
 
+## 🌍 Battlefield Environments (10 Playable Maps)
+
+Ascension Tactics features **10 distinct battlefields**, each rendered with unique procedural 3D obstacle architecture, environmental weather particle simulations, and strategic Line-of-Sight layouts:
+
+1. **Jungle Death World (Alien Primeval Biosphere)**
+   * *Visuals*: Towering gnarled jungle trees, dense canopy foliage, overgrown cane weeds, bleached creature skeletons, and hanging creepers.
+   * *Atmosphere*: Downward jungle precipitation, humid green lighting, and reduced long-range sight lines.
+2. **Glacial Frost World (Permafrost Ridges & Ice Chasms)**
+   * *Visuals*: Granite mountain peaks capped in snow, translucent glacial ice spires, and deep snow drifts.
+   * *Atmosphere*: Fluttering snowflakes, pale blue ice fog, and elevated ridge choke points.
+3. **Desert Wastes (Ash Dunes & Canyon Spires)**
+   * *Visuals*: Stratified rock crags, wind-carved sandstone towers, saguaro cacti, and shifting ash dunes.
+   * *Atmosphere*: High-velocity sandstorms, warm golden lighting, and sweeping open firing lanes.
+4. **Gothic Hive City (Industrial Ruins & Streets)**
+   * *Visuals*: Concrete multi-story ruined building walls, hazard-striped barricades, structural rebar, and fallen stone pillars.
+   * *Atmosphere*: Smoggy grey haze, sharp urban corners, and dense cover blocks.
+5. **Space-Tech / Void Station (Orbital Reactor & Bulkheads)**
+   * *Visuals*: Reinforced metal blast bulkheads with cyan conduits, glowing plasma reactor cores, amber fuel tanks, and beacon antenna towers.
+   * *Atmosphere*: Deep space void backdrop with drifting stars and orbital corridor choke points.
+6. **Astral Crystal Spire (Harmonic Prisms & Floating Monoliths)**
+   * *Visuals*: Prismatic cyan and violet crystal clusters, wraithbone gateway monoliths, and floating resonant energy rings.
+   * *Atmosphere*: Shimmering cosmic particle motes and ethereal amethyst lighting.
+7. **Corrupted Flesh-World (Mutated Terrain & Dark Tendrils)**
+   * *Visuals*: Pulsing demonic bone horns, occult altars with staring ocular cysts, and writhing tendril columns.
+   * *Atmosphere*: Crimson spore miasma, dark blood fog, and disturbing organic terrain.
+8. **Devoured World (Stripped Desolation & Digestion Pits)**
+   * *Visuals*: Acid digestion vents with glowing green bile pools, ribbed bio-conduit spires, and stripped bedrock craters.
+   * *Atmosphere*: Rising toxic digestion mist and vibrant neon green acid pools.
+9. **Tomb World (Living Metal Crypts & Monoliths)**
+   * *Visuals*: Stepped living-metal pyramid pylons with floating Gauss apex crystals, obsidian stasis portals, and Gauss energy coils.
+   * *Atmosphere*: Snapping emerald Gauss spark motes and deep obsidian metal architecture.
+10. **Warp Rift World (Dimensional Fissures & Molten Void)**
+    * *Visuals*: Volcanic basalt crags shattered by molten fissures, anti-gravity floating rock spires, and warp vortex monoliths.
+    * *Atmosphere*: Rising fiery embers, warp purple energy auras, and bubbling molten veins.
+
+---
+
 ## 🎮 Game Modes & Missions
 
 * **Extermination (Standard Skirmish)**: Annihilate the enemy force down to the last squad.
@@ -95,16 +132,28 @@ A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirm
 
 ## ⚙️ Engine Architecture & UI Systems
 
+* **Cinematic Title Screen & Main Menu**:
+  * Full-viewport panoramic orbital citadel vista overlooking deep space nebulae, starfield, and planetary curvature with the monolithic Ascension "A" monument.
+  * Master 3D embossed gold branding with horizontal golden wings framing `TACTICS`.
+  * Chamfered metallic action buttons: `SINGLE PLAYER` (primary warzone deployment), `MULTIPLAYER` (coming soon lock badge), and `LEARN MORE` (field manual & codex).
+  * Minimalist HUD framing with bottom-right interactive volume/audio toggle.
+
 * **Top-Right In-Battle Navigation Bar**:
   * **Combat Log**: Toggle battle telemetry and dice roll history panel.
+  * **Tactical Map**: Toggle radar minimap visibility with smooth layout reflow for targeting bars.
   * **Camera Options**: Switch camera presets (Command / Top / Cinematic) and toggle Action Camera tracking.
   * **Fullscreen**: Dedicated button and `F11` shortcut with live state icon sync and `ESC` isolation.
   * **Game Menu**: Centered dialog for restarting matches, returning to faction select, and accessing manual/codex.
 
+* **Unit Information Frame & Utility Capability System**:
+  * Reorganized upper stats into **3 equal columns**: `ATTACK` (Accuracy, Strength, Attacks), `DEFENSE` (Evasion, Dexterity, Agility), and `UTILITY` (Movement, Awareness, Morale).
+  * Interactive inspection buttons: `[WEP]` (Weapon Popup), `[ARM]` (Armour & Coverage Popup), and `[UTIL]` (Utility Popup).
+  * Categorical capability modeling: `MovementType` (`ground | vehicle | fly | colossus`) and `AwarenessType` (`sensory | vision | psychic`).
+  * Unit identity card with active squad model count badges, proportional HP bars, and tactical Energy bars.
+
 * **Screen-Space Anchored HUD**:
   * **End Turn Button**: Fixed to the bottom-right corner of the viewport, independent of camera state.
-  * **Unit Datasheet**: Fixed to the bottom-left corner with high-visibility squad stats, HP bars, and model counts.
-  * **Tactical Minimap**: Anchored to top-left with collapsible radar, compass, FoW shroud, and live unit blips.
+  * **Targeting Status & LoS Bar**: Automatically reflows based on map visibility.
   * **Gothic Aesthetic Theme**: Custom scrollbars, glowing gold borders, and dark crystalline glassmorphism backdrops.
 
 * **Deterministic Action Camera**:

@@ -16,35 +16,184 @@
   <div id="canvas-container"></div>
 
   <!-- HOME / TITLE SCREEN -->
-  <div id="home-screen">
-    <div class="home-dialog interactive">
-      <div>
-        <div class="modal-game-banner" style="font-size:32px; letter-spacing:8px;">&#9876; ASCENSION TACTICS &#9876;</div>
-        <div class="home-tagline">GRIMDARK TABLETOP SKIRMISH WARFARE</div>
+  <div id="home-screen" class="home-screen-cinematic">
+    <!-- BACKGROUND VISTA & CITADEL MONOLITH -->
+    <div class="home-backdrop">
+      <div class="space-nebula-glow"></div>
+      <div class="stars-layer"></div>
+      <div class="planet-horizon-glow"></div>
+      <!-- SVG Monument & Orbital Platform Architecture -->
+      <div class="citadel-monolith-scene">
+        <svg class="citadel-monolith-svg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gold-metal-light" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fff6cc" />
+              <stop offset="35%" stop-color="#d4af37" />
+              <stop offset="70%" stop-color="#9a721d" />
+              <stop offset="100%" stop-color="#3d2a06" />
+            </linearGradient>
+            <linearGradient id="metal-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2a384c" />
+              <stop offset="50%" stop-color="#141c28" />
+              <stop offset="100%" stop-color="#080c14" />
+            </linearGradient>
+            <linearGradient id="metal-bevel" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#475f7e" />
+              <stop offset="50%" stop-color="#1f2937" />
+              <stop offset="100%" stop-color="#0f172a" />
+            </linearGradient>
+            <radialGradient id="monolith-core-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(245, 158, 11, 0.4)" />
+              <stop offset="60%" stop-color="rgba(212, 175, 55, 0.1)" />
+              <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+            </radialGradient>
+          </defs>
+
+          <!-- Orbital Platform Base -->
+          <ellipse cx="400" cy="580" rx="460" ry="120" fill="url(#metal-dark)" stroke="#d4af37" stroke-width="1.5" opacity="0.85" />
+          <ellipse cx="400" cy="570" rx="360" ry="90" fill="#0c1119" stroke="rgba(212,175,55,0.4)" stroke-width="1" />
+          <ellipse cx="400" cy="560" rx="260" ry="65" fill="#131a26" stroke="#f59e0b" stroke-width="1" />
+
+          <!-- Platform Ring Light Channels -->
+          <path d="M 120 575 C 220 625, 580 625, 680 575" stroke="#f59e0b" stroke-width="3" fill="none" opacity="0.7" filter="drop-shadow(0 0 8px #f59e0b)" />
+          <path d="M 180 565 C 260 605, 540 605, 620 565" stroke="#38bdf8" stroke-width="1.5" fill="none" opacity="0.8" filter="drop-shadow(0 0 6px #38bdf8)" />
+
+          <!-- Left Secondary Spire -->
+          <polygon points="170,180 185,280 195,500 145,500 155,280" fill="url(#metal-bevel)" stroke="rgba(212,175,55,0.6)" stroke-width="1" />
+          <polygon points="170,180 178,280 180,500 170,500 162,280" fill="url(#gold-metal-light)" opacity="0.6" />
+          <line x1="170" y1="180" x2="170" y2="500" stroke="#fff" stroke-width="0.8" opacity="0.7" />
+
+          <!-- Right Secondary Spire -->
+          <polygon points="560,300 572,370 580,520 540,520 548,370" fill="url(#metal-bevel)" stroke="rgba(212,175,55,0.6)" stroke-width="1" />
+          <polygon points="560,300 566,370 568,520 560,520 554,370" fill="url(#gold-metal-light)" opacity="0.5" />
+
+          <!-- Far Left Edge Pylon -->
+          <polygon points="30,420 50,470 60,600 10,600 20,470" fill="url(#metal-bevel)" stroke="rgba(212,175,55,0.4)" stroke-width="1" />
+
+          <!-- Central Monument Core Ambient Glow -->
+          <circle cx="370" cy="380" r="220" fill="url(#monolith-core-glow)" />
+
+          <!-- Monument: Central Monolithic Ascension "A" Structure -->
+          <!-- Left Leg Outer Shadow/Body -->
+          <polygon points="370,80 345,150 220,490 275,520 370,250 465,520 520,490 395,150" fill="url(#metal-dark)" stroke="rgba(212,175,55,0.8)" stroke-width="2" />
+          
+          <!-- Outer Chamfered Bevels -->
+          <polygon points="370,80 395,150 520,490 495,500 380,180 370,110" fill="url(#gold-metal-light)" opacity="0.8" />
+          <polygon points="370,80 345,150 220,490 245,500 360,180 370,110" fill="url(#metal-bevel)" />
+
+          <!-- Inner Triangular Negative Space -->
+          <polygon points="370,220 285,450 455,450" fill="#080b12" stroke="#d4af37" stroke-width="2" />
+          
+          <!-- Crossbar Central Block (Ascension "A" Crossbeam) -->
+          <polygon points="320,380 420,380 435,430 305,430" fill="url(#metal-bevel)" stroke="#f59e0b" stroke-width="1.5" />
+          <polygon points="325,385 415,385 415,400 325,400" fill="url(#gold-metal-light)" opacity="0.9" />
+
+          <!-- Internal Geometric Facets & Highlight Ribs -->
+          <line x1="370" y1="80" x2="370" y2="220" stroke="#fef08a" stroke-width="2" filter="drop-shadow(0 0 6px #f59e0b)" />
+          <line x1="370" y1="80" x2="275" y2="520" stroke="#d4af37" stroke-width="1.2" opacity="0.6" />
+          <line x1="370" y1="80" x2="465" y2="520" stroke="#fff6cc" stroke-width="1.5" opacity="0.9" />
+          <line x1="370" y1="220" x2="370" y2="380" stroke="#f59e0b" stroke-width="1" opacity="0.7" />
+
+          <!-- Base Ground Light Walkways & Connecting Conduits -->
+          <path d="M 370 560 L 370 680" stroke="#f59e0b" stroke-width="4" opacity="0.7" filter="drop-shadow(0 0 8px #f59e0b)" />
+          <path d="M 350 565 L 290 680" stroke="rgba(212,175,55,0.5)" stroke-width="2" />
+          <path d="M 390 565 L 450 680" stroke="rgba(212,175,55,0.5)" stroke-width="2" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- HUD FRAME HEADER (TOP) -->
+    <div class="home-hud-top">
+      <div class="home-hud-brand">
+        <span class="hud-brand-icon">▲</span>
+        <span class="hud-brand-text">ASCENSION TACTICS</span>
+        <div class="hud-brand-line"></div>
+      </div>
+    </div>
+
+    <!-- MAIN HERO STAGE (RIGHT ALIGNED MENU PANEL) -->
+    <div class="home-stage-container">
+      <div class="home-hero-panel">
+        <!-- 3D GOLD LOGO TITLE -->
+        <div class="home-brand-block">
+          <h1 class="brand-title-ascension">ASCENSION</h1>
+          <div class="brand-subtitle-row">
+            <div class="brand-wing brand-wing-left"></div>
+            <span class="brand-subtitle-tactics">TACTICS</span>
+            <div class="brand-wing brand-wing-right"></div>
+          </div>
+        </div>
+
+        <!-- STACKED ACTION BUTTONS -->
+        <div class="home-action-menu">
+          <!-- 1. SINGLE PLAYER -->
+          <button id="btn-start-singleplayer" class="menu-action-btn primary-action" type="button">
+            <span class="btn-text-content">SINGLE PLAYER</span>
+            <span class="btn-action-icon">
+              <!-- Tactical Infantry Icon -->
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <circle cx="12" cy="4" r="2.5" />
+                <path d="M15 8h-6c-1.1 0-2 .9-2 2v6h2v6h3v-6h1v6h3v-6h2v-6c0-1.1-.9-2-2-2z" />
+                <path d="M6 11l-2 8h2l1.5-6z" opacity="0.6"/>
+              </svg>
+            </span>
+          </button>
+
+          <!-- 2. MULTIPLAYER (DISABLED / COMING SOON) -->
+          <button id="btn-start-multiplayer" class="menu-action-btn disabled-action" type="button" disabled>
+            <span class="btn-text-content">MULTIPLAYER</span>
+            <div class="btn-right-group">
+              <span class="menu-badge-lock">COMING SOON</span>
+              <span class="btn-action-icon">
+                <!-- Squad Fireteam Icon -->
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <circle cx="12" cy="4" r="2" />
+                  <path d="M14 7.5h-4c-.8 0-1.5.7-1.5 1.5v4.5h1.5v6.5h2v-4.5h1v4.5h2V13.5H16V9c0-.8-.7-1.5-1.5-1.5z" />
+                  <circle cx="6" cy="6" r="1.6" opacity="0.7" />
+                  <path d="M7.5 9h-3c-.6 0-1.1.5-1.1 1.1v3.4h1.1v5.5h1.5v-3.5h.8v3.5h1.5v-5.5h1.1v-3.4c0-.6-.5-1.1-1.9-1.1z" opacity="0.7"/>
+                  <circle cx="18" cy="6" r="1.6" opacity="0.7" />
+                  <path d="M19.5 9h-3c-.6 0-1.1.5-1.1 1.1v3.4h1.1v5.5h1.5v-3.5h.8v3.5h1.5v-5.5h1.1v-3.4c0-.6-.5-1.1-1.9-1.1z" opacity="0.7"/>
+                </svg>
+              </span>
+            </div>
+          </button>
+
+          <!-- 3. LEARN MORE -->
+          <button id="btn-start-learn" class="menu-action-btn" type="button">
+            <span class="btn-text-content">LEARN MORE</span>
+            <span class="btn-action-icon">
+              <!-- Datapad / Terminal Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+                <line x1="6" y1="8" x2="10" y2="8"></line>
+                <line x1="6" y1="12" x2="14" y2="12"></line>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD FRAME FOOTER (BOTTOM) -->
+    <div class="home-hud-bottom">
+      <!-- Version & Tagline (Left) -->
+      <div class="home-footer-version">
+        ASCENSION TACTICS • TABLETOP SKIRMISH WARFARE
       </div>
 
-      <div class="home-menu-list">
-        <!-- 1. SINGLE PLAYER (CLICKABLE -> OPENS RACE SELECT) -->
-        <button id="btn-start-singleplayer" class="home-btn active-btn">
-          <span>⚔️ SINGLE PLAYER</span>
-          <span class="home-btn-sub">Warzone Skirmish vs AI Overseer</span>
-        </button>
-
-        <!-- 2. MULTIPLAYER (UNCLICKABLE / COMING SOON) -->
-        <button class="home-btn disabled-btn" disabled>
-          <span>🌐 MULTIPLAYER</span>
-          <span class="home-btn-sub">Live PvP & Matchmaking</span>
-          <span class="home-badge-lock">COMING SOON</span>
-        </button>
-
-        <!-- 3. LEARN MORE (CLICKABLE -> OPENS FIELD MANUAL & CODEX) -->
-        <button id="btn-start-learn" class="home-btn active-btn">
-          <span>📖 LEARN MORE</span>
-          <span class="home-btn-sub">Game Rules, Factions & How to Play</span>
-        </button>
+      <!-- Audio Toggle (Right) -->
+      <div class="home-audio-control" id="btn-audio-toggle" title="Toggle Audio" role="button" tabindex="0">
+        <span class="audio-speaker-icon" id="home-audio-icon">🔊</span>
+        <div class="audio-vol-meter">
+          <span class="v-bar active"></span>
+          <span class="v-bar active"></span>
+          <span class="v-bar active"></span>
+          <span class="v-bar active"></span>
+          <span class="v-bar active"></span>
+        </div>
       </div>
-
-      <div class="home-version">ASCENSION EDITION • 3D TACTICAL WARFARE</div>
     </div>
   </div>
 
@@ -540,82 +689,157 @@
             <!-- SET 1 (CLONE 1) -->
             <div class="map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle</div>
-              <div class="map-sub">Dense • Low LoS</div>
-            </div>
-            <div class="map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert</div>
-              <div class="map-sub">Open • High LoS</div>
+              <div class="map-name">Jungle Death World</div>
+              <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
             <div class="map-card" data-map="snow">
               <div class="map-icon">❄️</div>
-              <div class="map-name">Snow</div>
-              <div class="map-sub">Ridges • Low LoS</div>
+              <div class="map-name">Glacial Frost World</div>
+              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert Wastes</div>
+              <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
             <div class="map-card" data-map="city">
               <div class="map-icon">🏛️</div>
-              <div class="map-name">City</div>
-              <div class="map-sub">Streets • High LoS</div>
+              <div class="map-name">Gothic Hive City</div>
+              <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
             <div class="map-card" data-map="tech">
               <div class="map-icon">🚀</div>
-              <div class="map-name">Tech Space</div>
-              <div class="map-sub">Corridors • High LoS</div>
+              <div class="map-name">Space-Tech / Void Station</div>
+              <div class="map-sub">Orbital Reactor & Bulkheads</div>
+            </div>
+            <div class="map-card" data-map="astral">
+              <div class="map-icon">✨</div>
+              <div class="map-name">Astral Crystal Spire</div>
+              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+            </div>
+            <div class="map-card" data-map="corrupted">
+              <div class="map-icon">💀</div>
+              <div class="map-name">Corrupted Flesh-World</div>
+              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+            </div>
+            <div class="map-card" data-map="devoured">
+              <div class="map-icon">👾</div>
+              <div class="map-name">Devoured World</div>
+              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+            </div>
+            <div class="map-card" data-map="tomb">
+              <div class="map-icon">⚡</div>
+              <div class="map-name">Tomb World</div>
+              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+            </div>
+            <div class="map-card" data-map="rift">
+              <div class="map-icon">🔥</div>
+              <div class="map-name">Warp Rift World</div>
+              <div class="map-sub">Dimensional Fissures & Molten Void</div>
             </div>
 
             <!-- SET 2 (MAIN ACTIVE SET) -->
             <div class="map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle</div>
-              <div class="map-sub">Dense • Low LoS</div>
-            </div>
-            <div class="map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert</div>
-              <div class="map-sub">Open • High LoS</div>
+              <div class="map-name">Jungle Death World</div>
+              <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
             <div class="map-card" data-map="snow">
               <div class="map-icon">❄️</div>
-              <div class="map-name">Snow</div>
-              <div class="map-sub">Ridges • Low LoS</div>
+              <div class="map-name">Glacial Frost World</div>
+              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert Wastes</div>
+              <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
             <div class="map-card" data-map="city">
               <div class="map-icon">🏛️</div>
-              <div class="map-name">City</div>
-              <div class="map-sub">Streets • High LoS</div>
+              <div class="map-name">Gothic Hive City</div>
+              <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
             <div class="map-card" data-map="tech">
               <div class="map-icon">🚀</div>
-              <div class="map-name">Tech Space</div>
-              <div class="map-sub">Corridors • High LoS</div>
+              <div class="map-name">Space-Tech / Void Station</div>
+              <div class="map-sub">Orbital Reactor & Bulkheads</div>
+            </div>
+            <div class="map-card" data-map="astral">
+              <div class="map-icon">✨</div>
+              <div class="map-name">Astral Crystal Spire</div>
+              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+            </div>
+            <div class="map-card" data-map="corrupted">
+              <div class="map-icon">💀</div>
+              <div class="map-name">Corrupted Flesh-World</div>
+              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+            </div>
+            <div class="map-card" data-map="devoured">
+              <div class="map-icon">👾</div>
+              <div class="map-name">Devoured World</div>
+              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+            </div>
+            <div class="map-card" data-map="tomb">
+              <div class="map-icon">⚡</div>
+              <div class="map-name">Tomb World</div>
+              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+            </div>
+            <div class="map-card" data-map="rift">
+              <div class="map-icon">🔥</div>
+              <div class="map-name">Warp Rift World</div>
+              <div class="map-sub">Dimensional Fissures & Molten Void</div>
             </div>
 
             <!-- SET 3 (CLONE 3) -->
             <div class="map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle</div>
-              <div class="map-sub">Dense • Low LoS</div>
-            </div>
-            <div class="map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert</div>
-              <div class="map-sub">Open • High LoS</div>
+              <div class="map-name">Jungle Death World</div>
+              <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
             <div class="map-card" data-map="snow">
               <div class="map-icon">❄️</div>
-              <div class="map-name">Snow</div>
-              <div class="map-sub">Ridges • Low LoS</div>
+              <div class="map-name">Glacial Frost World</div>
+              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
+            </div>
+            <div class="map-card" data-map="desert">
+              <div class="map-icon">🏜️</div>
+              <div class="map-name">Desert Wastes</div>
+              <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
             <div class="map-card" data-map="city">
               <div class="map-icon">🏛️</div>
-              <div class="map-name">City</div>
-              <div class="map-sub">Streets • High LoS</div>
+              <div class="map-name">Gothic Hive City</div>
+              <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
             <div class="map-card" data-map="tech">
               <div class="map-icon">🚀</div>
-              <div class="map-name">Tech Space</div>
-              <div class="map-sub">Corridors • High LoS</div>
+              <div class="map-name">Space-Tech / Void Station</div>
+              <div class="map-sub">Orbital Reactor & Bulkheads</div>
+            </div>
+            <div class="map-card" data-map="astral">
+              <div class="map-icon">✨</div>
+              <div class="map-name">Astral Crystal Spire</div>
+              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+            </div>
+            <div class="map-card" data-map="corrupted">
+              <div class="map-icon">💀</div>
+              <div class="map-name">Corrupted Flesh-World</div>
+              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+            </div>
+            <div class="map-card" data-map="devoured">
+              <div class="map-icon">👾</div>
+              <div class="map-name">Devoured World</div>
+              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+            </div>
+            <div class="map-card" data-map="tomb">
+              <div class="map-icon">⚡</div>
+              <div class="map-name">Tomb World</div>
+              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+            </div>
+            <div class="map-card" data-map="rift">
+              <div class="map-icon">🔥</div>
+              <div class="map-name">Warp Rift World</div>
+              <div class="map-sub">Dimensional Fissures & Molten Void</div>
             </div>
           </div>
         </div>
@@ -728,6 +952,14 @@
           </svg>
         </button>
 
+        <button class="nav-btn active" id="nav-btn-map" title="Tactical Map" aria-label="Tactical Map" aria-pressed="true">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+        </button>
+
         <button class="nav-btn" id="nav-btn-camera" title="Camera Options" aria-label="Camera Options">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="23 7 16 12 23 17 23 7"></polygon>
@@ -789,14 +1021,10 @@
     </div>
 
     <!-- TOP-LEFT TACTICAL MINIMAP -->
-    <div id="minimap-panel" class="interactive">
+    <div id="minimap-panel" class="interactive" role="region" aria-label="Tactical Map" aria-hidden="false">
       <div id="minimap-header">
         <div class="minimap-header-left">
           <span class="minimap-title" id="minimap-title">Tech Space</span>
-          <span class="minimap-compass">&#9650; N</span>
-        </div>
-        <div class="minimap-header-right">
-          <button id="btn-toggle-minimap" class="minimap-toggle-btn" title="Collapse Tactical Map">&#9660;</button>
         </div>
       </div>
       <div id="minimap-body">
@@ -849,18 +1077,228 @@
     </div>
 
     <div class="bottom-bar" id="gameplay-cockpit" style="display:none;">
-      <!-- DATASHEET (Hidden until unit is selected) -->
-      <div class="datasheet-panel interactive" id="datasheet" style="display:none;">
-        <div class="unit-portrait" id="ds-portrait">
-          <span id="ds-icon">&#9876;</span>
-          <div class="squad-count-badge" id="ds-models-badge">1x</div>
-        </div>
-        <div class="unit-info">
-          <div class="unit-name">
-            <span id="ds-name"></span>
-            <span class="unit-faction" id="ds-faction"></span>
+      <!-- ASCENSION TACTICS UNIT FRAME & POPUP CONTAINER -->
+      <div class="unit-frame-wrapper" id="unit-frame-container">
+        <!-- WEAPON POPUP -->
+        <div id="weapon-popup" class="equipment-popup weapon-popup-panel interactive" style="display:none;">
+          <div class="popup-header">
+            <div class="popup-tag">WEAPON PROFILE</div>
+            <div class="popup-title-row">
+              <span class="popup-name" id="wep-popup-name">PULSE RIFLE</span>
+              <button type="button" class="popup-close-btn" id="wep-popup-close" title="Close" aria-label="Close">✕</button>
+            </div>
           </div>
-          <div class="unit-stats-grid" id="ds-stats"></div>
+          <div class="popup-divider"></div>
+          <div class="popup-stats-table">
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Range</span>
+              <span class="popup-stat-value" id="wep-popup-range">24"</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Strength</span>
+              <span class="popup-stat-value" id="wep-popup-strength">4</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Penetration</span>
+              <span class="popup-stat-value" id="wep-popup-penetration">3</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Damage</span>
+              <span class="popup-stat-value" id="wep-popup-damage">4</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Attacks</span>
+              <span class="popup-stat-value" id="wep-popup-attacks">2</span>
+            </div>
+          </div>
+          
+          <div class="popup-section-header">DAMAGE TYPE</div>
+          <div class="popup-type-badge" id="wep-popup-damage-type">Plasma</div>
+
+          <div class="popup-section-header">EFFECTIVE AGAINST</div>
+          <ul class="popup-list effective-list" id="wep-popup-effective">
+            <li><span class="popup-list-icon check">✓</span> Heavy Armour</li>
+            <li><span class="popup-list-icon check">✓</span> Mechanical</li>
+          </ul>
+
+          <div class="popup-section-header">WEAK AGAINST</div>
+          <ul class="popup-list weak-list" id="wep-popup-weak">
+            <li><span class="popup-list-icon cross">✕</span> Energy Shields</li>
+            <li><span class="popup-list-icon cross">✕</span> Heat-resistant targets</li>
+          </ul>
+
+          <div class="popup-section-header">SPECIAL</div>
+          <div class="popup-special-text" id="wep-popup-special">Weapon-specific rules</div>
+        </div>
+
+        <!-- ARMOUR POPUP -->
+        <div id="armour-popup" class="equipment-popup armour-popup-panel interactive" style="display:none;">
+          <div class="popup-header">
+            <div class="popup-tag">ARMOUR PROFILE</div>
+            <div class="popup-title-row">
+              <span class="popup-name" id="arm-popup-name">ASCENDANT POWER ARMOUR</span>
+              <button type="button" class="popup-close-btn" id="arm-popup-close" title="Close" aria-label="Close">✕</button>
+            </div>
+          </div>
+          <div class="popup-divider"></div>
+          <div class="popup-stats-table">
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Armour</span>
+              <span class="popup-stat-value" id="arm-popup-armour">6</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Toughness</span>
+              <span class="popup-stat-value" id="arm-popup-toughness">6</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Resistance</span>
+              <span class="popup-stat-value" id="arm-popup-resistance">4</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Coverage</span>
+              <span class="popup-stat-value" id="arm-popup-coverage">3</span>
+            </div>
+          </div>
+
+          <div class="popup-section-header">PROTECTION AGAINST</div>
+          <ul class="popup-list effective-list" id="arm-popup-protection">
+            <li><span class="popup-list-icon check">✓</span> Kinetic</li>
+            <li><span class="popup-list-icon check">✓</span> Plasma</li>
+            <li><span class="popup-list-icon check">✓</span> Energy</li>
+          </ul>
+
+          <div class="popup-section-header">VULNERABLE TO</div>
+          <ul class="popup-list weak-list" id="arm-popup-vulnerable">
+            <li><span class="popup-list-icon cross">✕</span> Chemical</li>
+            <li><span class="popup-list-icon cross">✕</span> Psionic</li>
+          </ul>
+
+          <div class="popup-section-header">SPECIAL</div>
+          <div class="popup-special-text" id="arm-popup-special">Armour-specific rules</div>
+        </div>
+
+        <!-- UTILITY POPUP -->
+        <div id="utility-popup" class="equipment-popup utility-popup-panel interactive" style="display:none;">
+          <div class="popup-header">
+            <div class="popup-tag">UTILITY PROFILE</div>
+            <div class="popup-title-row">
+              <span class="popup-name" id="util-popup-name">TACTICAL UTILITY</span>
+              <button type="button" class="popup-close-btn" id="util-popup-close" title="Close" aria-label="Close">✕</button>
+            </div>
+          </div>
+          <div class="popup-divider"></div>
+
+          <div class="popup-section-header">AWARENESS</div>
+          <div class="popup-stat-row">
+            <span class="popup-stat-label">Type</span>
+            <span class="popup-type-badge utility-badge" id="util-popup-awareness-type">VISION</span>
+          </div>
+
+          <div class="popup-section-header" style="margin-top: 8px;">MOVEMENT</div>
+          <div class="popup-stat-row">
+            <span class="popup-stat-label">Type</span>
+            <span class="popup-type-badge utility-badge" id="util-popup-movement-type">VEHICLE</span>
+          </div>
+        </div>
+
+        <!-- MAIN UNIT FRAME (Hidden until unit is selected) -->
+        <div class="unit-frame interactive" id="datasheet" style="display:none;">
+          <!-- TIER 1: THREE EQUAL STAT COLUMNS (ATTACK, DEFENSE, UTILITY) -->
+          <div class="unit-frame-tier unit-frame-combat-tier">
+            <!-- ATTACK COLUMN -->
+            <div class="combat-col attack-col">
+              <div class="combat-col-header">ATTACK</div>
+              <div class="combat-col-body">
+                <div class="equip-slot-container">
+                  <button type="button" class="equip-image-btn weapon-btn" id="ds-weapon-btn" title="Inspect Weapon Profile" aria-label="Inspect Weapon Profile">
+                    <div class="equip-img-box weapon-box">
+                      <span class="equip-img-label">WEP</span>
+                      <span class="equip-img-icon" id="ds-wep-icon">🔫</span>
+                    </div>
+                  </button>
+                </div>
+                <div class="combat-stats-list">
+                  <div class="stat-row"><span class="stat-name">Accuracy</span><span class="stat-val" id="ds-stat-acc">4</span></div>
+                  <div class="stat-row"><span class="stat-name">Strength</span><span class="stat-val" id="ds-stat-str">5</span></div>
+                  <div class="stat-row"><span class="stat-name">Attacks</span><span class="stat-val" id="ds-stat-atk">2</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VERTICAL DIVIDER -->
+            <div class="unit-frame-vdivider"></div>
+
+            <!-- DEFENSE COLUMN -->
+            <div class="combat-col defense-col">
+              <div class="combat-col-header">DEFENSE</div>
+              <div class="combat-col-body">
+                <div class="equip-slot-container">
+                  <button type="button" class="equip-image-btn armour-btn" id="ds-armour-btn" title="Inspect Armour Profile" aria-label="Inspect Armour Profile">
+                    <div class="equip-img-box armour-box">
+                      <span class="equip-img-label">ARM</span>
+                      <span class="equip-img-icon" id="ds-arm-icon">🛡️</span>
+                    </div>
+                  </button>
+                </div>
+                <div class="combat-stats-list">
+                  <div class="stat-row"><span class="stat-name">Evasion</span><span class="stat-val" id="ds-stat-eva">4</span></div>
+                  <div class="stat-row"><span class="stat-name">Dexterity</span><span class="stat-val" id="ds-stat-dex">5</span></div>
+                  <div class="stat-row"><span class="stat-name">Agility</span><span class="stat-val" id="ds-stat-agi">4</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VERTICAL DIVIDER -->
+            <div class="unit-frame-vdivider"></div>
+
+            <!-- UTILITY COLUMN -->
+            <div class="combat-col utility-col">
+              <div class="combat-col-header">UTILITY</div>
+              <div class="combat-col-body">
+                <div class="equip-slot-container">
+                  <button type="button" class="equip-image-btn utility-btn" id="ds-utility-btn" title="Inspect Utility Capabilities" aria-label="Inspect Utility Capabilities">
+                    <div class="equip-img-box utility-box">
+                      <span class="equip-img-label">UTIL</span>
+                      <span class="equip-img-icon" id="ds-util-icon">🧭</span>
+                    </div>
+                  </button>
+                </div>
+                <div class="combat-stats-list">
+                  <div class="stat-row"><span class="stat-name">Movement</span><span class="stat-val" id="ds-stat-mov">6</span></div>
+                  <div class="stat-row"><span class="stat-name">Awareness</span><span class="stat-val" id="ds-stat-awa">5</span></div>
+                  <div class="stat-row"><span class="stat-name">Morale</span><span class="stat-val" id="ds-stat-mor">7</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIER 3: UNIT IDENTITY -->
+          <div class="unit-frame-tier unit-frame-identity-tier">
+            <div class="unit-portrait-container">
+              <div class="unit-portrait-box" id="ds-portrait">
+                <span class="unit-portrait-icon" id="ds-icon">&#9876;</span>
+                <div class="squad-count-badge" id="ds-models-badge">1x</div>
+              </div>
+            </div>
+            <div class="unit-identity-info">
+              <div class="unit-identity-name" id="ds-name">UNIT NAME</div>
+              <div class="unit-identity-role" id="ds-role">Unit Type / Role</div>
+              <!-- HP BAR -->
+              <div class="resource-bar-row">
+                <div class="resource-bar-container">
+                  <div class="resource-bar-fill hp-bar-fill" id="ds-hp-fill" style="width: 100%;"></div>
+                </div>
+                <span class="resource-bar-label" id="ds-hp-label">6/6 HP</span>
+              </div>
+              <!-- ENERGY BAR -->
+              <div class="resource-bar-row">
+                <div class="resource-bar-container">
+                  <div class="resource-bar-fill energy-bar-fill" id="ds-energy-fill" style="width: 80%;"></div>
+                </div>
+                <span class="resource-bar-label" id="ds-energy-label">80/100 Energy</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

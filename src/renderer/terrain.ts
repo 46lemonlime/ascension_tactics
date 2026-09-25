@@ -456,6 +456,487 @@ export function buildTechObstacle(group: THREE.Group, type: number): void {
   }
 }
 
+// 6. ASTRAL CRYSTAL SPIRE OBSTACLE BUILDER
+export function buildAstralObstacle(group: THREE.Group, type: number): void {
+  const crystalCyan = new THREE.MeshStandardMaterial({
+    color: 0x67e8f9,
+    roughness: 0.1,
+    metalness: 0.2,
+    emissive: 0x06b6d4,
+    emissiveIntensity: 0.6,
+    transparent: true,
+    opacity: 0.85
+  });
+  const crystalPurple = new THREE.MeshStandardMaterial({
+    color: 0xc084fc,
+    roughness: 0.15,
+    metalness: 0.3,
+    emissive: 0x9333ea,
+    emissiveIntensity: 0.7,
+    transparent: true,
+    opacity: 0.9
+  });
+  const wraithbone = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.4, metalness: 0.1 });
+  const astralStone = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, roughness: 0.85, metalness: 0.3 });
+  const ringMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.2, emissive: 0x7e22ce, emissiveIntensity: 0.5 });
+
+  if (type === 0) {
+    // Floating crystal cluster spire
+    const base = new THREE.Mesh(new THREE.DodecahedronGeometry(1.4, 0), astralStone);
+    base.position.y = 0.5;
+    base.scale.set(1.2, 0.7, 1.2);
+    base.castShadow = true;
+    group.add(base);
+
+    const mainCrystal = new THREE.Mesh(new THREE.ConeGeometry(0.7, 3.8, 6), crystalCyan);
+    mainCrystal.position.set(0, 2.3, 0);
+    mainCrystal.castShadow = true;
+    group.add(mainCrystal);
+
+    const crystalCap = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.2, 6), crystalCyan);
+    crystalCap.position.set(0, 0.4, 0);
+    crystalCap.rotation.x = Math.PI;
+    group.add(crystalCap);
+
+    // Surrounding crystal shards
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const shard = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.2, 5), crystalPurple);
+      shard.position.set(Math.cos(angle) * 0.9, 1.2, Math.sin(angle) * 0.9);
+      shard.rotation.x = Math.sin(angle) * 0.4;
+      shard.rotation.z = -Math.cos(angle) * 0.4;
+      shard.castShadow = true;
+      group.add(shard);
+    }
+  } else if (type === 1) {
+    // Wraithbone monolith gateway
+    const pillar1 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.0, 0.6), wraithbone);
+    pillar1.position.set(-1.0, 2.0, 0);
+    pillar1.castShadow = true;
+    group.add(pillar1);
+
+    const pillar2 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.0, 0.6), wraithbone);
+    pillar2.position.set(1.0, 2.0, 0);
+    pillar2.castShadow = true;
+    group.add(pillar2);
+
+    const arch = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 0.8), wraithbone);
+    arch.position.set(0, 3.8, 0);
+    arch.castShadow = true;
+    group.add(arch);
+
+    // Floating resonant prism in the gateway center
+    const prism = new THREE.Mesh(new THREE.OctahedronGeometry(0.65, 0), crystalPurple);
+    prism.position.set(0, 2.2, 0);
+    prism.rotation.y = Math.PI / 4;
+    group.add(prism);
+
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.06, 6, 16), ringMat);
+    ring.position.set(0, 2.2, 0);
+    ring.rotation.x = Math.PI / 3;
+    group.add(ring);
+  } else {
+    // Resonant obelisk with levitating rings
+    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.6, 0.8, 8), astralStone);
+    pedestal.position.y = 0.4;
+    pedestal.castShadow = true;
+    group.add(pedestal);
+
+    const obelisk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.6, 3.6, 6), wraithbone);
+    obelisk.position.y = 2.4;
+    obelisk.castShadow = true;
+    group.add(obelisk);
+
+    const apex = new THREE.Mesh(new THREE.OctahedronGeometry(0.5, 0), crystalCyan);
+    apex.position.y = 4.4;
+    group.add(apex);
+
+    for (let r = 0; r < 3; r++) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.85 + r * 0.2, 0.05, 6, 16), ringMat);
+      ring.position.y = 1.4 + r * 0.9;
+      ring.rotation.x = Math.PI / 2 + 0.2 * (r - 1);
+      ring.rotation.y = 0.3 * r;
+      group.add(ring);
+    }
+  }
+}
+
+// 7. CORRUPTED FLESH-WORLD OBSTACLE BUILDER
+export function buildCorruptedObstacle(group: THREE.Group, type: number): void {
+  const fleshDark = new THREE.MeshStandardMaterial({ color: 0x4a0404, roughness: 0.85, metalness: 0.1 });
+  const fleshPulsing = new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.6, emissive: 0x4c0519, emissiveIntensity: 0.5 });
+  const boneSpike = new THREE.MeshStandardMaterial({ color: 0xdfdacb, roughness: 0.7, metalness: 0.05 });
+  const eyeGlow = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.2, emissive: 0xd97706, emissiveIntensity: 0.8 });
+  const tentacleMat = new THREE.MeshStandardMaterial({ color: 0x581c87, roughness: 0.7, emissive: 0x3b0764, emissiveIntensity: 0.3 });
+
+  if (type === 0) {
+    // Demonic horns and bone spikes on fleshy mound
+    const mound = new THREE.Mesh(new THREE.DodecahedronGeometry(1.6, 1), fleshDark);
+    mound.position.y = 0.5;
+    mound.scale.set(1.4, 0.7, 1.4);
+    mound.castShadow = true;
+    group.add(mound);
+
+    // Large arching demon horn
+    const horn1 = new THREE.Mesh(new THREE.ConeGeometry(0.45, 3.6, 8), boneSpike);
+    horn1.position.set(-0.4, 1.8, 0);
+    horn1.rotation.z = -0.35;
+    horn1.rotation.y = 0.3;
+    horn1.castShadow = true;
+    group.add(horn1);
+
+    const horn2 = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.8, 8), boneSpike);
+    horn2.position.set(0.6, 1.4, 0.3);
+    horn2.rotation.z = 0.4;
+    horn2.rotation.y = -0.4;
+    horn2.castShadow = true;
+    group.add(horn2);
+
+    // Sprouting bone spines
+    for (let s = 0; s < 5; s++) {
+      const angle = (s / 5) * Math.PI * 2;
+      const spine = new THREE.Mesh(new THREE.ConeGeometry(0.12, 1.6, 5), boneSpike);
+      spine.position.set(Math.cos(angle) * 1.1, 0.7, Math.sin(angle) * 1.1);
+      spine.rotation.x = Math.sin(angle) * 0.5;
+      spine.rotation.z = -Math.cos(angle) * 0.5;
+      group.add(spine);
+    }
+  } else if (type === 1) {
+    // Occult eye altar with staring ocular pustules
+    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.2, 3.2, 8), fleshDark);
+    pillar.position.y = 1.6;
+    pillar.castShadow = true;
+    group.add(pillar);
+
+    // Main demonic central eye
+    const mainEye = new THREE.Mesh(new THREE.SphereGeometry(0.65, 12, 12), eyeGlow);
+    mainEye.position.set(0, 2.8, 0.4);
+    mainEye.scale.set(1, 0.8, 0.6);
+    group.add(mainEye);
+
+    // Minor eyes around pillar
+    for (let e = 0; e < 4; e++) {
+      const angle = (e / 4) * Math.PI * 2 + 0.4;
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), eyeGlow);
+      eye.position.set(Math.cos(angle) * 0.85, 1.2 + (e % 2) * 0.7, Math.sin(angle) * 0.85);
+      group.add(eye);
+    }
+
+    // Horns crowning the altar
+    const crownHorn = new THREE.Mesh(new THREE.ConeGeometry(0.25, 1.8, 6), boneSpike);
+    crownHorn.position.set(-0.5, 3.8, 0);
+    crownHorn.rotation.z = -0.3;
+    group.add(crownHorn);
+
+    const crownHorn2 = new THREE.Mesh(new THREE.ConeGeometry(0.25, 1.8, 6), boneSpike);
+    crownHorn2.position.set(0.5, 3.8, 0);
+    crownHorn2.rotation.z = 0.3;
+    group.add(crownHorn2);
+  } else {
+    // Writhing tendril pillar with cysts
+    const mainTendril = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.7, 3.8, 8), tentacleMat);
+    mainTendril.position.set(0.1, 1.9, 0);
+    mainTendril.rotation.z = 0.12;
+    mainTendril.castShadow = true;
+    group.add(mainTendril);
+
+    const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.4, 2.2, 6), tentacleMat);
+    branch.position.set(-0.6, 2.2, 0.3);
+    branch.rotation.z = -0.6;
+    branch.rotation.x = 0.3;
+    branch.castShadow = true;
+    group.add(branch);
+
+    // Glowing pustule clusters
+    for (let p = 0; p < 6; p++) {
+      const cyst = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 6), fleshPulsing);
+      cyst.position.set(
+        (p % 2 === 0 ? 0.35 : -0.35) * (0.8 + (p % 3) * 0.2),
+        0.6 + p * 0.55,
+        (p % 3 - 1) * 0.3
+      );
+      group.add(cyst);
+    }
+  }
+}
+
+// 8. DEVOURED WORLD OBSTACLE BUILDER
+export function buildDevouredObstacle(group: THREE.Group, type: number): void {
+  const chitinBlack = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7, metalness: 0.3 });
+  const chitinPurple = new THREE.MeshStandardMaterial({ color: 0x3b0764, roughness: 0.6, metalness: 0.2 });
+  const acidBile = new THREE.MeshStandardMaterial({
+    color: 0x84cc16,
+    roughness: 0.2,
+    emissive: 0x4d7c0f,
+    emissiveIntensity: 0.8,
+    transparent: true,
+    opacity: 0.9
+  });
+  const strippedRock = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.95 });
+
+  if (type === 0) {
+    // Acid digestion chimney bio-vent
+    const ventBase = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.7, 2.6, 8), chitinBlack);
+    ventBase.position.y = 1.3;
+    ventBase.castShadow = true;
+    group.add(ventBase);
+
+    // Acid pool at rim
+    const acidPool = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.2, 8), acidBile);
+    acidPool.position.y = 2.55;
+    group.add(acidPool);
+
+    // Chitin plates surrounding vent
+    for (let c = 0; c < 4; c++) {
+      const angle = (c / 4) * Math.PI * 2;
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.8, 0.8), chitinPurple);
+      plate.position.set(Math.cos(angle) * 1.25, 1.8, Math.sin(angle) * 1.25);
+      plate.rotation.y = angle;
+      plate.rotation.z = (c % 2 === 0 ? 0.15 : -0.15);
+      plate.castShadow = true;
+      group.add(plate);
+    }
+  } else if (type === 1) {
+    // Ribbed bio-conduit spire / organism spine
+    const spine = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.8, 4.0, 7), chitinPurple);
+    spine.position.y = 2.0;
+    spine.castShadow = true;
+    group.add(spine);
+
+    // Rib plates
+    for (let r = 0; r < 5; r++) {
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(0.7 - r * 0.08, 0.1, 4, 10, Math.PI * 1.2), chitinBlack);
+      rib.position.set(0, 0.8 + r * 0.65, 0);
+      rib.rotation.y = r * 0.4;
+      rib.rotation.x = Math.PI / 2;
+      group.add(rib);
+    }
+
+    // Glowing bile gland
+    const gland = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), acidBile);
+    gland.position.set(0, 3.8, 0);
+    group.add(gland);
+  } else {
+    // Stripped bedrock crater with mandibles and toxic bile pool
+    const crater = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.2, 0.6, 8), strippedRock);
+    crater.position.y = 0.3;
+    crater.castShadow = true;
+    group.add(crater);
+
+    const bilePool = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.15, 8), acidBile);
+    bilePool.position.y = 0.55;
+    group.add(bilePool);
+
+    // Chitin mandibles / spikes
+    for (let m = 0; m < 3; m++) {
+      const angle = (m / 3) * Math.PI * 2;
+      const mandible = new THREE.Mesh(new THREE.ConeGeometry(0.3, 2.4, 5), chitinBlack);
+      mandible.position.set(Math.cos(angle) * 1.1, 1.2, Math.sin(angle) * 1.1);
+      mandible.rotation.x = -Math.sin(angle) * 0.4;
+      mandible.rotation.z = Math.cos(angle) * 0.4;
+      mandible.castShadow = true;
+      group.add(mandible);
+    }
+  }
+}
+
+// 9. TOMB WORLD OBSTACLE BUILDER
+export function buildTombObstacle(group: THREE.Group, type: number): void {
+  const livingMetal = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35, metalness: 0.85 });
+  const tombObsidian = new THREE.MeshStandardMaterial({ color: 0x030712, roughness: 0.5, metalness: 0.6 });
+  const gaussGreen = new THREE.MeshStandardMaterial({
+    color: 0x22c55e,
+    roughness: 0.1,
+    emissive: 0x16a34a,
+    emissiveIntensity: 0.9
+  });
+  const gaussBright = new THREE.MeshStandardMaterial({
+    color: 0x86efac,
+    roughness: 0.1,
+    emissive: 0x22c55e,
+    emissiveIntensity: 1.0
+  });
+
+  if (type === 0) {
+    // Stepped living-metal pyramid pylon with floating apex crystal
+    const step1 = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.7, 2.8), livingMetal);
+    step1.position.y = 0.35;
+    step1.castShadow = true;
+    group.add(step1);
+
+    const step2 = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.7, 2.0), livingMetal);
+    step2.position.y = 1.05;
+    step2.castShadow = true;
+    group.add(step2);
+
+    const step3 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.7, 1.2), tombObsidian);
+    step3.position.y = 1.75;
+    step3.castShadow = true;
+    group.add(step3);
+
+    // Floating Gauss apex octahedron
+    const apex = new THREE.Mesh(new THREE.OctahedronGeometry(0.6, 0), gaussGreen);
+    apex.position.y = 3.0;
+    group.add(apex);
+
+    // Gauss energy conduit lines
+    const line = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.8, 6), gaussBright);
+    line.position.y = 2.3;
+    group.add(line);
+  } else if (type === 1) {
+    // Tomb gateway stasis portal
+    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 3.8, 0.7), livingMetal);
+    p1.position.set(-1.1, 1.9, 0);
+    p1.castShadow = true;
+    group.add(p1);
+
+    const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 3.8, 0.7), livingMetal);
+    p2.position.set(1.1, 1.9, 0);
+    p2.castShadow = true;
+    group.add(p2);
+
+    const lintel = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.6, 0.9), tombObsidian);
+    lintel.position.set(0, 3.7, 0);
+    lintel.castShadow = true;
+    group.add(lintel);
+
+    // Glowing Gauss portal field
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 3.0), gaussGreen);
+    portal.position.set(0, 1.8, 0);
+    group.add(portal);
+
+    // Conduit glowing bands
+    for (let b = 0; b < 3; b++) {
+      const band = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.12, 0.75), gaussGreen);
+      band.position.set(-1.1, 0.8 + b * 1.1, 0);
+      group.add(band);
+      const band2 = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.12, 0.75), gaussGreen);
+      band2.position.set(1.1, 0.8 + b * 1.1, 0);
+      group.add(band2);
+    }
+  } else {
+    // Gauss power obelisk with segmented floating rings
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.4, 0.6, 6), tombObsidian);
+    base.position.y = 0.3;
+    base.castShadow = true;
+    group.add(base);
+
+    const core = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 3.8, 6), livingMetal);
+    core.position.y = 2.2;
+    core.castShadow = true;
+    group.add(core);
+
+    const energyCore = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 4.0, 8), gaussGreen);
+    energyCore.position.y = 2.2;
+    group.add(energyCore);
+
+    for (let r = 0; r < 3; r++) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 6, 6), gaussBright);
+      ring.position.y = 1.2 + r * 1.1;
+      ring.rotation.x = Math.PI / 2;
+      group.add(ring);
+    }
+  }
+}
+
+// 10. WARP RIFT WORLD OBSTACLE BUILDER
+export function buildRiftObstacle(group: THREE.Group, type: number): void {
+  const obsidianBasalt = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.8, metalness: 0.3 });
+  const moltenCore = new THREE.MeshStandardMaterial({
+    color: 0xef4444,
+    roughness: 0.3,
+    emissive: 0xdc2626,
+    emissiveIntensity: 0.9
+  });
+  const warpPurple = new THREE.MeshStandardMaterial({
+    color: 0xa855f7,
+    roughness: 0.2,
+    emissive: 0x7e22ce,
+    emissiveIntensity: 0.8,
+    transparent: true,
+    opacity: 0.85
+  });
+  const warpFire = new THREE.MeshStandardMaterial({
+    color: 0xf97316,
+    roughness: 0.3,
+    emissive: 0xea580c,
+    emissiveIntensity: 0.85
+  });
+
+  if (type === 0) {
+    // Basalt crag with molten fissure
+    const crag1 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.5, 0), obsidianBasalt);
+    crag1.position.set(-0.4, 1.4, 0);
+    crag1.scale.set(0.9, 1.8, 1.0);
+    crag1.rotation.set(0.2, 0.4, 0.1);
+    crag1.castShadow = true;
+    group.add(crag1);
+
+    const crag2 = new THREE.Mesh(new THREE.DodecahedronGeometry(1.3, 0), obsidianBasalt);
+    crag2.position.set(0.6, 1.1, 0.2);
+    crag2.scale.set(0.8, 1.5, 0.9);
+    crag2.rotation.set(-0.2, -0.3, -0.15);
+    crag2.castShadow = true;
+    group.add(crag2);
+
+    // Glowing molten lava core in the fissure
+    const magmaFissure = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.6, 1.2), moltenCore);
+    magmaFissure.position.set(0.1, 1.3, 0.1);
+    group.add(magmaFissure);
+
+    // Floating embers / shards
+    const ember = new THREE.Mesh(new THREE.DodecahedronGeometry(0.25, 0), warpFire);
+    ember.position.set(0.2, 3.2, -0.2);
+    group.add(ember);
+  } else if (type === 1) {
+    // Floating anti-gravity rock spires over molten vortex
+    const baseRock = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.8, 0.7, 8), obsidianBasalt);
+    baseRock.position.y = 0.35;
+    baseRock.castShadow = true;
+    group.add(baseRock);
+
+    const ventGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.1, 8), warpPurple);
+    ventGlow.position.y = 0.71;
+    group.add(ventGlow);
+
+    // Levitating shattered basalt shard
+    const floatShard = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.6, 5), obsidianBasalt);
+    floatShard.position.set(0, 2.6, 0);
+    floatShard.rotation.x = Math.PI;
+    floatShard.rotation.z = 0.15;
+    floatShard.castShadow = true;
+    group.add(floatShard);
+
+    const floatShard2 = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.8, 5), obsidianBasalt);
+    floatShard2.position.set(0.7, 2.0, 0.4);
+    floatShard2.rotation.z = -0.3;
+    group.add(floatShard2);
+
+    // Warp energy aura
+    const energyAura = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), warpFire);
+    energyAura.position.set(0, 1.4, 0);
+    group.add(energyAura);
+  } else {
+    // Warp rift monolith with vortex rings
+    const monolith = new THREE.Mesh(new THREE.BoxGeometry(1.2, 3.8, 1.2), obsidianBasalt);
+    monolith.position.y = 1.9;
+    monolith.castShadow = true;
+    group.add(monolith);
+
+    const riftCore = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 10), warpPurple);
+    riftCore.position.set(0, 2.2, 0.65);
+    group.add(riftCore);
+
+    for (let v = 0; v < 3; v++) {
+      const vortexRing = new THREE.Mesh(new THREE.TorusGeometry(0.9 + v * 0.25, 0.06, 6, 16), warpFire);
+      vortexRing.position.set(0, 1.2 + v * 0.9, 0);
+      vortexRing.rotation.x = Math.PI / 2.5 + v * 0.2;
+      vortexRing.rotation.y = v * 0.4;
+      group.add(vortexRing);
+    }
+  }
+}
+
 /**
  * Procedurally generates 3D meshes for map obstacles based on theme
  */
@@ -481,6 +962,18 @@ export function createObstacleMeshes(themeId: string): THREE.Group {
       buildSnowObstacle(obsGroup, type);
     } else if (themeId === 'city') {
       buildCityObstacle(obsGroup, type);
+    } else if (themeId === 'tech') {
+      buildTechObstacle(obsGroup, type);
+    } else if (themeId === 'astral') {
+      buildAstralObstacle(obsGroup, type);
+    } else if (themeId === 'corrupted') {
+      buildCorruptedObstacle(obsGroup, type);
+    } else if (themeId === 'devoured') {
+      buildDevouredObstacle(obsGroup, type);
+    } else if (themeId === 'tomb') {
+      buildTombObstacle(obsGroup, type);
+    } else if (themeId === 'rift') {
+      buildRiftObstacle(obsGroup, type);
     } else {
       buildTechObstacle(obsGroup, type);
     }
@@ -490,3 +983,4 @@ export function createObstacleMeshes(themeId: string): THREE.Group {
 
   return group;
 }
+

@@ -9,7 +9,7 @@ export type EscortStance = 'escort' | 'attack' | 'random';
 export type EscortRole = 'player_escorts' | 'enemy_escorts';
 export type CameraMode = 'iso' | 'top' | 'cinematic' | 'tactical';
 export type FormationType = 'line' | 'column' | 'wedge' | 'loose' | 'block';
-export type ParticleType = 'rain' | 'sand' | 'snow' | 'stars' | 'none';
+export type ParticleType = 'rain' | 'sand' | 'snow' | 'stars' | 'astral' | 'corruption' | 'acid' | 'gauss' | 'rift' | 'none';
 
 export interface WeaponProfile {
   name: string;
@@ -46,6 +46,17 @@ export interface MoraleProfile {
   casualtyPenalty: number;
 }
 
+export type MovementType = 'ground' | 'vehicle' | 'fly' | 'colossus';
+export type AwarenessType = 'sensory' | 'vision' | 'psychic';
+
+export interface UtilityProfile {
+  movement: number;
+  awareness: number;
+  morale: number;
+  movementType: MovementType;
+  awarenessType: AwarenessType;
+}
+
 export interface UnitDef {
   id?: string;
   type: string;
@@ -64,6 +75,9 @@ export interface UnitDef {
   hp: number;
   movement?: number;
   m: number;
+  movementType?: MovementType;
+  awarenessType?: AwarenessType;
+  utility?: UtilityProfile;
   leadership?: number;
   toughness?: number;
   t: number;

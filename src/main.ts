@@ -69,6 +69,7 @@ deploymentUi.onStartBattle = () => {
 
 // ================== TOP-RIGHT IN-BATTLE NAVIGATION & MENUS ==================
 const navBtnLogs = document.getElementById('nav-btn-logs');
+const navBtnMap = document.getElementById('nav-btn-map');
 const navBtnCamera = document.getElementById('nav-btn-camera');
 const navBtnFullscreen = document.getElementById('nav-btn-fullscreen');
 const navBtnMenu = document.getElementById('nav-btn-menu');
@@ -155,7 +156,29 @@ if (navBtnLogs) {
   });
 }
 
-// 2. CAMERA OPTIONS
+// 2. TACTICAL MAP VISIBILITY CONTROL
+const minimapPanel = document.getElementById('minimap-panel');
+
+const setMinimapVisible = (visible: boolean) => {
+  if (minimapPanel) {
+    minimapPanel.style.display = visible ? 'block' : 'none';
+    minimapPanel.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    minimapPanel.classList.toggle('hidden', !visible);
+  }
+  if (navBtnMap) {
+    navBtnMap.classList.toggle('active', visible);
+    navBtnMap.setAttribute('aria-pressed', visible ? 'true' : 'false');
+  }
+};
+
+if (navBtnMap) {
+  navBtnMap.addEventListener('click', () => {
+    const isVisible = minimapPanel ? minimapPanel.style.display !== 'none' : true;
+    setMinimapVisible(!isVisible);
+  });
+}
+
+// 3. CAMERA OPTIONS
 const setCamPresetActive = (preset: 'command' | 'top' | 'cinematic') => {
   [popCamCommand, popCamTop, popCamCinematic].forEach(b => b?.classList.remove('active'));
   if (preset === 'command') popCamCommand?.classList.add('active');
@@ -388,17 +411,6 @@ document.addEventListener('click', (e) => {
     closePopups();
   }
 });
-
-// Minimap Collapsible
-const btnToggleMinimap = document.getElementById('btn-toggle-minimap');
-const minimapBody = document.getElementById('minimap-body');
-if (btnToggleMinimap && minimapBody) {
-  btnToggleMinimap.addEventListener('click', () => {
-    const isCollapsed = minimapBody.style.display === 'none';
-    minimapBody.style.display = isCollapsed ? 'block' : 'none';
-    btnToggleMinimap.innerHTML = isCollapsed ? '&#9660;' : '&#9650;';
-  });
-}
 
 // Bottom Cockpit Actions
 const btnEndTurn = document.getElementById('btn-end-turn');

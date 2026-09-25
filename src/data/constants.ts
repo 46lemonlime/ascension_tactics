@@ -159,5 +159,78 @@ export const MAP_OBSTACLES: Record<string, string[]> = {
     key(29, 12), key(30, 12), key(31, 12), key(31, 13), key(29, 18), key(30, 18), key(31, 18), key(31, 17),
     key(29, 32), key(30, 32), key(31, 32), key(31, 33), key(29, 38), key(30, 38), key(31, 38), key(31, 37),
     key(35, 24), key(35, 25), key(35, 26), key(35, 27), key(34, 26), key(33, 26)
+  ],
+
+  // 6. ASTRAL: Prismatic crystal spires, floating wraithbone monoliths, and harmonic ley nodes
+  astral: [
+    key(6, 14), key(7, 14), key(7, 15), key(8, 15), key(6, 18), key(7, 18),
+    key(32, 14), key(33, 14), key(32, 15), key(31, 15), key(33, 18), key(32, 18),
+    key(6, 38), key(7, 38), key(7, 37), key(8, 37), key(6, 34), key(7, 34),
+    key(32, 38), key(33, 38), key(32, 37), key(31, 37), key(33, 34), key(32, 34),
+    key(18, 25), key(19, 25), key(20, 25), key(21, 25),
+    key(18, 29), key(19, 29), key(20, 29), key(21, 29),
+    key(14, 27), key(15, 27), key(24, 27), key(25, 27),
+    key(12, 18), key(13, 19), key(26, 19), key(27, 18),
+    key(12, 34), key(13, 33), key(26, 33), key(27, 34),
+    key(19, 12), key(20, 12), key(19, 42), key(20, 42)
+  ],
+
+  // 7. CORRUPTED: Mutated flesh-growths, twisted root tendrils, and warped daemon spires
+  corrupted: [
+    key(4, 12), key(5, 12), key(5, 13), key(6, 13), key(6, 14),
+    key(3, 26), key(4, 26), key(5, 27), key(5, 28), key(6, 28),
+    key(4, 40), key(5, 40), key(5, 39), key(6, 39), key(6, 38),
+    key(35, 12), key(34, 12), key(34, 13), key(33, 13), key(33, 14),
+    key(36, 26), key(35, 26), key(34, 27), key(34, 28), key(33, 28),
+    key(35, 40), key(34, 40), key(34, 39), key(33, 39), key(33, 38),
+    key(17, 23), key(18, 23), key(18, 24), key(19, 24),
+    key(21, 24), key(22, 24), key(22, 23), key(23, 23),
+    key(17, 31), key(18, 31), key(18, 30), key(19, 30),
+    key(21, 30), key(22, 30), key(22, 31), key(23, 31),
+    key(19, 27), key(20, 27),
+    key(12, 16), key(13, 17), key(26, 17), key(27, 16),
+    key(12, 36), key(13, 35), key(26, 35), key(27, 36)
+  ],
+
+  // 8. DEVOURED: Acidic digestion chasms, excavated bedrock trenches, and hollowed craters
+  devoured: [
+    key(6, 16), key(7, 16), key(8, 16), key(9, 16), key(9, 17), key(10, 17),
+    key(30, 16), key(31, 16), key(32, 16), key(33, 16), key(30, 17), key(29, 17),
+    key(6, 38), key(7, 38), key(8, 38), key(9, 38), key(9, 37), key(10, 37),
+    key(30, 38), key(31, 38), key(32, 38), key(33, 38), key(30, 37), key(29, 37),
+    key(16, 24), key(17, 24), key(16, 25), key(17, 25),
+    key(22, 24), key(23, 24), key(22, 25), key(23, 25),
+    key(16, 29), key(17, 29), key(16, 30), key(17, 30),
+    key(22, 29), key(23, 29), key(22, 30), key(23, 30),
+    key(3, 26), key(4, 27), key(5, 27), key(35, 26), key(36, 27), key(34, 27),
+    key(19, 14), key(20, 14), key(19, 40), key(20, 40)
+  ],
+
+  // 9. TOMB: Stepped living-metal pylons, tomb gateways, and monumental sarcophagi
+  tomb: [
+    key(8, 14), key(9, 14), key(10, 14), key(8, 15), key(9, 15), key(10, 15),
+    key(8, 18), key(9, 18), key(10, 18),
+    key(29, 14), key(30, 14), key(31, 14), key(29, 15), key(30, 15), key(31, 15),
+    key(29, 18), key(30, 18), key(31, 18),
+    key(8, 36), key(9, 36), key(10, 36), key(8, 37), key(9, 37), key(10, 37),
+    key(8, 40), key(9, 40), key(10, 40),
+    key(29, 36), key(30, 36), key(31, 36), key(29, 37), key(30, 37), key(31, 37),
+    key(29, 40), key(30, 40), key(31, 40),
+    key(18, 26), key(19, 26), key(20, 26), key(21, 26),
+    key(18, 28), key(19, 28), key(20, 28), key(21, 28),
+    key(4, 27), key(5, 27), key(34, 27), key(35, 27)
+  ],
+
+  // 10. RIFT: Volcanic basalt pillars, molten fissures, and dimensional warp tears
+  rift: [
+    key(7, 13), key(8, 13), key(8, 14), key(9, 14), key(10, 15),
+    key(29, 15), key(30, 14), key(31, 14), key(31, 13), key(32, 13),
+    key(7, 41), key(8, 41), key(8, 40), key(9, 40), key(10, 39),
+    key(29, 39), key(30, 40), key(31, 40), key(31, 41), key(32, 41),
+    key(17, 25), key(18, 25), key(19, 25), key(17, 26), key(18, 26),
+    key(21, 28), key(22, 28), key(23, 28), key(22, 29), key(23, 29),
+    key(14, 21), key(15, 21), key(24, 33), key(25, 33),
+    key(3, 27), key(4, 27), key(4, 28), key(35, 27), key(36, 27), key(35, 26),
+    key(19, 10), key(20, 10), key(19, 44), key(20, 44)
   ]
 };
