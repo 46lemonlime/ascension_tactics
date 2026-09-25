@@ -179,13 +179,6 @@ if (navBtnMap) {
 }
 
 // 3. CAMERA OPTIONS
-const setCamPresetActive = (preset: 'command' | 'top' | 'cinematic') => {
-  [popCamCommand, popCamTop, popCamCinematic].forEach(b => b?.classList.remove('active'));
-  if (preset === 'command') popCamCommand?.classList.add('active');
-  if (preset === 'top') popCamTop?.classList.add('active');
-  if (preset === 'cinematic') popCamCinematic?.classList.add('active');
-};
-
 if (navBtnCamera) {
   navBtnCamera.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -195,21 +188,18 @@ if (navBtnCamera) {
 
 if (popCamCommand) {
   popCamCommand.addEventListener('click', () => {
-    setCamPresetActive('command');
     scene.cameraController.setPresetView('iso', engine.state.phase === 'deployment');
   });
 }
 
 if (popCamTop) {
   popCamTop.addEventListener('click', () => {
-    setCamPresetActive('top');
     scene.cameraController.setPresetView('top');
   });
 }
 
 if (popCamCinematic) {
   popCamCinematic.addEventListener('click', () => {
-    setCamPresetActive('cinematic');
     scene.cameraController.setPresetView('cinematic');
   });
 }
@@ -362,7 +352,6 @@ if (popMenuRestart) {
         deploymentUi.renderRoster(engine.state.rosterPlayer || [], initialKey);
         scene.cameraController.frameDeploymentZone(false);
         scene.updateDeploymentHighlights(engine.state.rosterPlayer || []);
-        setCamPresetActive('command');
       }
     );
   });
@@ -582,15 +571,12 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 
   // Camera presets
   if (e.key === '1') {
-    setCamPresetActive('command');
     scene.cameraController.setPresetView('iso', engine.state.phase === 'deployment');
   }
   if (e.key === '2') {
-    setCamPresetActive('top');
     scene.cameraController.setPresetView('top');
   }
   if (e.key === '3') {
-    setCamPresetActive('cinematic');
     scene.cameraController.setPresetView('cinematic');
   }
 

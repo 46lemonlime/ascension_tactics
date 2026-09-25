@@ -322,8 +322,8 @@ export class CameraController {
         this.animateTo(new THREE.Vector3(0, 100.6, 178.15), new THREE.Vector3(0, 0, 35), 800);
       }
     } else if (preset === 'top') {
-      // Top-down tactical view (zoomed by 5 scrolls from (0, 260, 0.1))
-      this.animateTo(new THREE.Vector3(0, 201.2, 0.08), new THREE.Vector3(0, 0, 0), 800);
+      // Top-down tactical view (further zoomed by 3 scrolls to 172.5)
+      this.animateTo(new THREE.Vector3(0, 172.5, 0.07), new THREE.Vector3(0, 0, 0), 800);
     } else if (preset === 'cinematic') {
       // Low-angle cinematic vista (zoomed by 5 scrolls from (-120, 55, 95))
       this.animateTo(new THREE.Vector3(-92.85, 43.46, 73.51), new THREE.Vector3(0, 4, 0), 1000);
