@@ -5,6 +5,7 @@ import { UNIT_DEFS } from '../data/units';
 import type { MissionType } from '../data/types';
 import { sfx } from '../audio/synth';
 import { getBiomeArtwork, getMissionArtwork } from './landscape-art';
+import { InfoPanelSizer } from './panel-sizer';
 
 export const FACTION_CYCLE: string[] = [
   'random',
@@ -138,12 +139,13 @@ export class DOMManager {
     this.selectMissionOption(this.selectedMission || 'extermination');
     this.updateSinglePlayerSummary();
 
-    // Reset carousel positions
+    // Reset carousel positions and sync dynamic panel sizes
     setTimeout(() => {
       this.updatePlayerCarousel(0);
       this.updateAiCarousel(0);
       this.updateMapCarousel(0);
       this.updateMissionCarousel(0);
+      InfoPanelSizer.syncAllPanelHeights();
     }, 50);
   }
 
@@ -403,7 +405,7 @@ export class DOMManager {
 
     this.updateSinglePlayerSummary();
 
-    // Re-align carousels when entering stage
+    // Re-align carousels and sync dynamic panel sizes when entering stage
     setTimeout(() => {
       if (stage === 1) {
         this.updatePlayerCarousel(0);
@@ -415,6 +417,7 @@ export class DOMManager {
       if (stage === 3) {
         this.updateMissionCarousel(0);
       }
+      InfoPanelSizer.syncAllPanelHeights();
     }, 40);
   }
 
@@ -724,12 +727,16 @@ export class DOMManager {
       });
     }
 
-    const btnConfirm = document.getElementById('btn-confirm-race');
-    if (btnConfirm) {
-      btnConfirm.addEventListener('click', () => {
-        this.launchSkirmish();
-      });
-    }
+    // 8. DYNAMIC INFOBOX SIZING ON WINDOW RESIZE & INIT
+    let resizeTimer: any = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        InfoPanelSizer.syncAllPanelHeights();
+      }, 100);
+    });
+
+    InfoPanelSizer.syncAllPanelHeights();
   }
 
   private updatePlayerCarousel(delta: number, immediate: boolean = false): void {
