@@ -306,22 +306,50 @@
     </div>
   </div>
 
-  <!-- RACE & MAP SELECTION SCREEN -->
-  <div id="race-modal" style="display:none;">
-    <div class="race-dialog interactive">
-      <div class="race-dialog-header">
-        <div class="modal-game-banner">&#9876; ASCENSION TACTICS 3D &#9876;</div>
-        <div class="modal-game-tagline">TABLETOP SKIRMISH WARFARE</div>
-        <h2>MISSION BRIEFING & WARZONE SETUP</h2>
-        <p>Select your strike faction, configure the AI opponent, and choose your tactical theater of war.</p>
+  <!-- FULL-SCREEN SINGLE PLAYER SELECTION FLOW (3 STAGES) -->
+  <div id="race-modal" class="fullscreen-sp-screen" style="display:none;">
+    <!-- 1. TOP HUD HEADER -->
+    <div class="sp-hud-header">
+      <div class="sp-header-brand">
+        <span class="sp-brand-icon">▲</span>
+        <span class="sp-brand-title">ASCENSION TACTICS</span>
+        <div class="sp-brand-divider"></div>
+        <span class="sp-mode-label">SINGLE PLAYER</span>
       </div>
 
-      <!-- 1. FACTION SELECTION (STICKY RANDOM + 3-CARD INFINITE CAROUSEL) -->
-      <div class="modal-section-title">&#9876; 1. CHOOSE YOUR ARMY</div>
-      <div class="faction-carousel-container">
-        <!-- STICKY OPTION 1: RANDOM ARMY (ALWAYS IN POSITION 1) -->
-        <div class="faction-card sticky-random-card selected-player" id="fcard-random">
-          <div class="faction-card-badge" id="fbadge-random" style="display:block;">AUTO</div>
+      <!-- PROGRESS STEPPER BREADCRUMBS -->
+      <div class="sp-stepper">
+        <div class="sp-step-pill active" id="sp-step-pill-1" data-step="1">
+          <span class="sp-step-num">1</span>
+          <span class="sp-step-text">FACTION</span>
+        </div>
+        <div class="sp-step-connector"></div>
+        <div class="sp-step-pill" id="sp-step-pill-2" data-step="2">
+          <span class="sp-step-num">2</span>
+          <span class="sp-step-text">MAP</span>
+        </div>
+        <div class="sp-step-connector"></div>
+        <div class="sp-step-pill" id="sp-step-pill-3" data-step="3">
+          <span class="sp-step-num">3</span>
+          <span class="sp-step-text">MISSION</span>
+        </div>
+      </div>
+
+      <!-- EXIT TO MAIN MENU BUTTON -->
+      <button id="btn-sp-close" class="sp-close-btn" title="Return to Main Menu" aria-label="Return to Main Menu">✕</button>
+    </div>
+
+    <!-- 2. STAGE 1: FACTION SELECTION -->
+    <div id="sp-stage-faction" class="sp-stage-container">
+      <div class="sp-stage-header">
+        <h2 class="sp-stage-title">SELECT YOUR WARHOST</h2>
+        <p class="sp-stage-subtitle">Choose your commanding faction or deploy a dynamic mystery strike force.</p>
+      </div>
+
+      <div class="sp-carousel-wrapper">
+        <!-- STICKY RANDOM ARMY CARD -->
+        <div class="sp-selection-card faction-card sticky-random-card selected-player" id="fcard-random">
+          <div class="sp-card-badge faction-card-badge" id="fbadge-random" style="display:block;">AUTO</div>
           <div class="faction-icon">🎲</div>
           <div class="faction-name">Random Army</div>
           <div class="faction-sub">Dynamic Mystery Force</div>
@@ -330,86 +358,86 @@
         </div>
 
         <!-- CAROUSEL ROTATION ARROW (PREV) -->
-        <button id="btn-race-carousel-prev" class="race-nav-btn" title="Previous Factions" aria-label="Previous Factions">&#10094;</button>
+        <button id="btn-race-carousel-prev" class="sp-carousel-nav-btn" title="Previous Factions" aria-label="Previous Factions">&#10094;</button>
 
-        <!-- ROTATING VIEWPORT (3 CARDS VISIBLE AT ONCE, INFINITELY LOOPABLE) -->
-        <div class="race-carousel-viewport">
+        <!-- ROTATING VIEWPORT (INFINITELY LOOPABLE) -->
+        <div class="sp-carousel-viewport race-carousel-viewport">
           <div class="factions-grid" id="factions-grid-track">
             <!-- SET 1 (CLONE 1) -->
-            <div class="faction-card" data-race="ascendants">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ascendants">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
               <div class="faction-name">The Ascendants</div>
               <div class="faction-sub">Elite Super-Warriors</div>
               <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
               <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="directorate">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="directorate">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
               <div class="faction-name">The Directorate</div>
               <div class="faction-sub">Mass Combined Arms</div>
               <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
               <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="elyri">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="elyri">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
               <div class="faction-name">The Elyri</div>
               <div class="faction-sub">Speed & Precision</div>
               <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
               <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="veykari">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="veykari">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
               <div class="faction-name">The Veykari</div>
               <div class="faction-sub">Predatory Raiders</div>
               <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
               <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="ghar">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ghar">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
               <div class="faction-name">The Ghar</div>
               <div class="faction-sub">Aggressive Horde</div>
               <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
               <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
             </div>
-            <div class="faction-card" data-race="devourers">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="devourers">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
               <div class="faction-name">The Devourers</div>
               <div class="faction-sub">Adaptive Swarm</div>
               <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
               <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="revenant">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="revenant">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
               <div class="faction-name">The Revenant</div>
               <div class="faction-sub">Synthetic Dynasties</div>
               <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
               <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
             </div>
-            <div class="faction-card" data-race="concordat">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="concordat">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
               <div class="faction-name">The Concordat</div>
               <div class="faction-sub">Networked Firepower</div>
               <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
               <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
             </div>
-            <div class="faction-card" data-race="riftborn">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="riftborn">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
               <div class="faction-name">The Riftborn</div>
               <div class="faction-sub">Reality Shifters</div>
               <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
               <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
             </div>
-            <div class="faction-card" data-race="forsaken">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="forsaken">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
               <div class="faction-name">The Forsaken</div>
               <div class="faction-sub">Corrupted Ascendants</div>
@@ -418,80 +446,80 @@
             </div>
 
             <!-- SET 2 (MAIN ACTIVE SET) -->
-            <div class="faction-card" data-race="ascendants">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ascendants">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
               <div class="faction-name">The Ascendants</div>
               <div class="faction-sub">Elite Super-Warriors</div>
               <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
               <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="directorate">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="directorate">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
               <div class="faction-name">The Directorate</div>
               <div class="faction-sub">Mass Combined Arms</div>
               <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
               <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="elyri">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="elyri">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
               <div class="faction-name">The Elyri</div>
               <div class="faction-sub">Speed & Precision</div>
               <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
               <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="veykari">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="veykari">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
               <div class="faction-name">The Veykari</div>
               <div class="faction-sub">Predatory Raiders</div>
               <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
               <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="ghar">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ghar">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
               <div class="faction-name">The Ghar</div>
               <div class="faction-sub">Aggressive Horde</div>
               <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
               <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
             </div>
-            <div class="faction-card" data-race="devourers">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="devourers">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
               <div class="faction-name">The Devourers</div>
               <div class="faction-sub">Adaptive Swarm</div>
               <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
               <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="revenant">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="revenant">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
               <div class="faction-name">The Revenant</div>
               <div class="faction-sub">Synthetic Dynasties</div>
               <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
               <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
             </div>
-            <div class="faction-card" data-race="concordat">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="concordat">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
               <div class="faction-name">The Concordat</div>
               <div class="faction-sub">Networked Firepower</div>
               <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
               <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
             </div>
-            <div class="faction-card" data-race="riftborn">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="riftborn">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
               <div class="faction-name">The Riftborn</div>
               <div class="faction-sub">Reality Shifters</div>
               <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
               <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
             </div>
-            <div class="faction-card" data-race="forsaken">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="forsaken">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
               <div class="faction-name">The Forsaken</div>
               <div class="faction-sub">Corrupted Ascendants</div>
@@ -500,80 +528,80 @@
             </div>
 
             <!-- SET 3 (CLONE 3) -->
-            <div class="faction-card" data-race="ascendants">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ascendants">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ascendants.jpg" alt="The Ascendants" class="faction-icon-img" /></div>
               <div class="faction-name">The Ascendants</div>
               <div class="faction-sub">Elite Super-Warriors</div>
               <div class="faction-desc">Genetically rebuilt super-soldiers with heavy 2+/3+ armor, devastator batteries, and devastating commanders.</div>
               <div class="faction-units-preview">Commander • Vanguard • Interceptors • Devastators • Centurions • Dreadnought</div>
             </div>
-            <div class="faction-card" data-race="directorate">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="directorate">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/directorate.jpg" alt="The Directorate" class="faction-icon-img" /></div>
               <div class="faction-name">The Directorate</div>
               <div class="faction-sub">Mass Combined Arms</div>
               <div class="faction-desc">Conventional mass military power deploying shock trooper firing lines, bipedal sentinels, and heavy artillery.</div>
               <div class="faction-units-preview">Field Marshal • Shock Troopers • Heavy Ordnance • Sentinel • Basilisk • Battle Tank</div>
             </div>
-            <div class="faction-card" data-race="elyri">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="elyri">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/elyri.jpg" alt="The Elyri" class="faction-icon-img" /></div>
               <div class="faction-name">The Elyri</div>
               <div class="faction-sub">Speed & Precision</div>
               <div class="faction-desc">Ancient psychic civilization wielding high mobility (M8-12), monofilament shurikens, and titan spirit constructs.</div>
               <div class="faction-units-preview">Farseer • Blade Dancers • Reapers • Defenders • D-Cannon • Spirit Titan</div>
             </div>
-            <div class="faction-card" data-race="veykari">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="veykari">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/veykari.jpg" alt="The Veykari" class="faction-icon-img" /></div>
               <div class="faction-name">The Veykari</div>
               <div class="faction-sub">Predatory Raiders</div>
               <div class="faction-desc">Ruthless void raiders with toxic splinter shard rifles, executioner Incubi Klaives, and objective looting mechanics.</div>
               <div class="faction-units-preview">Archon • Incubi • Scourges • Raiders • Pain Engine • Void Skiff</div>
             </div>
-            <div class="faction-card" data-race="ghar">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="ghar">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/ghar.jpg" alt="The Ghar" class="faction-icon-img" /></div>
               <div class="faction-name">The Ghar</div>
               <div class="faction-sub">Aggressive Horde</div>
               <div class="faction-desc">Brutal alien war clans with high toughness (T5), savage Power Klaws, scrap artillery, and War Momentum surges.</div>
               <div class="faction-units-preview">Warboss • Nobz • Lootaz • Swarm Mob • Mek Gunz • Deff Dread</div>
             </div>
-            <div class="faction-card" data-race="devourers">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="devourers">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/devourers.jpg" alt="The Devourers" class="faction-icon-img" /></div>
               <div class="faction-name">The Devourers</div>
               <div class="faction-sub">Adaptive Swarm</div>
               <div class="faction-desc">Distributed biological intelligence featuring chittering swarms, synapse commanders, spore cannons, and Carnifexes.</div>
               <div class="faction-units-preview">Hive Tyrant • Bio-Warriors • Stalkers • Gaunt Brood • Biovore • Carnifex</div>
             </div>
-            <div class="faction-card" data-race="revenant">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="revenant">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/revenant.jpg" alt="The Revenant" class="faction-icon-img" /></div>
               <div class="faction-name">The Revenant</div>
               <div class="faction-sub">Synthetic Dynasties</div>
               <div class="faction-desc">Immortal metallic warriors with armor-shredding Gauss weaponry, Reconstitution self-repair, and titan beam walkers.</div>
               <div class="faction-units-preview">Overlord • Immortals • Destroyers • Phalanx • Heavy Destroyer • Doomstalker</div>
             </div>
-            <div class="faction-card" data-race="concordat">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="concordat">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/concordat.jpg" alt="The Concordat" class="faction-icon-img" /></div>
               <div class="faction-name">The Concordat</div>
               <div class="faction-sub">Networked Firepower</div>
               <div class="faction-desc">Multi-species federation combining 34" pulse volleys, 44"-48" railguns, battlesuits, and networked fire support.</div>
               <div class="faction-units-preview">Commander • Fire Cadre • Stealth • Rail Snipers • Broadside • Repulsor Tank</div>
             </div>
-            <div class="faction-card" data-race="riftborn">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="riftborn">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/riftborn.jpg" alt="The Riftborn" class="faction-icon-img" /></div>
               <div class="faction-name">The Riftborn</div>
               <div class="faction-sub">Reality Shifters</div>
               <div class="faction-desc">Extra-dimensional entities capable of opening dimensional rifts, teleporting across space, and manipulating reality.</div>
               <div class="faction-units-preview">Rift Herald • Stalkers • Warp Skimmers • Phantoms • Juggernaut • Void Avatar</div>
             </div>
-            <div class="faction-card" data-race="forsaken">
-              <div class="faction-card-badge" style="display:none;">SELECTED</div>
+            <div class="sp-selection-card faction-card" data-race="forsaken">
+              <div class="sp-card-badge faction-card-badge" style="display:none;">SELECTED</div>
               <div class="faction-icon"><img src="/assets/emblems/forsaken.jpg" alt="The Forsaken" class="faction-icon-img" /></div>
               <div class="faction-name">The Forsaken</div>
               <div class="faction-sub">Corrupted Ascendants</div>
@@ -584,219 +612,233 @@
         </div>
 
         <!-- CAROUSEL ROTATION ARROW (NEXT) -->
-        <button id="btn-race-carousel-next" class="race-nav-btn" title="Next Factions" aria-label="Next Factions">&#10095;</button>
+        <button id="btn-race-carousel-next" class="sp-carousel-nav-btn" title="Next Factions" aria-label="Next Factions">&#10095;</button>
+      </div>
+    </div>
+
+    <!-- 3. STAGE 2: MAP SELECTION -->
+    <div id="sp-stage-map" class="sp-stage-container" style="display:none;">
+      <div class="sp-stage-header">
+        <h2 class="sp-stage-title">SELECT BATTLEFIELD THEATER</h2>
+        <p class="sp-stage-subtitle">Choose the planetary combat environment and environmental terrain.</p>
       </div>
 
-      <!-- 2. BATTLEFIELD MAP BIOME SELECTION (STICKY RANDOM + 3-CARD INFINITE CAROUSEL) -->
-      <div class="modal-section-title">&#127758; 2. SELECT BATTLEFIELD BIOME</div>
-      <div class="map-carousel-container">
-        <!-- STICKY OPTION 1: RANDOM BIOME (ALWAYS IN POSITION 1) -->
-        <div class="map-card sticky-random-map-card selected-map" id="mcard-random">
-          <div class="map-card-badge">AUTO</div>
+      <div class="sp-carousel-wrapper">
+        <!-- STICKY RANDOM BIOME CARD -->
+        <div class="sp-selection-card map-card sticky-random-map-card selected-map" id="mcard-random">
+          <div class="sp-card-badge map-card-badge">AUTO</div>
           <div class="map-icon">🎲</div>
           <div class="map-name">Random Biome</div>
           <div class="map-sub">Dynamic Mystery Theater</div>
+          <div class="map-desc">Deploy into an unpredictable tactical theater with dynamic terrain obstacles.</div>
         </div>
 
         <!-- CAROUSEL ROTATION ARROW (PREV) -->
-        <button id="btn-map-carousel-prev" class="map-nav-btn" title="Previous Maps" aria-label="Previous Maps">&#10094;</button>
+        <button id="btn-map-carousel-prev" class="sp-carousel-nav-btn" title="Previous Maps" aria-label="Previous Maps">&#10094;</button>
 
-        <!-- ROTATING VIEWPORT (3 CARDS VISIBLE AT ONCE, INFINITELY LOOPABLE) -->
-        <div class="map-carousel-viewport">
+        <!-- ROTATING VIEWPORT (INFINITELY LOOPABLE) -->
+        <div class="sp-carousel-viewport map-carousel-viewport">
           <div class="maps-grid" id="maps-grid-track">
             <!-- SET 1 (CLONE 1) -->
-            <div class="map-card" data-map="jungle">
+            <div class="sp-selection-card map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
               <div class="map-name">Jungle Death World</div>
               <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
-            <div class="map-card" data-map="snow">
+            <div class="sp-selection-card map-card" data-map="snow">
               <div class="map-icon">❄️</div>
               <div class="map-name">Glacial Frost World</div>
               <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
             </div>
-            <div class="map-card" data-map="desert">
+            <div class="sp-selection-card map-card" data-map="desert">
               <div class="map-icon">🏜️</div>
               <div class="map-name">Desert Wastes</div>
               <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
-            <div class="map-card" data-map="city">
+            <div class="sp-selection-card map-card" data-map="city">
               <div class="map-icon">🏛️</div>
               <div class="map-name">Gothic Hive City</div>
               <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
-            <div class="map-card" data-map="tech">
+            <div class="sp-selection-card map-card" data-map="tech">
               <div class="map-icon">🚀</div>
               <div class="map-name">Space-Tech / Void Station</div>
               <div class="map-sub">Orbital Reactor & Bulkheads</div>
             </div>
-            <div class="map-card" data-map="astral">
+            <div class="sp-selection-card map-card" data-map="astral">
               <div class="map-icon">✨</div>
               <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+              <div class="map-sub">Harmonic Prisms & Monoliths</div>
             </div>
-            <div class="map-card" data-map="corrupted">
+            <div class="sp-selection-card map-card" data-map="corrupted">
               <div class="map-icon">💀</div>
               <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+              <div class="map-sub">Mutated Terrain & Tendrils</div>
             </div>
-            <div class="map-card" data-map="devoured">
+            <div class="sp-selection-card map-card" data-map="devoured">
               <div class="map-icon">👾</div>
               <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+              <div class="map-sub">Stripped Desolation Pits</div>
             </div>
-            <div class="map-card" data-map="tomb">
+            <div class="sp-selection-card map-card" data-map="tomb">
               <div class="map-icon">⚡</div>
               <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+              <div class="map-sub">Living Metal Crypts</div>
             </div>
-            <div class="map-card" data-map="rift">
+            <div class="sp-selection-card map-card" data-map="rift">
               <div class="map-icon">🔥</div>
               <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Molten Void</div>
+              <div class="map-sub">Dimensional Fissures & Void</div>
             </div>
 
             <!-- SET 2 (MAIN ACTIVE SET) -->
-            <div class="map-card" data-map="jungle">
+            <div class="sp-selection-card map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
               <div class="map-name">Jungle Death World</div>
               <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
-            <div class="map-card" data-map="snow">
+            <div class="sp-selection-card map-card" data-map="snow">
               <div class="map-icon">❄️</div>
               <div class="map-name">Glacial Frost World</div>
               <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
             </div>
-            <div class="map-card" data-map="desert">
+            <div class="sp-selection-card map-card" data-map="desert">
               <div class="map-icon">🏜️</div>
               <div class="map-name">Desert Wastes</div>
               <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
-            <div class="map-card" data-map="city">
+            <div class="sp-selection-card map-card" data-map="city">
               <div class="map-icon">🏛️</div>
               <div class="map-name">Gothic Hive City</div>
               <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
-            <div class="map-card" data-map="tech">
+            <div class="sp-selection-card map-card" data-map="tech">
               <div class="map-icon">🚀</div>
               <div class="map-name">Space-Tech / Void Station</div>
               <div class="map-sub">Orbital Reactor & Bulkheads</div>
             </div>
-            <div class="map-card" data-map="astral">
+            <div class="sp-selection-card map-card" data-map="astral">
               <div class="map-icon">✨</div>
               <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+              <div class="map-sub">Harmonic Prisms & Monoliths</div>
             </div>
-            <div class="map-card" data-map="corrupted">
+            <div class="sp-selection-card map-card" data-map="corrupted">
               <div class="map-icon">💀</div>
               <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+              <div class="map-sub">Mutated Terrain & Tendrils</div>
             </div>
-            <div class="map-card" data-map="devoured">
+            <div class="sp-selection-card map-card" data-map="devoured">
               <div class="map-icon">👾</div>
               <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+              <div class="map-sub">Stripped Desolation Pits</div>
             </div>
-            <div class="map-card" data-map="tomb">
+            <div class="sp-selection-card map-card" data-map="tomb">
               <div class="map-icon">⚡</div>
               <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+              <div class="map-sub">Living Metal Crypts</div>
             </div>
-            <div class="map-card" data-map="rift">
+            <div class="sp-selection-card map-card" data-map="rift">
               <div class="map-icon">🔥</div>
               <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Molten Void</div>
+              <div class="map-sub">Dimensional Fissures & Void</div>
             </div>
 
             <!-- SET 3 (CLONE 3) -->
-            <div class="map-card" data-map="jungle">
+            <div class="sp-selection-card map-card" data-map="jungle">
               <div class="map-icon">🌿</div>
               <div class="map-name">Jungle Death World</div>
               <div class="map-sub">Alien Primeval Biosphere</div>
             </div>
-            <div class="map-card" data-map="snow">
+            <div class="sp-selection-card map-card" data-map="snow">
               <div class="map-icon">❄️</div>
               <div class="map-name">Glacial Frost World</div>
               <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
             </div>
-            <div class="map-card" data-map="desert">
+            <div class="sp-selection-card map-card" data-map="desert">
               <div class="map-icon">🏜️</div>
               <div class="map-name">Desert Wastes</div>
               <div class="map-sub">Ash Dunes & Canyon Spires</div>
             </div>
-            <div class="map-card" data-map="city">
+            <div class="sp-selection-card map-card" data-map="city">
               <div class="map-icon">🏛️</div>
               <div class="map-name">Gothic Hive City</div>
               <div class="map-sub">Industrial Ruins & Streets</div>
             </div>
-            <div class="map-card" data-map="tech">
+            <div class="sp-selection-card map-card" data-map="tech">
               <div class="map-icon">🚀</div>
               <div class="map-name">Space-Tech / Void Station</div>
               <div class="map-sub">Orbital Reactor & Bulkheads</div>
             </div>
-            <div class="map-card" data-map="astral">
+            <div class="sp-selection-card map-card" data-map="astral">
               <div class="map-icon">✨</div>
               <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Floating Monoliths</div>
+              <div class="map-sub">Harmonic Prisms & Monoliths</div>
             </div>
-            <div class="map-card" data-map="corrupted">
+            <div class="sp-selection-card map-card" data-map="corrupted">
               <div class="map-icon">💀</div>
               <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Dark Tendrils</div>
+              <div class="map-sub">Mutated Terrain & Tendrils</div>
             </div>
-            <div class="map-card" data-map="devoured">
+            <div class="sp-selection-card map-card" data-map="devoured">
               <div class="map-icon">👾</div>
               <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation & Digestion Pits</div>
+              <div class="map-sub">Stripped Desolation Pits</div>
             </div>
-            <div class="map-card" data-map="tomb">
+            <div class="sp-selection-card map-card" data-map="tomb">
               <div class="map-icon">⚡</div>
               <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts & Monoliths</div>
+              <div class="map-sub">Living Metal Crypts</div>
             </div>
-            <div class="map-card" data-map="rift">
+            <div class="sp-selection-card map-card" data-map="rift">
               <div class="map-icon">🔥</div>
               <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Molten Void</div>
+              <div class="map-sub">Dimensional Fissures & Void</div>
             </div>
           </div>
         </div>
 
         <!-- CAROUSEL ROTATION ARROW (NEXT) -->
-        <button id="btn-map-carousel-next" class="map-nav-btn" title="Next Maps" aria-label="Next Maps">&#10095;</button>
+        <button id="btn-map-carousel-next" class="sp-carousel-nav-btn" title="Next Maps" aria-label="Next Maps">&#10095;</button>
+      </div>
+    </div>
+
+    <!-- 4. STAGE 3: MISSION SELECTION -->
+    <div id="sp-stage-mission" class="sp-stage-container" style="display:none;">
+      <div class="sp-stage-header">
+        <h2 class="sp-stage-title">SELECT MISSION OBJECTIVE & OPPONENT</h2>
+        <p class="sp-stage-subtitle">Define primary operational victory parameters and tactical opposition.</p>
       </div>
 
-      <!-- 3. MISSION OBJECTIVE SELECTION -->
-      <div class="modal-section-title">&#9876; 3. CHOOSE YOUR MISSION</div>
-      <div class="mission-cards-grid">
+      <!-- PEER MISSION SELECTION CARDS -->
+      <div class="sp-mission-cards-grid mission-cards-grid">
         <!-- Extermination Card -->
-        <div class="mission-card selected-mission" id="mcard-extermination">
-          <div class="mission-card-badge" id="mbadge-extermination">SELECTED</div>
+        <div class="sp-selection-card mission-card selected-mission" id="mcard-extermination">
+          <div class="sp-card-badge mission-card-badge" id="mbadge-extermination">SELECTED</div>
           <div class="mission-icon">⚔️</div>
           <div class="mission-name">Extermination</div>
-          <div class="mission-sub">Annihilation &bull; Survival</div>
+          <div class="mission-sub">Annihilation • Survival</div>
           <div class="mission-desc">Annihilate all enemy forces to claim the sector. If the 8-round limit is reached, the force with the most surviving units wins.</div>
-          <div class="mission-params">Turn Limit: 8 Rounds &bull; Win by Elimination or Squad Count</div>
+          <div class="mission-params">Turn Limit: 8 Rounds • Win by Elimination or Squad Count</div>
         </div>
 
-        <!-- Escort Card -->
-        <div class="mission-card" id="mcard-escort">
-          <div class="mission-card-badge" id="mbadge-escort" style="display:none;">SELECTED</div>
+        <!-- VIP Escort Card -->
+        <div class="sp-selection-card mission-card" id="mcard-escort">
+          <div class="sp-card-badge mission-card-badge" id="mbadge-escort" style="display:none;">SELECTED</div>
           <div class="mission-icon">🛡️</div>
           <div class="mission-name">VIP Escort</div>
           <div class="mission-sub">Extraction vs Interception</div>
           <div class="mission-desc">Safely transport your VIP Courier to the extraction zone across enemy lines, or intercept and eliminate the rival VIP before extraction.</div>
-          <div class="mission-params">VIP Unit &bull; Extraction Landing Zone &bull; 8 Rounds</div>
+          <div class="mission-params">VIP Unit • Extraction Landing Zone • 8 Rounds</div>
         </div>
 
         <!-- Domination Card -->
-        <div class="mission-card" id="mcard-domination">
-          <div class="mission-card-badge" id="mbadge-domination" style="display:none;">SELECTED</div>
+        <div class="sp-selection-card mission-card" id="mcard-domination">
+          <div class="sp-card-badge mission-card-badge" id="mbadge-domination" style="display:none;">SELECTED</div>
           <div class="mission-icon">🚩</div>
           <div class="mission-name">Domination</div>
-          <div class="mission-sub">Area Control &bull; Victory Points</div>
+          <div class="mission-sub">Area Control • Victory Points</div>
           <div class="mission-desc">Capture and hold 3 Strategic Control Nodes (Alpha, Bravo, Charlie). Earn Victory Points each round. First to 100 VP or highest score at Round 8 wins.</div>
-          <div class="mission-params">3 Strategic Beacons &bull; Target: 100 VP &bull; 8 Rounds</div>
+          <div class="mission-params">3 Strategic Beacons • Target: 100 VP • 8 Rounds</div>
         </div>
       </div>
 
@@ -824,8 +866,8 @@
         </div>
       </div>
 
-      <!-- 4. OPPONENT & CONFIRM -->
-      <div class="race-settings-bar">
+      <!-- OPPONENT SELECTION BAR -->
+      <div class="sp-opponent-bar race-settings-bar">
         <div class="ai-select-group">
           <span><b>AI Opponent:</b></span>
           <select id="ai-race-select">
@@ -842,16 +884,42 @@
             <option value="forsaken">💀 The Forsaken (Corrupted Ascendants)</option>
           </select>
         </div>
+      </div>
+    </div>
 
-        <div style="display:flex; gap:12px; align-items:center;">
-          <button id="btn-back-to-home" class="btn-return-menu">
-            <span class="btn-return-icon">◀</span> RETURN TO MAIN MENU
-          </button>
-          <button id="btn-confirm-race" class="btn-action btn-primary" style="font-size:14px; padding:12px 28px;">
-            COMMENCE DEPLOYMENT &rarr;
-          </button>
+    <!-- 5. SHARED BOTTOM HUD FOOTER -->
+    <div class="sp-hud-footer">
+      <!-- Back Navigation Button -->
+      <button id="btn-sp-back" class="sp-nav-btn sp-back-btn">
+        <span class="sp-btn-arrow">◀</span> <span id="sp-back-text">RETURN TO MAIN MENU</span>
+      </button>
+
+      <!-- Center Live Selection Summary -->
+      <div class="sp-selection-summary">
+        <div class="sp-summary-item">
+          <span class="sp-summary-label">WARHOST:</span>
+          <span class="sp-summary-val" id="sp-summary-faction">Random Army</span>
+        </div>
+        <div class="sp-summary-sep">•</div>
+        <div class="sp-summary-item">
+          <span class="sp-summary-label">THEATER:</span>
+          <span class="sp-summary-val" id="sp-summary-map">Random Biome</span>
+        </div>
+        <div class="sp-summary-sep">•</div>
+        <div class="sp-summary-item">
+          <span class="sp-summary-label">MISSION:</span>
+          <span class="sp-summary-val" id="sp-summary-mission">Extermination</span>
         </div>
       </div>
+
+      <!-- Forward / Launch Action Button -->
+      <button id="btn-sp-next" class="sp-nav-btn sp-next-btn">
+        <span id="sp-next-text">NEXT: SELECT MAP</span> <span class="sp-btn-arrow">▶</span>
+      </button>
+
+      <!-- Hidden legacy buttons for compatibility -->
+      <button id="btn-back-to-home" style="display:none;"></button>
+      <button id="btn-confirm-race" style="display:none;"></button>
     </div>
   </div>
 

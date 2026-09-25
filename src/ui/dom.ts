@@ -21,6 +21,9 @@ export class DOMManager {
   public p1EscortRole: 'escort' | 'attack' | 'random' = 'escort';
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
 
+  // Single Player Flow Stage
+  public currentSinglePlayerStage: 1 | 2 | 3 = 1;
+
   private raceCarouselIndex: number = 10;
   private mapCarouselIndex: number = 10;
 
@@ -97,8 +100,10 @@ export class DOMManager {
     if (this.learnModal) this.learnModal.style.display = 'none';
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
-    
+
+    this.setSinglePlayerStage(1);
     this.selectMapOption(this.selectedTheme || 'random');
+    this.updateSinglePlayerSummary();
 
     // Reset carousel positions
     setTimeout(() => {
@@ -317,6 +322,109 @@ export class DOMManager {
     `;
   }
 
+  public setSinglePlayerStage(stage: 1 | 2 | 3): void {
+    this.currentSinglePlayerStage = stage;
+
+    const stageFaction = document.getElementById('sp-stage-faction');
+    const stageMap = document.getElementById('sp-stage-map');
+    const stageMission = document.getElementById('sp-stage-mission');
+
+    if (stageFaction) stageFaction.style.display = stage === 1 ? 'flex' : 'none';
+    if (stageMap) stageMap.style.display = stage === 2 ? 'flex' : 'none';
+    if (stageMission) stageMission.style.display = stage === 3 ? 'flex' : 'none';
+
+    // Update Stepper Pills
+    const pill1 = document.getElementById('sp-step-pill-1');
+    const pill2 = document.getElementById('sp-step-pill-2');
+    const pill3 = document.getElementById('sp-step-pill-3');
+
+    [pill1, pill2, pill3].forEach(p => p?.classList.remove('active', 'completed'));
+
+    if (stage === 1) {
+      pill1?.classList.add('active');
+    } else if (stage === 2) {
+      pill1?.classList.add('completed');
+      pill2?.classList.add('active');
+    } else if (stage === 3) {
+      pill1?.classList.add('completed');
+      pill2?.classList.add('completed');
+      pill3?.classList.add('active');
+    }
+
+    // Update Navigation Button Text
+    const backText = document.getElementById('sp-back-text');
+    const nextText = document.getElementById('sp-next-text');
+
+    if (stage === 1) {
+      if (backText) backText.textContent = 'RETURN TO MAIN MENU';
+      if (nextText) nextText.textContent = 'NEXT: SELECT MAP';
+    } else if (stage === 2) {
+      if (backText) backText.textContent = 'BACK TO FACTION';
+      if (nextText) nextText.textContent = 'NEXT: SELECT MISSION';
+    } else if (stage === 3) {
+      if (backText) backText.textContent = 'BACK TO MAP';
+      if (nextText) nextText.textContent = 'COMMENCE DEPLOYMENT ⚔️';
+    }
+
+    this.updateSinglePlayerSummary();
+
+    // Re-align carousels when entering stage
+    setTimeout(() => {
+      if (stage === 1) this.updateRaceCarousel(0);
+      if (stage === 2) this.updateMapCarousel(0);
+    }, 40);
+  }
+
+  public updateSinglePlayerSummary(): void {
+    const summaryFaction = document.getElementById('sp-summary-faction');
+    const summaryMap = document.getElementById('sp-summary-map');
+    const summaryMission = document.getElementById('sp-summary-mission');
+
+    const factionNames: Record<string, string> = {
+      random: 'Random Army',
+      ascendants: 'The Ascendants',
+      directorate: 'The Directorate',
+      elyri: 'The Elyri',
+      veykari: 'The Veykari',
+      ghar: 'The Ghar',
+      devourers: 'The Devourers',
+      revenant: 'The Revenant',
+      concordat: 'The Concordat',
+      riftborn: 'The Riftborn',
+      forsaken: 'The Forsaken'
+    };
+
+    const mapNames: Record<string, string> = {
+      random: 'Random Biome',
+      jungle: 'Jungle World',
+      snow: 'Glacial World',
+      desert: 'Desert Wastes',
+      city: 'Gothic Hive City',
+      tech: 'Space-Tech Station',
+      astral: 'Astral Crystal Spire',
+      corrupted: 'Corrupted Flesh-World',
+      devoured: 'Devoured World',
+      tomb: 'Tomb World',
+      rift: 'Warp Rift World'
+    };
+
+    const missionNames: Record<string, string> = {
+      extermination: 'Extermination',
+      escort: 'VIP Escort',
+      domination: 'Domination'
+    };
+
+    if (summaryFaction) {
+      summaryFaction.textContent = factionNames[this.selectedP1Faction] || 'The Ascendants';
+    }
+    if (summaryMap) {
+      summaryMap.textContent = mapNames[this.selectedTheme] || 'Random Biome';
+    }
+    if (summaryMission) {
+      summaryMission.textContent = missionNames[this.selectedMission] || 'Extermination';
+    }
+  }
+
   private initRaceModal(): void {
     // 1. FACTION CAROUSEL
     const raceTrack = document.getElementById('factions-grid-track');
@@ -326,18 +434,26 @@ export class DOMManager {
     const fbadgeRandom = document.getElementById('fbadge-random');
 
     if (btnRacePrev) {
-      btnRacePrev.addEventListener('click', () => this.updateRaceCarousel(-1));
+      btnRacePrev.addEventListener('click', () => {
+        sfx('click');
+        this.updateRaceCarousel(-1);
+      });
     }
     if (btnRaceNext) {
-      btnRaceNext.addEventListener('click', () => this.updateRaceCarousel(1));
+      btnRaceNext.addEventListener('click', () => {
+        sfx('click');
+        this.updateRaceCarousel(1);
+      });
     }
 
     if (fcardRandom) {
       fcardRandom.addEventListener('click', () => {
+        sfx('click');
         this.selectedP1Faction = 'random';
         this.deselectAllFactionCards();
         fcardRandom.classList.add('selected-player');
         if (fbadgeRandom) fbadgeRandom.style.display = 'block';
+        this.updateSinglePlayerSummary();
       });
     }
 
@@ -347,11 +463,13 @@ export class DOMManager {
         card.addEventListener('click', () => {
           const race = card.getAttribute('data-race');
           if (!race) return;
+          sfx('click');
           this.selectedP1Faction = race;
           this.deselectAllFactionCards();
           card.classList.add('selected-player');
           const badge = card.querySelector<HTMLElement>('.faction-card-badge');
           if (badge) badge.style.display = 'block';
+          this.updateSinglePlayerSummary();
         });
       });
     }
@@ -363,14 +481,21 @@ export class DOMManager {
     const mcardRandom = document.getElementById('mcard-random');
 
     if (btnMapPrev) {
-      btnMapPrev.addEventListener('click', () => this.updateMapCarousel(-1));
+      btnMapPrev.addEventListener('click', () => {
+        sfx('click');
+        this.updateMapCarousel(-1);
+      });
     }
     if (btnMapNext) {
-      btnMapNext.addEventListener('click', () => this.updateMapCarousel(1));
+      btnMapNext.addEventListener('click', () => {
+        sfx('click');
+        this.updateMapCarousel(1);
+      });
     }
 
     if (mcardRandom) {
       mcardRandom.addEventListener('click', () => {
+        sfx('click');
         this.selectMapOption('random');
       });
     }
@@ -381,6 +506,7 @@ export class DOMManager {
         card.addEventListener('click', () => {
           const mapId = card.getAttribute('data-map');
           if (!mapId) return;
+          sfx('click');
           this.selectMapOption(mapId);
         });
       });
@@ -396,6 +522,7 @@ export class DOMManager {
     const escortConfigRow = document.getElementById('escort-config-row');
 
     const selectMission = (m: MissionType) => {
+      sfx('click');
       this.selectedMission = m;
       [mcardExtermination, mcardEscort, mcardDomination].forEach(c => c?.classList.remove('selected-mission'));
       if (mbadgeExtermination) mbadgeExtermination.style.display = m === 'extermination' ? 'block' : 'none';
@@ -409,6 +536,7 @@ export class DOMManager {
       if (escortConfigRow) {
         escortConfigRow.style.display = m === 'escort' ? 'flex' : 'none';
       }
+      this.updateSinglePlayerSummary();
     };
 
     if (mcardExtermination) mcardExtermination.addEventListener('click', () => selectMission('extermination'));
@@ -430,7 +558,49 @@ export class DOMManager {
       });
     }
 
-    // 5. BUTTONS: BACK TO HOME & CONFIRM
+    // 5. STEPPER PILL NAVIGATION
+    const pill1 = document.getElementById('sp-step-pill-1');
+    const pill2 = document.getElementById('sp-step-pill-2');
+    const pill3 = document.getElementById('sp-step-pill-3');
+
+    if (pill1) pill1.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(1); });
+    if (pill2) pill2.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(2); });
+    if (pill3) pill3.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(3); });
+
+    // 6. TOP CLOSE BUTTON & SHARED FOOTER BUTTONS
+    const btnSpClose = document.getElementById('btn-sp-close');
+    if (btnSpClose) {
+      btnSpClose.addEventListener('click', () => {
+        sfx('click');
+        this.showHomeScreen();
+      });
+    }
+
+    const btnSpBack = document.getElementById('btn-sp-back');
+    if (btnSpBack) {
+      btnSpBack.addEventListener('click', () => {
+        sfx('click');
+        if (this.currentSinglePlayerStage === 1) {
+          this.showHomeScreen();
+        } else {
+          this.setSinglePlayerStage((this.currentSinglePlayerStage - 1) as 1 | 2 | 3);
+        }
+      });
+    }
+
+    const btnSpNext = document.getElementById('btn-sp-next');
+    if (btnSpNext) {
+      btnSpNext.addEventListener('click', () => {
+        sfx('click');
+        if (this.currentSinglePlayerStage < 3) {
+          this.setSinglePlayerStage((this.currentSinglePlayerStage + 1) as 1 | 2 | 3);
+        } else {
+          this.launchSkirmish();
+        }
+      });
+    }
+
+    // Legacy buttons support
     const btnBack = document.getElementById('btn-back-to-home');
     if (btnBack) {
       btnBack.addEventListener('click', () => {
@@ -505,7 +675,7 @@ export class DOMManager {
       if (card) {
         card.classList.add('selected-map');
         const badge = document.createElement('div');
-        badge.className = 'map-card-badge';
+        badge.className = 'sp-card-badge map-card-badge';
         badge.textContent = 'AUTO';
         card.appendChild(badge);
       }
@@ -513,11 +683,13 @@ export class DOMManager {
       document.querySelectorAll(`[data-map="${mapId}"]`).forEach(card => {
         card.classList.add('selected-map');
         const badge = document.createElement('div');
-        badge.className = 'map-card-badge';
+        badge.className = 'sp-card-badge map-card-badge';
         badge.textContent = 'SELECTED';
         card.appendChild(badge);
       });
     }
+
+    this.updateSinglePlayerSummary();
   }
 
   private deselectAllMapCards(): void {
