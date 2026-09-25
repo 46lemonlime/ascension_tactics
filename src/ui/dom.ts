@@ -1,8 +1,10 @@
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
+import { MISSIONS, MISSION_CYCLE } from '../data/missions';
 import { UNIT_DEFS } from '../data/units';
 import type { MissionType } from '../data/types';
 import { sfx } from '../audio/synth';
+import { getBiomeArtwork, getMissionArtwork } from './landscape-art';
 
 export const FACTION_CYCLE: string[] = [
   'random',
@@ -55,6 +57,7 @@ export class DOMManager {
   private playerCarouselIndex: number = 11;
   private aiCarouselIndex: number = 11;
   private mapCarouselIndex: number = 11;
+  private missionCarouselIndex: number = MISSION_CYCLE.length;
 
   public onStartGame?: (
     p1Faction: string,
@@ -132,6 +135,7 @@ export class DOMManager {
 
     this.setSinglePlayerStage(1);
     this.selectMapOption(this.selectedTheme || 'random');
+    this.selectMissionOption(this.selectedMission || 'extermination');
     this.updateSinglePlayerSummary();
 
     // Reset carousel positions
@@ -139,6 +143,7 @@ export class DOMManager {
       this.updatePlayerCarousel(0);
       this.updateAiCarousel(0);
       this.updateMapCarousel(0);
+      this.updateMissionCarousel(0);
     }, 50);
   }
 
@@ -407,6 +412,9 @@ export class DOMManager {
       if (stage === 2) {
         this.updateMapCarousel(0);
       }
+      if (stage === 3) {
+        this.updateMissionCarousel(0);
+      }
     }, 40);
   }
 
@@ -564,6 +572,7 @@ export class DOMManager {
     }
 
     // 3. MAP CAROUSEL
+    this.buildBiomeLandscapeTrack();
     const mapTrack = document.getElementById('maps-grid-track');
     const btnMapPrev = document.getElementById('btn-map-carousel-prev');
     const btnMapNext = document.getElementById('btn-map-carousel-next');
@@ -583,16 +592,17 @@ export class DOMManager {
 
     if (mapTrack) {
       mapTrack.addEventListener('transitionend', () => {
-        if (this.mapCarouselIndex >= 22) {
-          this.mapCarouselIndex -= 11;
+        const N = MAP_CYCLE.length;
+        if (this.mapCarouselIndex >= 2 * N) {
+          this.mapCarouselIndex -= N;
           this.updateMapCarousel(0, true);
-        } else if (this.mapCarouselIndex < 11) {
-          this.mapCarouselIndex += 11;
+        } else if (this.mapCarouselIndex < N) {
+          this.mapCarouselIndex += N;
           this.updateMapCarousel(0, true);
         }
       });
 
-      const mapCards = mapTrack.querySelectorAll<HTMLElement>('.sp-map-card');
+      const mapCards = mapTrack.querySelectorAll<HTMLElement>('.sp-landscape-card');
       mapCards.forEach(card => {
         card.addEventListener('click', () => {
           const idxStr = card.getAttribute('data-index');
@@ -605,36 +615,49 @@ export class DOMManager {
       });
     }
 
-    // 4. MISSION SELECTION
-    const mcardExtermination = document.getElementById('mcard-extermination');
-    const mcardEscort = document.getElementById('mcard-escort');
-    const mcardDomination = document.getElementById('mcard-domination');
-    const mbadgeExtermination = document.getElementById('mbadge-extermination');
-    const mbadgeEscort = document.getElementById('mbadge-escort');
-    const mbadgeDomination = document.getElementById('mbadge-domination');
-    const escortConfigRow = document.getElementById('escort-config-row');
+    // 4. MISSION CAROUSEL
+    this.buildMissionLandscapeTrack();
+    const missionTrack = document.getElementById('missions-grid-track');
+    const btnMissionPrev = document.getElementById('btn-mission-carousel-prev');
+    const btnMissionNext = document.getElementById('btn-mission-carousel-next');
 
-    const selectMission = (m: MissionType) => {
-      sfx('click');
-      this.selectedMission = m;
-      [mcardExtermination, mcardEscort, mcardDomination].forEach(c => c?.classList.remove('selected-mission'));
-      if (mbadgeExtermination) mbadgeExtermination.style.display = m === 'extermination' ? 'block' : 'none';
-      if (mbadgeEscort) mbadgeEscort.style.display = m === 'escort' ? 'block' : 'none';
-      if (mbadgeDomination) mbadgeDomination.style.display = m === 'domination' ? 'block' : 'none';
+    if (btnMissionPrev) {
+      btnMissionPrev.addEventListener('click', () => {
+        sfx('click');
+        this.updateMissionCarousel(-1);
+      });
+    }
+    if (btnMissionNext) {
+      btnMissionNext.addEventListener('click', () => {
+        sfx('click');
+        this.updateMissionCarousel(1);
+      });
+    }
 
-      if (m === 'extermination') mcardExtermination?.classList.add('selected-mission');
-      if (m === 'escort') mcardEscort?.classList.add('selected-mission');
-      if (m === 'domination') mcardDomination?.classList.add('selected-mission');
+    if (missionTrack) {
+      missionTrack.addEventListener('transitionend', () => {
+        const N = MISSION_CYCLE.length;
+        if (this.missionCarouselIndex >= 2 * N) {
+          this.missionCarouselIndex -= N;
+          this.updateMissionCarousel(0, true);
+        } else if (this.missionCarouselIndex < N) {
+          this.missionCarouselIndex += N;
+          this.updateMissionCarousel(0, true);
+        }
+      });
 
-      if (escortConfigRow) {
-        escortConfigRow.style.display = m === 'escort' ? 'flex' : 'none';
-      }
-      this.updateSinglePlayerSummary();
-    };
-
-    if (mcardExtermination) mcardExtermination.addEventListener('click', () => selectMission('extermination'));
-    if (mcardEscort) mcardEscort.addEventListener('click', () => selectMission('escort'));
-    if (mcardDomination) mcardDomination.addEventListener('click', () => selectMission('domination'));
+      const missionCards = missionTrack.querySelectorAll<HTMLElement>('.sp-landscape-card');
+      missionCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const idxStr = card.getAttribute('data-index');
+          if (idxStr !== null) {
+            sfx('click');
+            this.missionCarouselIndex = parseInt(idxStr, 10);
+            this.updateMissionCarousel(0);
+          }
+        });
+      });
+    }
 
     // 5. ESCORT CONFIG
     const playerEscortSelect = document.getElementById('player-escort-role') as HTMLSelectElement;
@@ -859,6 +882,68 @@ export class DOMManager {
     }
   }
 
+  private buildBiomeLandscapeTrack(): void {
+    const mapTrack = document.getElementById('maps-grid-track');
+    if (!mapTrack) return;
+    mapTrack.innerHTML = '';
+
+    const N = MAP_CYCLE.length;
+    // Build 3 sets of clones (Set 0: 0..N-1, Set 1: N..2N-1, Set 2: 2N..3N-1)
+    for (let set = 0; set < 3; set++) {
+      MAP_CYCLE.forEach((themeId, idx) => {
+        const globalIdx = set * N + idx;
+        const theme = themeId === 'random' ? { name: 'Random Biome', icon: '🎲' } : THEMES[themeId] || { name: themeId, icon: '🌐' };
+        const card = document.createElement('div');
+        card.className = `sp-landscape-card ${globalIdx === this.mapCarouselIndex ? 'selected-map' : ''}`;
+        card.setAttribute('data-map', themeId);
+        card.setAttribute('data-index', globalIdx.toString());
+        card.title = theme.name;
+
+        card.innerHTML = `
+          <div class="sp-landscape-thumb">
+            ${getBiomeArtwork(themeId)}
+          </div>
+          <div class="sp-landscape-label-bar">
+            <span class="sp-landscape-icon">${theme.icon}</span>
+            <span class="sp-landscape-name">${theme.name}</span>
+          </div>
+        `;
+        mapTrack.appendChild(card);
+      });
+    }
+  }
+
+  private buildMissionLandscapeTrack(): void {
+    const missionTrack = document.getElementById('missions-grid-track');
+    if (!missionTrack) return;
+    missionTrack.innerHTML = '';
+
+    const N = MISSION_CYCLE.length;
+    // Build 3 sets of clones (Set 0: 0..N-1, Set 1: N..2N-1, Set 2: 2N..3N-1)
+    for (let set = 0; set < 3; set++) {
+      MISSION_CYCLE.forEach((mId, idx) => {
+        const globalIdx = set * N + idx;
+        const mDef = MISSIONS[mId] || { name: mId, icon: '⚔️' };
+        const card = document.createElement('div');
+        card.className = `sp-landscape-card ${globalIdx === this.missionCarouselIndex ? 'selected-mission' : ''}`;
+        card.setAttribute('data-mission', mId);
+        card.setAttribute('data-index', globalIdx.toString());
+        card.title = mDef.name;
+
+        card.innerHTML = `
+          <div class="sp-landscape-thumb">
+            ${getMissionArtwork(mId)}
+          </div>
+          <div class="sp-landscape-label-bar">
+            <span class="sp-landscape-icon">${mDef.icon}</span>
+            <span class="sp-landscape-name">${mDef.name}</span>
+          </div>
+        `;
+        missionTrack.appendChild(card);
+      });
+    }
+  }
+
   private updateMapCarousel(delta: number, immediate: boolean = false): void {
     const mapTrack = document.getElementById('maps-grid-track');
     const viewport = document.getElementById('viewport-map-wheel');
@@ -866,10 +951,10 @@ export class DOMManager {
 
     this.mapCarouselIndex += delta;
 
-    const cardWidth = 136;
-    const gap = 14;
+    const cardWidth = 260;
+    const gap = 18;
     const stride = cardWidth + gap;
-    const viewportWidth = viewport.clientWidth || 436;
+    const viewportWidth = viewport.clientWidth || 816;
     const offset = (this.mapCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
 
     if (immediate) {
@@ -882,7 +967,8 @@ export class DOMManager {
       mapTrack.style.transform = `translateX(-${offset}px)`;
     }
 
-    const normIndex = ((this.mapCarouselIndex % 11) + 11) % 11;
+    const N = MAP_CYCLE.length;
+    const normIndex = ((this.mapCarouselIndex % N) + N) % N;
     const themeId = MAP_CYCLE[normIndex] || 'random';
     this.selectedTheme = themeId;
 
@@ -894,7 +980,7 @@ export class DOMManager {
   private syncMapCardHighlight(themeId: string, activeIndex: number): void {
     const mapTrack = document.getElementById('maps-grid-track');
     if (!mapTrack) return;
-    const cards = mapTrack.querySelectorAll<HTMLElement>('.sp-map-card');
+    const cards = mapTrack.querySelectorAll<HTMLElement>('.sp-landscape-card');
     cards.forEach(c => {
       const idx = parseInt(c.getAttribute('data-index') || '-1', 10);
       if (idx === activeIndex) {
@@ -960,8 +1046,85 @@ export class DOMManager {
   public selectMapOption(mapId: string): void {
     const idx = MAP_CYCLE.indexOf(mapId);
     if (idx !== -1) {
-      this.mapCarouselIndex = 11 + idx;
+      this.mapCarouselIndex = MAP_CYCLE.length + idx;
       this.updateMapCarousel(0);
+    }
+  }
+
+  private updateMissionCarousel(delta: number, immediate: boolean = false): void {
+    const missionTrack = document.getElementById('missions-grid-track');
+    const viewport = document.getElementById('viewport-mission-wheel');
+    if (!missionTrack || !viewport) return;
+
+    this.missionCarouselIndex += delta;
+
+    const cardWidth = 260;
+    const gap = 18;
+    const stride = cardWidth + gap;
+    const viewportWidth = viewport.clientWidth || 816;
+    const offset = (this.missionCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
+
+    if (immediate) {
+      missionTrack.style.transition = 'none';
+      missionTrack.style.transform = `translateX(-${offset}px)`;
+      void missionTrack.offsetHeight;
+      missionTrack.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    } else {
+      missionTrack.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      missionTrack.style.transform = `translateX(-${offset}px)`;
+    }
+
+    const N = MISSION_CYCLE.length;
+    const normIndex = ((this.missionCarouselIndex % N) + N) % N;
+    const mId = MISSION_CYCLE[normIndex] || 'extermination';
+    this.selectedMission = mId;
+
+    this.syncMissionCardHighlight(mId, this.missionCarouselIndex);
+    this.updateMissionInfoBox(mId);
+    this.updateSinglePlayerSummary();
+  }
+
+  private syncMissionCardHighlight(missionId: string, activeIndex: number): void {
+    const missionTrack = document.getElementById('missions-grid-track');
+    if (!missionTrack) return;
+    const cards = missionTrack.querySelectorAll<HTMLElement>('.sp-landscape-card');
+    cards.forEach(c => {
+      const idx = parseInt(c.getAttribute('data-index') || '-1', 10);
+      if (idx === activeIndex) {
+        c.classList.add('selected-mission');
+      } else {
+        c.classList.remove('selected-mission');
+      }
+    });
+  }
+
+  private updateMissionInfoBox(missionId: string): void {
+    const titleEl = document.getElementById('mission-info-title');
+    const subEl = document.getElementById('mission-info-sub');
+    const descEl = document.getElementById('mission-info-desc');
+    const paramsEl = document.getElementById('mission-info-params');
+    const featuresEl = document.getElementById('mission-info-features');
+    const escortConfigRow = document.getElementById('escort-config-row');
+
+    const m = MISSIONS[missionId];
+    if (!m) return;
+
+    if (titleEl) titleEl.textContent = `${m.icon} ${m.name.toUpperCase()}`;
+    if (subEl) subEl.textContent = (m.subtitle || '').toUpperCase();
+    if (descEl) descEl.textContent = m.desc || '';
+    if (paramsEl) paramsEl.innerHTML = `<strong>PARAMETERS:</strong> ${m.params}`;
+    if (featuresEl) featuresEl.textContent = m.features;
+
+    if (escortConfigRow) {
+      escortConfigRow.style.display = missionId === 'escort' ? 'flex' : 'none';
+    }
+  }
+
+  public selectMissionOption(missionId: MissionType): void {
+    const idx = MISSION_CYCLE.indexOf(missionId);
+    if (idx !== -1) {
+      this.missionCarouselIndex = MISSION_CYCLE.length + idx;
+      this.updateMissionCarousel(0);
     }
   }
 

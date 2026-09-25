@@ -714,151 +714,15 @@
         <p class="sp-stage-subtitle">Choose the planetary combat environment and environmental terrain.</p>
       </div>
 
-      <!-- MAP SELECTION WRAPPER (3-CARD CAROUSEL + FIXED INFOBOX BELOW) -->
+      <!-- MAP SELECTION WRAPPER (3-LANDSCAPE-CARD CAROUSEL + FIXED INFOBOX BELOW) -->
       <div class="sp-map-selection-container">
-        <!-- 3-MAP CAROUSEL -->
+        <!-- 3-MAP LANDSCAPE CAROUSEL -->
         <div class="sp-map-carousel-wrapper">
           <button id="btn-map-carousel-prev" class="sp-carousel-nav-btn" title="Previous Biome" aria-label="Previous Biome">&#10094;</button>
 
-          <div class="sp-carousel-viewport sp-map-viewport" id="viewport-map-wheel">
-            <div class="maps-emblems-track" id="maps-grid-track">
-              <!-- SET 0 (CLONES) -->
-              <div class="sp-map-card" data-map="random" data-index="0" title="Random Biome">
-                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
-                <div class="sp-map-label">Random Biome</div>
-              </div>
-              <div class="sp-map-card" data-map="jungle" data-index="1" title="Jungle Death World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
-                <div class="sp-map-label">Jungle World</div>
-              </div>
-              <div class="sp-map-card" data-map="snow" data-index="2" title="Glacial Frost World">
-                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
-                <div class="sp-map-label">Glacial World</div>
-              </div>
-              <div class="sp-map-card" data-map="desert" data-index="3" title="Desert Wastes">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
-                <div class="sp-map-label">Desert Wastes</div>
-              </div>
-              <div class="sp-map-card" data-map="city" data-index="4" title="Gothic Hive City">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
-                <div class="sp-map-label">Gothic Hive</div>
-              </div>
-              <div class="sp-map-card" data-map="tech" data-index="5" title="Space-Tech / Void Station">
-                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
-                <div class="sp-map-label">Space-Tech</div>
-              </div>
-              <div class="sp-map-card" data-map="astral" data-index="6" title="Astral Crystal Spire">
-                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
-                <div class="sp-map-label">Astral Spire</div>
-              </div>
-              <div class="sp-map-card" data-map="corrupted" data-index="7" title="Corrupted Flesh-World">
-                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
-                <div class="sp-map-label">Flesh-World</div>
-              </div>
-              <div class="sp-map-card" data-map="devoured" data-index="8" title="Devoured World">
-                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
-                <div class="sp-map-label">Devoured World</div>
-              </div>
-              <div class="sp-map-card" data-map="tomb" data-index="9" title="Tomb World">
-                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
-                <div class="sp-map-label">Tomb World</div>
-              </div>
-              <div class="sp-map-card" data-map="rift" data-index="10" title="Warp Rift World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
-                <div class="sp-map-label">Warp Rift</div>
-              </div>
-
-              <!-- SET 1 (MAIN ACTIVE SET - DEFAULT FOCUS AT INDEX 11) -->
-              <div class="sp-map-card selected-map" data-map="random" data-index="11" title="Random Biome">
-                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
-                <div class="sp-map-label">Random Biome</div>
-              </div>
-              <div class="sp-map-card" data-map="jungle" data-index="12" title="Jungle Death World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
-                <div class="sp-map-label">Jungle World</div>
-              </div>
-              <div class="sp-map-card" data-map="snow" data-index="13" title="Glacial Frost World">
-                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
-                <div class="sp-map-label">Glacial World</div>
-              </div>
-              <div class="sp-map-card" data-map="desert" data-index="14" title="Desert Wastes">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
-                <div class="sp-map-label">Desert Wastes</div>
-              </div>
-              <div class="sp-map-card" data-map="city" data-index="15" title="Gothic Hive City">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
-                <div class="sp-map-label">Gothic Hive</div>
-              </div>
-              <div class="sp-map-card" data-map="tech" data-index="16" title="Space-Tech / Void Station">
-                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
-                <div class="sp-map-label">Space-Tech</div>
-              </div>
-              <div class="sp-map-card" data-map="astral" data-index="17" title="Astral Crystal Spire">
-                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
-                <div class="sp-map-label">Astral Spire</div>
-              </div>
-              <div class="sp-map-card" data-map="corrupted" data-index="18" title="Corrupted Flesh-World">
-                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
-                <div class="sp-map-label">Flesh-World</div>
-              </div>
-              <div class="sp-map-card" data-map="devoured" data-index="19" title="Devoured World">
-                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
-                <div class="sp-map-label">Devoured World</div>
-              </div>
-              <div class="sp-map-card" data-map="tomb" data-index="20" title="Tomb World">
-                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
-                <div class="sp-map-label">Tomb World</div>
-              </div>
-              <div class="sp-map-card" data-map="rift" data-index="21" title="Warp Rift World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
-                <div class="sp-map-label">Warp Rift</div>
-              </div>
-
-              <!-- SET 2 (CLONES) -->
-              <div class="sp-map-card" data-map="random" data-index="22" title="Random Biome">
-                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
-                <div class="sp-map-label">Random Biome</div>
-              </div>
-              <div class="sp-map-card" data-map="jungle" data-index="23" title="Jungle Death World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
-                <div class="sp-map-label">Jungle World</div>
-              </div>
-              <div class="sp-map-card" data-map="snow" data-index="24" title="Glacial Frost World">
-                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
-                <div class="sp-map-label">Glacial World</div>
-              </div>
-              <div class="sp-map-card" data-map="desert" data-index="25" title="Desert Wastes">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
-                <div class="sp-map-label">Desert Wastes</div>
-              </div>
-              <div class="sp-map-card" data-map="city" data-index="26" title="Gothic Hive City">
-                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
-                <div class="sp-map-label">Gothic Hive</div>
-              </div>
-              <div class="sp-map-card" data-map="tech" data-index="27" title="Space-Tech / Void Station">
-                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
-                <div class="sp-map-label">Space-Tech</div>
-              </div>
-              <div class="sp-map-card" data-map="astral" data-index="28" title="Astral Crystal Spire">
-                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
-                <div class="sp-map-label">Astral Spire</div>
-              </div>
-              <div class="sp-map-card" data-map="corrupted" data-index="29" title="Corrupted Flesh-World">
-                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
-                <div class="sp-map-label">Flesh-World</div>
-              </div>
-              <div class="sp-map-card" data-map="devoured" data-index="30" title="Devoured World">
-                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
-                <div class="sp-map-label">Devoured World</div>
-              </div>
-              <div class="sp-map-card" data-map="tomb" data-index="31" title="Tomb World">
-                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
-                <div class="sp-map-label">Tomb World</div>
-              </div>
-              <div class="sp-map-card" data-map="rift" data-index="32" title="Warp Rift World">
-                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
-                <div class="sp-map-label">Warp Rift</div>
-              </div>
+          <div class="sp-carousel-viewport sp-landscape-viewport" id="viewport-map-wheel">
+            <div class="sp-landscape-track" id="maps-grid-track">
+              <!-- Dynamically populated from THEMES with 3 sets of landscape cards -->
             </div>
           </div>
 
@@ -893,60 +757,59 @@
         <p class="sp-stage-subtitle">Define primary operational victory parameters and tactical opposition.</p>
       </div>
 
-      <!-- PEER MISSION SELECTION CARDS -->
-      <div class="sp-mission-cards-grid mission-cards-grid">
-        <!-- Extermination Card -->
-        <div class="sp-selection-card mission-card selected-mission" id="mcard-extermination">
-          <div class="sp-card-badge mission-card-badge" id="mbadge-extermination">SELECTED</div>
-          <div class="mission-icon">⚔️</div>
-          <div class="mission-name">Extermination</div>
-          <div class="mission-sub">Annihilation • Survival</div>
-          <div class="mission-desc">Annihilate all enemy forces to claim the sector. If the 8-round limit is reached, the force with the most surviving units wins.</div>
-          <div class="mission-params">Turn Limit: 8 Rounds • Win by Elimination or Squad Count</div>
+      <!-- MISSION SELECTION WRAPPER (3-LANDSCAPE-CARD CAROUSEL + FIXED INFOBOX BELOW) -->
+      <div class="sp-mission-selection-container">
+        <!-- 3-MISSION LANDSCAPE CAROUSEL -->
+        <div class="sp-mission-carousel-wrapper">
+          <button id="btn-mission-carousel-prev" class="sp-carousel-nav-btn" title="Previous Mission" aria-label="Previous Mission">&#10094;</button>
+
+          <div class="sp-carousel-viewport sp-landscape-viewport" id="viewport-mission-wheel">
+            <div class="sp-landscape-track" id="missions-grid-track">
+              <!-- Dynamically populated from MISSIONS with 3 sets of landscape cards -->
+            </div>
+          </div>
+
+          <button id="btn-mission-carousel-next" class="sp-carousel-nav-btn" title="Next Mission" aria-label="Next Mission">&#10095;</button>
         </div>
 
-        <!-- VIP Escort Card -->
-        <div class="sp-selection-card mission-card" id="mcard-escort">
-          <div class="sp-card-badge mission-card-badge" id="mbadge-escort" style="display:none;">SELECTED</div>
-          <div class="mission-icon">🛡️</div>
-          <div class="mission-name">VIP Escort</div>
-          <div class="mission-sub">Extraction vs Interception</div>
-          <div class="mission-desc">Safely transport your VIP Courier to the extraction zone across enemy lines, or intercept and eliminate the rival VIP before extraction.</div>
-          <div class="mission-params">VIP Unit • Extraction Landing Zone • 8 Rounds</div>
-        </div>
+        <!-- DEDICATED FIXED-SIZE MISSION INFO BOX -->
+        <div class="sp-mission-infobox" id="sp-mission-infobox">
+          <div class="sp-infobox-header">
+            <div class="sp-infobox-title-group">
+              <h4 class="sp-infobox-title" id="mission-info-title">⚔️ EXTERMINATION</h4>
+              <div class="sp-infobox-sub" id="mission-info-sub">ANNIHILATION • TACTICAL SURVIVAL</div>
+            </div>
+          </div>
+          <div class="sp-infobox-desc" id="mission-info-desc">
+            Engage and annihilate all hostile warbands to claim absolute battlefield supremacy over the sector. If the 8-round limit expires, victory is awarded to the force with superior surviving unit strength.
+          </div>
+          <div class="sp-infobox-doctrine" id="mission-info-params">
+            <strong>PARAMETERS:</strong> 8 Combat Rounds • Victory by Complete Annihilation or Squad Superiority
+          </div>
+          <div class="sp-infobox-roster" id="mission-info-features">
+            Full-spectrum engagement • Free tactical maneuver • No perimeter restrictions
+          </div>
 
-        <!-- Domination Card -->
-        <div class="sp-selection-card mission-card" id="mcard-domination">
-          <div class="sp-card-badge mission-card-badge" id="mbadge-domination" style="display:none;">SELECTED</div>
-          <div class="mission-icon">🚩</div>
-          <div class="mission-name">Domination</div>
-          <div class="mission-sub">Area Control • Victory Points</div>
-          <div class="mission-desc">Capture and hold 3 Strategic Control Nodes (Alpha, Bravo, Charlie). Earn Victory Points each round. First to 100 VP or highest score at Round 8 wins.</div>
-          <div class="mission-params">3 Strategic Beacons • Target: 100 VP • 8 Rounds</div>
-        </div>
-      </div>
-
-      <!-- ESCORT STANCE CONFIGURATION (Visible only when Escort mission is chosen) -->
-      <div id="escort-config-row" class="escort-config-row" style="display:none;">
-        <div class="escort-role-group">
-          <span><b>🛡️ Your Tactical Stance:</b></span>
-          <select id="player-escort-role">
-            <option value="escort">🛡️ Escort VIP (Reach Extraction Zone)</option>
-            <option value="attack">⚔️ Intercept VIP (Stop & Eliminate Enemy VIP)</option>
-            <option value="random">🎲 Random Stance</option>
-          </select>
-        </div>
-        <div class="escort-role-group">
-          <span><b>💀 AI Opponent Stance:</b></span>
-          <select id="enemy-escort-role">
-            <option value="opposite">🔄 Counter-Stance (Opposite to You)</option>
-            <option value="escort">🛡️ AI Escort VIP</option>
-            <option value="attack">⚔️ AI Intercept VIP</option>
-            <option value="random">🎲 Random Stance</option>
-          </select>
-        </div>
-        <div class="escort-note-text">
-          ℹ️ If both forces select the same stance, roles are automatically randomized on launch.
+          <!-- ESCORT STANCE CONFIGURATION (Cleanly docked inside panel when Escort is selected) -->
+          <div id="escort-config-row" class="escort-config-inline" style="display:none;">
+            <div class="escort-role-group">
+              <span><b>🛡️ Player 1 Stance:</b></span>
+              <select id="player-escort-role">
+                <option value="escort">🛡️ Escort VIP (Reach Extraction Zone)</option>
+                <option value="attack">⚔️ Intercept VIP (Stop & Eliminate Enemy VIP)</option>
+                <option value="random">🎲 Random Stance</option>
+              </select>
+            </div>
+            <div class="escort-role-group">
+              <span><b>💀 AI Opponent Stance:</b></span>
+              <select id="enemy-escort-role">
+                <option value="opposite">🔄 Counter-Stance (Opposite to You)</option>
+                <option value="escort">🛡️ AI Escort VIP</option>
+                <option value="attack">⚔️ AI Intercept VIP</option>
+                <option value="random">🎲 Random Stance</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
