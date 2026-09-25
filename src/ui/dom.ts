@@ -18,6 +18,20 @@ export const FACTION_CYCLE: string[] = [
   'forsaken'
 ];
 
+export const MAP_CYCLE: string[] = [
+  'random',
+  'jungle',
+  'snow',
+  'desert',
+  'city',
+  'tech',
+  'astral',
+  'corrupted',
+  'devoured',
+  'tomb',
+  'rift'
+];
+
 export class DOMManager {
   // Screens & Modals
   public homeScreen: HTMLElement | null;
@@ -40,7 +54,7 @@ export class DOMManager {
 
   private playerCarouselIndex: number = 11;
   private aiCarouselIndex: number = 11;
-  private mapCarouselIndex: number = 10;
+  private mapCarouselIndex: number = 11;
 
   public onStartGame?: (
     p1Faction: string,
@@ -553,7 +567,6 @@ export class DOMManager {
     const mapTrack = document.getElementById('maps-grid-track');
     const btnMapPrev = document.getElementById('btn-map-carousel-prev');
     const btnMapNext = document.getElementById('btn-map-carousel-next');
-    const mcardRandom = document.getElementById('mcard-random');
 
     if (btnMapPrev) {
       btnMapPrev.addEventListener('click', () => {
@@ -568,21 +581,26 @@ export class DOMManager {
       });
     }
 
-    if (mcardRandom) {
-      mcardRandom.addEventListener('click', () => {
-        sfx('click');
-        this.selectMapOption('random');
-      });
-    }
-
     if (mapTrack) {
-      const mapCards = mapTrack.querySelectorAll<HTMLElement>('.map-card');
+      mapTrack.addEventListener('transitionend', () => {
+        if (this.mapCarouselIndex >= 22) {
+          this.mapCarouselIndex -= 11;
+          this.updateMapCarousel(0, true);
+        } else if (this.mapCarouselIndex < 11) {
+          this.mapCarouselIndex += 11;
+          this.updateMapCarousel(0, true);
+        }
+      });
+
+      const mapCards = mapTrack.querySelectorAll<HTMLElement>('.sp-map-card');
       mapCards.forEach(card => {
         card.addEventListener('click', () => {
-          const mapId = card.getAttribute('data-map');
-          if (!mapId) return;
-          sfx('click');
-          this.selectMapOption(mapId);
+          const idxStr = card.getAttribute('data-index');
+          if (idxStr !== null) {
+            sfx('click');
+            this.mapCarouselIndex = parseInt(idxStr, 10);
+            this.updateMapCarousel(0);
+          }
         });
       });
     }
@@ -698,10 +716,10 @@ export class DOMManager {
 
     this.playerCarouselIndex += delta;
 
-    const cardWidth = 130;
+    const cardWidth = 136;
     const gap = 14;
     const stride = cardWidth + gap;
-    const viewportWidth = viewport.clientWidth || 418;
+    const viewportWidth = viewport.clientWidth || 436;
     const offset = (this.playerCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
 
     if (immediate) {
@@ -730,10 +748,10 @@ export class DOMManager {
 
     this.aiCarouselIndex += delta;
 
-    const cardWidth = 130;
+    const cardWidth = 136;
     const gap = 14;
     const stride = cardWidth + gap;
-    const viewportWidth = viewport.clientWidth || 418;
+    const viewportWidth = viewport.clientWidth || 436;
     const offset = (this.aiCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
 
     if (immediate) {
@@ -841,50 +859,110 @@ export class DOMManager {
     }
   }
 
-  private updateMapCarousel(delta: number): void {
+  private updateMapCarousel(delta: number, immediate: boolean = false): void {
     const mapTrack = document.getElementById('maps-grid-track');
-    if (!mapTrack) return;
+    const viewport = document.getElementById('viewport-map-wheel');
+    if (!mapTrack || !viewport) return;
 
     this.mapCarouselIndex += delta;
-    if (this.mapCarouselIndex < 0) this.mapCarouselIndex = 19;
-    if (this.mapCarouselIndex > 20) this.mapCarouselIndex = 10;
 
-    const firstCard = mapTrack.querySelector<HTMLElement>('.map-card');
-    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 180;
-    const offset = this.mapCarouselIndex * (cardWidth + 12);
-    mapTrack.style.transform = `translateX(-${offset}px)`;
+    const cardWidth = 136;
+    const gap = 14;
+    const stride = cardWidth + gap;
+    const viewportWidth = viewport.clientWidth || 436;
+    const offset = (this.mapCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
+
+    if (immediate) {
+      mapTrack.style.transition = 'none';
+      mapTrack.style.transform = `translateX(-${offset}px)`;
+      void mapTrack.offsetHeight;
+      mapTrack.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    } else {
+      mapTrack.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      mapTrack.style.transform = `translateX(-${offset}px)`;
+    }
+
+    const normIndex = ((this.mapCarouselIndex % 11) + 11) % 11;
+    const themeId = MAP_CYCLE[normIndex] || 'random';
+    this.selectedTheme = themeId;
+
+    this.syncMapCardHighlight(themeId, this.mapCarouselIndex);
+    this.updateMapInfoBox(themeId);
+    this.updateSinglePlayerSummary();
+  }
+
+  private syncMapCardHighlight(themeId: string, activeIndex: number): void {
+    const mapTrack = document.getElementById('maps-grid-track');
+    if (!mapTrack) return;
+    const cards = mapTrack.querySelectorAll<HTMLElement>('.sp-map-card');
+    cards.forEach(c => {
+      const idx = parseInt(c.getAttribute('data-index') || '-1', 10);
+      if (idx === activeIndex) {
+        c.classList.add('selected-map');
+      } else {
+        c.classList.remove('selected-map');
+      }
+    });
+  }
+
+  private updateMapInfoBox(themeId: string): void {
+    const titleEl = document.getElementById('map-info-title');
+    const subEl = document.getElementById('map-info-sub');
+    const descEl = document.getElementById('map-info-desc');
+    const atmosphereEl = document.getElementById('map-info-atmosphere');
+    const featuresEl = document.getElementById('map-info-features');
+
+    if (themeId === 'random') {
+      if (titleEl) titleEl.textContent = '🎲 RANDOM BIOME';
+      if (subEl) subEl.textContent = 'DYNAMIC MYSTERY THEATER';
+      if (descEl) descEl.textContent = 'Deploy into an unpredictable planetary theater with dynamic terrain obstacles, tactical hazards, and shifting environmental atmospheric conditions.';
+      if (atmosphereEl) atmosphereEl.innerHTML = '<strong>ATMOSPHERE:</strong> Dynamic Environmental Conditions • Adapt to Field Terrain';
+      if (featuresEl) featuresEl.innerHTML = '<span>Unpredictable Obstacles</span> • <span>Variable Line of Sight</span> • <span>Dynamic Cover</span>';
+      return;
+    }
+
+    const t = THEMES[themeId];
+    if (!t) return;
+
+    if (titleEl) titleEl.textContent = `${t.icon} ${t.name.toUpperCase()}`;
+    if (subEl) subEl.textContent = (t.subtitle || '').toUpperCase();
+    if (descEl) descEl.textContent = t.desc || '';
+    if (atmosphereEl) {
+      const weatherText = t.particleType === 'rain' ? 'Torrential Acid Rain & Low Light' :
+                          t.particleType === 'snow' ? 'Sub-Zero Blizzard & Permafrost Hazards' :
+                          t.particleType === 'sand' ? 'Blinding Sandstorms & Solar Thermal Heat' :
+                          t.particleType === 'stars' ? 'Zero-G Void Conditions & Solar Radiation' :
+                          t.particleType === 'astral' ? 'Harmonic Ley Resonances & Prismatic Aura' :
+                          t.particleType === 'corruption' ? 'Corrosive Spores & Mutagenic Bio-Toxins' :
+                          t.particleType === 'acid' ? 'Atmospheric Digestive Vapors & Caustic Mists' :
+                          t.particleType === 'gauss' ? 'Gauss Energy Static & Electromagnetic Flux' :
+                          t.particleType === 'rift' ? 'Warp Fire Storms & Dimensional Grav-Anomalies' :
+                          'Industrial Smog & Low Atmospheric Visibility';
+      atmosphereEl.innerHTML = `<strong>ATMOSPHERE:</strong> ${weatherText}`;
+    }
+    if (featuresEl) {
+      const obstacleMap: Record<string, string> = {
+        jungle: 'Ancient Titan Ribs • Bio-Spores • Overgrown Temple Ruins',
+        snow: 'Glacial Ice Walls • Sub-Zero Chasms • Frozen Relic Outposts',
+        desert: 'Fossil Ash Dunes • Canyon Spires • Sunken Vault Ruins',
+        city: 'Reinforced Hab-Blocks • Blast Barricades • Gothic Street Avenues',
+        tech: 'Orbital Bulkheads • Reactor Cores • Power Conduit Relays',
+        astral: 'Prismatic Monoliths • Crystal Clusters • Harmonic Leylines',
+        corrupted: 'Mutated Flesh Altars • Barbed Spines • Mutated Tendrils',
+        devoured: 'Acid Digestion Pits • Chitin Spires • Subterranean Ducts',
+        tomb: 'Gauss Crypt Pylons • Living-Metal Monoliths • Tomb Portals',
+        rift: 'Basalt Magma Crags • Dimensional Tears • Molten Void Fissures'
+      };
+      featuresEl.textContent = obstacleMap[themeId] || 'Dense Tactical Cover • Strategic Obstacles';
+    }
   }
 
   public selectMapOption(mapId: string): void {
-    this.selectedTheme = mapId;
-
-    // Clear all map selections & badges
-    document.querySelectorAll('.map-card, .sticky-random-map-card').forEach(c => {
-      c.classList.remove('selected-map');
-      const badge = c.querySelector('.map-card-badge');
-      if (badge) badge.remove();
-    });
-
-    if (mapId === 'random') {
-      const card = document.getElementById('mcard-random');
-      if (card) {
-        card.classList.add('selected-map');
-        const badge = document.createElement('div');
-        badge.className = 'sp-card-badge map-card-badge';
-        badge.textContent = 'AUTO';
-        card.appendChild(badge);
-      }
-    } else {
-      document.querySelectorAll(`[data-map="${mapId}"]`).forEach(card => {
-        card.classList.add('selected-map');
-        const badge = document.createElement('div');
-        badge.className = 'sp-card-badge map-card-badge';
-        badge.textContent = 'SELECTED';
-        card.appendChild(badge);
-      });
+    const idx = MAP_CYCLE.indexOf(mapId);
+    if (idx !== -1) {
+      this.mapCarouselIndex = 11 + idx;
+      this.updateMapCarousel(0);
     }
-
-    this.updateSinglePlayerSummary();
   }
 
   private deselectAllMapCards(): void {

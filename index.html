@@ -351,8 +351,7 @@
         <!-- LEFT WHEEL: YOUR FACTION -->
         <div class="sp-wheel-column" id="wheel-col-player">
           <div class="sp-wheel-header">
-            <span class="sp-wheel-badge player-badge">PLAYER 1</span>
-            <h3 class="sp-wheel-title">YOUR FACTION</h3>
+            <h3 class="sp-wheel-title">PLAYER 1</h3>
           </div>
 
           <!-- EMBLEM CAROUSEL WRAPPER -->
@@ -531,11 +530,10 @@
           <div class="sp-vs-line-bottom"></div>
         </div>
 
-        <!-- RIGHT WHEEL: AI FACTION -->
+        <!-- RIGHT WHEEL: AI OPPONENT -->
         <div class="sp-wheel-column" id="wheel-col-ai">
           <div class="sp-wheel-header">
-            <span class="sp-wheel-badge ai-badge">AI OPPONENT</span>
-            <h3 class="sp-wheel-title">AI FACTION</h3>
+            <h3 class="sp-wheel-title">AI OPPONENT</h3>
           </div>
 
           <!-- EMBLEM CAROUSEL WRAPPER -->
@@ -712,186 +710,179 @@
     <!-- 3. STAGE 2: MAP SELECTION -->
     <div id="sp-stage-map" class="sp-stage-container" style="display:none;">
       <div class="sp-stage-header">
-        <h2 class="sp-stage-title">SELECT BATTLEFIELD THEATER</h2>
+        <h2 class="sp-stage-title">SELECT BATTLEFIELD BIOME</h2>
         <p class="sp-stage-subtitle">Choose the planetary combat environment and environmental terrain.</p>
       </div>
 
-      <div class="sp-carousel-wrapper">
-        <!-- STICKY RANDOM BIOME CARD -->
-        <div class="sp-selection-card map-card sticky-random-map-card selected-map" id="mcard-random">
-          <div class="sp-card-badge map-card-badge">AUTO</div>
-          <div class="map-icon">🎲</div>
-          <div class="map-name">Random Biome</div>
-          <div class="map-sub">Dynamic Mystery Theater</div>
-          <div class="map-desc">Deploy into an unpredictable tactical theater with dynamic terrain obstacles.</div>
-        </div>
+      <!-- MAP SELECTION WRAPPER (3-CARD CAROUSEL + FIXED INFOBOX BELOW) -->
+      <div class="sp-map-selection-container">
+        <!-- 3-MAP CAROUSEL -->
+        <div class="sp-map-carousel-wrapper">
+          <button id="btn-map-carousel-prev" class="sp-carousel-nav-btn" title="Previous Biome" aria-label="Previous Biome">&#10094;</button>
 
-        <!-- CAROUSEL ROTATION ARROW (PREV) -->
-        <button id="btn-map-carousel-prev" class="sp-carousel-nav-btn" title="Previous Maps" aria-label="Previous Maps">&#10094;</button>
+          <div class="sp-carousel-viewport sp-map-viewport" id="viewport-map-wheel">
+            <div class="maps-emblems-track" id="maps-grid-track">
+              <!-- SET 0 (CLONES) -->
+              <div class="sp-map-card" data-map="random" data-index="0" title="Random Biome">
+                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
+                <div class="sp-map-label">Random Biome</div>
+              </div>
+              <div class="sp-map-card" data-map="jungle" data-index="1" title="Jungle Death World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
+                <div class="sp-map-label">Jungle World</div>
+              </div>
+              <div class="sp-map-card" data-map="snow" data-index="2" title="Glacial Frost World">
+                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
+                <div class="sp-map-label">Glacial World</div>
+              </div>
+              <div class="sp-map-card" data-map="desert" data-index="3" title="Desert Wastes">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
+                <div class="sp-map-label">Desert Wastes</div>
+              </div>
+              <div class="sp-map-card" data-map="city" data-index="4" title="Gothic Hive City">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
+                <div class="sp-map-label">Gothic Hive</div>
+              </div>
+              <div class="sp-map-card" data-map="tech" data-index="5" title="Space-Tech / Void Station">
+                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
+                <div class="sp-map-label">Space-Tech</div>
+              </div>
+              <div class="sp-map-card" data-map="astral" data-index="6" title="Astral Crystal Spire">
+                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
+                <div class="sp-map-label">Astral Spire</div>
+              </div>
+              <div class="sp-map-card" data-map="corrupted" data-index="7" title="Corrupted Flesh-World">
+                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
+                <div class="sp-map-label">Flesh-World</div>
+              </div>
+              <div class="sp-map-card" data-map="devoured" data-index="8" title="Devoured World">
+                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
+                <div class="sp-map-label">Devoured World</div>
+              </div>
+              <div class="sp-map-card" data-map="tomb" data-index="9" title="Tomb World">
+                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
+                <div class="sp-map-label">Tomb World</div>
+              </div>
+              <div class="sp-map-card" data-map="rift" data-index="10" title="Warp Rift World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
+                <div class="sp-map-label">Warp Rift</div>
+              </div>
 
-        <!-- ROTATING VIEWPORT (INFINITELY LOOPABLE) -->
-        <div class="sp-carousel-viewport map-carousel-viewport">
-          <div class="maps-grid" id="maps-grid-track">
-            <!-- SET 1 (CLONE 1) -->
-            <div class="sp-selection-card map-card" data-map="jungle">
-              <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle Death World</div>
-              <div class="map-sub">Alien Primeval Biosphere</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="snow">
-              <div class="map-icon">❄️</div>
-              <div class="map-name">Glacial Frost World</div>
-              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert Wastes</div>
-              <div class="map-sub">Ash Dunes & Canyon Spires</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="city">
-              <div class="map-icon">🏛️</div>
-              <div class="map-name">Gothic Hive City</div>
-              <div class="map-sub">Industrial Ruins & Streets</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tech">
-              <div class="map-icon">🚀</div>
-              <div class="map-name">Space-Tech / Void Station</div>
-              <div class="map-sub">Orbital Reactor & Bulkheads</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="astral">
-              <div class="map-icon">✨</div>
-              <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Monoliths</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="corrupted">
-              <div class="map-icon">💀</div>
-              <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Tendrils</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="devoured">
-              <div class="map-icon">👾</div>
-              <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation Pits</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tomb">
-              <div class="map-icon">⚡</div>
-              <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="rift">
-              <div class="map-icon">🔥</div>
-              <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Void</div>
-            </div>
+              <!-- SET 1 (MAIN ACTIVE SET - DEFAULT FOCUS AT INDEX 11) -->
+              <div class="sp-map-card selected-map" data-map="random" data-index="11" title="Random Biome">
+                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
+                <div class="sp-map-label">Random Biome</div>
+              </div>
+              <div class="sp-map-card" data-map="jungle" data-index="12" title="Jungle Death World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
+                <div class="sp-map-label">Jungle World</div>
+              </div>
+              <div class="sp-map-card" data-map="snow" data-index="13" title="Glacial Frost World">
+                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
+                <div class="sp-map-label">Glacial World</div>
+              </div>
+              <div class="sp-map-card" data-map="desert" data-index="14" title="Desert Wastes">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
+                <div class="sp-map-label">Desert Wastes</div>
+              </div>
+              <div class="sp-map-card" data-map="city" data-index="15" title="Gothic Hive City">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
+                <div class="sp-map-label">Gothic Hive</div>
+              </div>
+              <div class="sp-map-card" data-map="tech" data-index="16" title="Space-Tech / Void Station">
+                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
+                <div class="sp-map-label">Space-Tech</div>
+              </div>
+              <div class="sp-map-card" data-map="astral" data-index="17" title="Astral Crystal Spire">
+                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
+                <div class="sp-map-label">Astral Spire</div>
+              </div>
+              <div class="sp-map-card" data-map="corrupted" data-index="18" title="Corrupted Flesh-World">
+                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
+                <div class="sp-map-label">Flesh-World</div>
+              </div>
+              <div class="sp-map-card" data-map="devoured" data-index="19" title="Devoured World">
+                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
+                <div class="sp-map-label">Devoured World</div>
+              </div>
+              <div class="sp-map-card" data-map="tomb" data-index="20" title="Tomb World">
+                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
+                <div class="sp-map-label">Tomb World</div>
+              </div>
+              <div class="sp-map-card" data-map="rift" data-index="21" title="Warp Rift World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
+                <div class="sp-map-label">Warp Rift</div>
+              </div>
 
-            <!-- SET 2 (MAIN ACTIVE SET) -->
-            <div class="sp-selection-card map-card" data-map="jungle">
-              <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle Death World</div>
-              <div class="map-sub">Alien Primeval Biosphere</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="snow">
-              <div class="map-icon">❄️</div>
-              <div class="map-name">Glacial Frost World</div>
-              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert Wastes</div>
-              <div class="map-sub">Ash Dunes & Canyon Spires</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="city">
-              <div class="map-icon">🏛️</div>
-              <div class="map-name">Gothic Hive City</div>
-              <div class="map-sub">Industrial Ruins & Streets</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tech">
-              <div class="map-icon">🚀</div>
-              <div class="map-name">Space-Tech / Void Station</div>
-              <div class="map-sub">Orbital Reactor & Bulkheads</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="astral">
-              <div class="map-icon">✨</div>
-              <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Monoliths</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="corrupted">
-              <div class="map-icon">💀</div>
-              <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Tendrils</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="devoured">
-              <div class="map-icon">👾</div>
-              <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation Pits</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tomb">
-              <div class="map-icon">⚡</div>
-              <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="rift">
-              <div class="map-icon">🔥</div>
-              <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Void</div>
-            </div>
-
-            <!-- SET 3 (CLONE 3) -->
-            <div class="sp-selection-card map-card" data-map="jungle">
-              <div class="map-icon">🌿</div>
-              <div class="map-name">Jungle Death World</div>
-              <div class="map-sub">Alien Primeval Biosphere</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="snow">
-              <div class="map-icon">❄️</div>
-              <div class="map-name">Glacial Frost World</div>
-              <div class="map-sub">Permafrost Ridges & Ice Chasms</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="desert">
-              <div class="map-icon">🏜️</div>
-              <div class="map-name">Desert Wastes</div>
-              <div class="map-sub">Ash Dunes & Canyon Spires</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="city">
-              <div class="map-icon">🏛️</div>
-              <div class="map-name">Gothic Hive City</div>
-              <div class="map-sub">Industrial Ruins & Streets</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tech">
-              <div class="map-icon">🚀</div>
-              <div class="map-name">Space-Tech / Void Station</div>
-              <div class="map-sub">Orbital Reactor & Bulkheads</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="astral">
-              <div class="map-icon">✨</div>
-              <div class="map-name">Astral Crystal Spire</div>
-              <div class="map-sub">Harmonic Prisms & Monoliths</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="corrupted">
-              <div class="map-icon">💀</div>
-              <div class="map-name">Corrupted Flesh-World</div>
-              <div class="map-sub">Mutated Terrain & Tendrils</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="devoured">
-              <div class="map-icon">👾</div>
-              <div class="map-name">Devoured World</div>
-              <div class="map-sub">Stripped Desolation Pits</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="tomb">
-              <div class="map-icon">⚡</div>
-              <div class="map-name">Tomb World</div>
-              <div class="map-sub">Living Metal Crypts</div>
-            </div>
-            <div class="sp-selection-card map-card" data-map="rift">
-              <div class="map-icon">🔥</div>
-              <div class="map-name">Warp Rift World</div>
-              <div class="map-sub">Dimensional Fissures & Void</div>
+              <!-- SET 2 (CLONES) -->
+              <div class="sp-map-card" data-map="random" data-index="22" title="Random Biome">
+                <div class="sp-map-frame"><span class="sp-map-icon">🎲</span></div>
+                <div class="sp-map-label">Random Biome</div>
+              </div>
+              <div class="sp-map-card" data-map="jungle" data-index="23" title="Jungle Death World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🌿</span></div>
+                <div class="sp-map-label">Jungle World</div>
+              </div>
+              <div class="sp-map-card" data-map="snow" data-index="24" title="Glacial Frost World">
+                <div class="sp-map-frame"><span class="sp-map-icon">❄️</span></div>
+                <div class="sp-map-label">Glacial World</div>
+              </div>
+              <div class="sp-map-card" data-map="desert" data-index="25" title="Desert Wastes">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏜️</span></div>
+                <div class="sp-map-label">Desert Wastes</div>
+              </div>
+              <div class="sp-map-card" data-map="city" data-index="26" title="Gothic Hive City">
+                <div class="sp-map-frame"><span class="sp-map-icon">🏛️</span></div>
+                <div class="sp-map-label">Gothic Hive</div>
+              </div>
+              <div class="sp-map-card" data-map="tech" data-index="27" title="Space-Tech / Void Station">
+                <div class="sp-map-frame"><span class="sp-map-icon">🚀</span></div>
+                <div class="sp-map-label">Space-Tech</div>
+              </div>
+              <div class="sp-map-card" data-map="astral" data-index="28" title="Astral Crystal Spire">
+                <div class="sp-map-frame"><span class="sp-map-icon">✨</span></div>
+                <div class="sp-map-label">Astral Spire</div>
+              </div>
+              <div class="sp-map-card" data-map="corrupted" data-index="29" title="Corrupted Flesh-World">
+                <div class="sp-map-frame"><span class="sp-map-icon">💀</span></div>
+                <div class="sp-map-label">Flesh-World</div>
+              </div>
+              <div class="sp-map-card" data-map="devoured" data-index="30" title="Devoured World">
+                <div class="sp-map-frame"><span class="sp-map-icon">👾</span></div>
+                <div class="sp-map-label">Devoured World</div>
+              </div>
+              <div class="sp-map-card" data-map="tomb" data-index="31" title="Tomb World">
+                <div class="sp-map-frame"><span class="sp-map-icon">⚡</span></div>
+                <div class="sp-map-label">Tomb World</div>
+              </div>
+              <div class="sp-map-card" data-map="rift" data-index="32" title="Warp Rift World">
+                <div class="sp-map-frame"><span class="sp-map-icon">🔥</span></div>
+                <div class="sp-map-label">Warp Rift</div>
+              </div>
             </div>
           </div>
+
+          <button id="btn-map-carousel-next" class="sp-carousel-nav-btn" title="Next Biome" aria-label="Next Biome">&#10095;</button>
         </div>
 
-        <!-- CAROUSEL ROTATION ARROW (NEXT) -->
-        <button id="btn-map-carousel-next" class="sp-carousel-nav-btn" title="Next Maps" aria-label="Next Maps">&#10095;</button>
+        <!-- DEDICATED FIXED-SIZE BATTLEFIELD INFO BOX -->
+        <div class="sp-map-infobox" id="sp-map-infobox">
+          <div class="sp-infobox-header">
+            <div class="sp-infobox-title-group">
+              <h4 class="sp-infobox-title" id="map-info-title">🎲 RANDOM BIOME</h4>
+              <div class="sp-infobox-sub" id="map-info-sub">DYNAMIC MYSTERY THEATER</div>
+            </div>
+          </div>
+          <div class="sp-infobox-desc" id="map-info-desc">
+            Deploy into an unpredictable planetary theater with dynamic terrain obstacles, tactical hazards, and shifting environmental atmospheric conditions.
+          </div>
+          <div class="sp-infobox-doctrine" id="map-info-atmosphere">
+            <strong>ATMOSPHERE:</strong> Dynamic Environmental Conditions • Adapt to Field Terrain
+          </div>
+          <div class="sp-infobox-roster" id="map-info-features">
+            <span>Unpredictable Obstacles</span> • <span>Variable Line of Sight</span> • <span>Dynamic Cover</span>
+          </div>
+        </div>
       </div>
     </div>
 
