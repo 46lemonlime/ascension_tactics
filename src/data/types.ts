@@ -200,6 +200,7 @@ export interface Faction {
     desc: string;
   };
   image?: string;
+  emblem?: string;
 }
 
 export interface Objective {

@@ -272,6 +272,10 @@ export class DOMManager {
       </div>
     ` : '';
 
+    const emblemHtml = faction.emblem
+      ? `<img src="${faction.emblem}" alt="${faction.name}" style="width:36px;height:36px;object-fit:contain;border-radius:4px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));" />`
+      : faction.icon;
+
     const heroSectionHtml = faction.image ? `
       <div class="dossier-hero-row">
         <div class="dossier-image-container">
@@ -279,7 +283,7 @@ export class DOMManager {
         </div>
         <div class="dossier-info-col">
           <div class="dossier-header">
-            <div class="dossier-icon">${faction.icon}</div>
+            <div class="dossier-icon">${emblemHtml}</div>
             <div class="dossier-title-box">
               <h3>${faction.name.toUpperCase()}</h3>
               <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>
@@ -291,7 +295,7 @@ export class DOMManager {
       </div>
     ` : `
       <div class="dossier-header">
-        <div class="dossier-icon">${faction.icon}</div>
+        <div class="dossier-icon">${emblemHtml}</div>
         <div class="dossier-title-box">
           <h3>${faction.name.toUpperCase()}</h3>
           <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>

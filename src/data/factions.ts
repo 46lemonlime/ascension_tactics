@@ -37,6 +37,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Vulnerable to being surrounded'
     ],
     image: '/assets/factions/ascendants.jpg',
+    emblem: '/assets/emblems/ascendants.jpg',
     roster: getFactionRoster('marines')
   },
 
@@ -70,6 +71,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Command structure can be disrupted'
     ],
     image: '/assets/factions/directorate.jpg',
+    emblem: '/assets/emblems/directorate.jpg',
     roster: getFactionRoster('directorate')
   },
 
@@ -102,6 +104,7 @@ export const FACTIONS: Record<string, Faction> = {
       'Mistakes are heavily punished'
     ],
     image: '/assets/factions/elyri.jpg',
+    emblem: '/assets/emblems/elyri.jpg',
     roster: getFactionRoster('eldar')
   },
 
@@ -138,6 +141,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Veykari armies capture and loot battlefield objectives for combat buffs, temporary upgrades, and tactical advantages.'
     },
     image: '/assets/factions/veykari.jpg',
+    emblem: '/assets/emblems/veykari.jpg',
     roster: getFactionRoster('dark_eldar')
   },
 
@@ -174,6 +178,7 @@ export const FACTIONS: Record<string, Faction> = {
       desc: 'Winning engagements generates War Momentum, unlocking powerful combat surges and aggressive battle buffs.'
     },
     image: '/assets/factions/ghar.jpg',
+    emblem: '/assets/emblems/ghar.jpg',
     roster: getFactionRoster('orcs')
   },
 
