@@ -29,8 +29,8 @@ const engine = new GameEngine(scene, log, datasheet, minimap, dom);
 dom.showHomeScreen();
 
 // Wire Single Player launch from Race Select Modal
-dom.onStartGame = (p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole) => {
-  engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
+dom.onStartGame = (setup) => {
+  engine.startNewGame(setup);
 
   deploymentUi.show(true);
   const initialKey = engine.state.rosterPlayer?.[0]?.key || null;
@@ -335,18 +335,22 @@ if (popMenuRestart) {
   popMenuRestart.addEventListener('click', () => {
     showConfirmModal(
       'Restart Battle',
-      'Restart this battle from the beginning with the same factions, map, and mission?',
+      'Restart this battle from the beginning with the same army compositions, map, and mission?',
       '🔄',
       'Restart',
       () => {
         setGameMenuOpen(false);
-        const p1Faction = engine.state.p1Faction || 'space_marines';
-        const p2Faction = engine.state.p2Faction || 'chaos';
-        const theme = engine.state.theme || 'desert';
-        const mission = engine.state.mission || 'extermination';
-        const p1EscortRole = engine.state.escortRole || 'escort';
-        const p2EscortRole = engine.state.p2EscortRole || 'attack';
-        engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
+        if (engine.state.matchSetup) {
+          engine.startNewGame(engine.state.matchSetup);
+        } else {
+          const p1Faction = engine.state.p1Faction || 'space_marines';
+          const p2Faction = engine.state.p2Faction || 'chaos';
+          const theme = engine.state.theme || 'desert';
+          const mission = engine.state.mission || 'extermination';
+          const p1EscortRole = engine.state.escortRole || 'escort';
+          const p2EscortRole = engine.state.p2EscortRole || 'attack';
+          engine.startNewGame(p1Faction, p2Faction, theme, mission, p1EscortRole, p2EscortRole);
+        }
         deploymentUi.show(true);
         const initialKey = engine.state.rosterPlayer?.[0]?.key || null;
         deploymentUi.renderRoster(engine.state.rosterPlayer || [], initialKey);

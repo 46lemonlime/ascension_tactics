@@ -333,6 +333,11 @@
           <span class="sp-step-num">3</span>
           <span class="sp-step-text">MISSION</span>
         </div>
+        <div class="sp-step-connector"></div>
+        <div class="sp-step-pill" id="sp-step-pill-4" data-step="4">
+          <span class="sp-step-num">4</span>
+          <span class="sp-step-text">ARMY</span>
+        </div>
       </div>
 
       <!-- EXIT TO MAIN MENU BUTTON -->
@@ -810,11 +815,98 @@
               </select>
             </div>
           </div>
+          <!-- MATCH POINT LIMIT SELECTOR -->
+          <div class="sp-point-limit-box">
+            <div class="sp-point-limit-label-group">
+              <span class="sp-point-limit-icon">⚖️</span>
+              <div class="sp-point-limit-text">
+                <span class="sp-point-limit-heading">POINT LIMIT</span>
+                <span class="sp-point-limit-sub">Authoritative tactical budget for both Player and AI warhosts</span>
+              </div>
+            </div>
+            <div class="sp-point-limit-select-wrap">
+              <select id="sp-point-limit-select" class="sp-point-limit-select">
+                <option value="1000">1000 PTS (Combat Patrol)</option>
+                <option value="2000" selected>2000 PTS (Standard Incursion)</option>
+                <option value="3000">3000 PTS (Strike Force)</option>
+                <option value="4000">4000 PTS (Grand Onslaught)</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 5. SHARED BOTTOM HUD FOOTER -->
+    <!-- 5. STAGE 4: ARMY COMPOSITION -->
+    <div id="sp-stage-army" class="sp-stage-container" style="display:none;">
+      <div class="sp-stage-header">
+        <h2 class="sp-stage-title">ARMY COMPOSITION</h2>
+        <p class="sp-stage-subtitle">Recruit and configure your tactical strike force within the match point budget.</p>
+      </div>
+
+      <!-- POINT BUDGET STATS BAR -->
+      <div class="sp-army-budget-bar">
+        <div class="sp-budget-card">
+          <span class="sp-budget-lbl">POINT LIMIT</span>
+          <span class="sp-budget-val limit" id="sp-army-limit-val">2000</span>
+        </div>
+        <div class="sp-budget-card">
+          <span class="sp-budget-lbl">POINTS USED</span>
+          <span class="sp-budget-val used" id="sp-army-used-val">0 / 2000</span>
+        </div>
+        <div class="sp-budget-card">
+          <span class="sp-budget-lbl">POINTS REMAINING</span>
+          <span class="sp-budget-val remaining" id="sp-army-rem-val">2000</span>
+        </div>
+        <div class="sp-budget-progress-wrap">
+          <div class="sp-budget-progress-bar" id="sp-army-progress-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- MAIN COMPOSITION WORKSPACE (ROSTER GRID + SUMMARY DOCK) -->
+      <div class="sp-army-workspace">
+        <!-- LEFT: AVAILABLE FACTION SQUADS -->
+        <div class="sp-army-roster-column">
+          <div class="sp-army-section-header">
+            <h3 class="sp-army-section-title">AVAILABLE RECRUITS</h3>
+            <span class="sp-army-faction-badge" id="sp-army-faction-badge">THE ASCENDANTS</span>
+          </div>
+          <div class="sp-army-units-grid" id="sp-army-units-grid">
+            <!-- Dynamically populated unit recruit cards -->
+          </div>
+        </div>
+
+        <!-- RIGHT: SELECTED STRIKE FORCE PANEL -->
+        <div class="sp-army-summary-column">
+          <div class="sp-army-section-header">
+            <h3 class="sp-army-section-title">YOUR STRIKE FORCE</h3>
+            <div class="sp-army-actions">
+              <button id="btn-army-reset" class="sp-army-btn-secondary" title="Reset Army Selection">CLEAR</button>
+              <button id="btn-army-autofill" class="sp-army-btn-secondary" title="Auto-Fill Balanced Army">AUTO-FILL</button>
+            </div>
+          </div>
+          <div class="sp-army-selected-list" id="sp-army-selected-list">
+            <!-- Dynamically rendered selected squad breakdown -->
+          </div>
+          <div class="sp-army-summary-footer">
+            <div class="sp-army-stat-row">
+              <span>Total Squads:</span>
+              <span id="sp-army-total-squads">0</span>
+            </div>
+            <div class="sp-army-stat-row">
+              <span>Total Models:</span>
+              <span id="sp-army-total-models">0</span>
+            </div>
+            <div class="sp-army-stat-row highlight">
+              <span>Budget Usage:</span>
+              <span id="sp-army-total-pts-pct">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. SHARED BOTTOM HUD FOOTER -->
     <div class="sp-hud-footer">
       <!-- Back Navigation Button -->
       <button id="btn-sp-back" class="sp-nav-btn sp-back-btn">

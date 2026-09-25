@@ -3,6 +3,7 @@ import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { UNIT_ROSTER } from '../data/units';
 import { buildFactionRosters } from '../data/rosters';
+import { convertArmyToPlayerRoster, convertArmyToEnemyRoster, buildAIArmy, getDefaultArmyComposition } from './army-builder';
 import { updateFogOfWar, hasLineOfSight, updatePlayerAwareness, playerAwareTiles, enemyAwareTiles } from './awareness';
 import { resolveAttack } from './combat';
 import { rallyUnit } from './morale';
@@ -12,7 +13,7 @@ import { animateMovePath } from './movement';
 import { clearTweens, spawnTeleportBeam, showWorldText } from './effects';
 import { sfx } from '../audio/synth';
 import { savePlayerCamera, restorePlayerCamera, getActionCamEnabled, getActiveCameraController, animateCameraTo } from '../renderer/camera';
-import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem } from '../data/types';
+import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem, MatchSetup, PointLimit } from '../data/types';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
 import type { DatasheetUI } from '../ui/datasheet-ui';
@@ -118,31 +119,55 @@ export class GameEngine {
   }
 
   public startNewGame(
-    p1Faction: string,
-    p2Faction: string,
-    theme: string,
-    mission: MissionType,
-    p1EscortRole: 'escort' | 'attack' = 'escort',
-    p2EscortRole: 'escort' | 'attack' = 'attack'
+    setupOrP1Faction: MatchSetup | string,
+    p2FactionArg?: string,
+    themeArg?: string,
+    missionArg?: MissionType,
+    p1EscortRoleArg: 'escort' | 'attack' = 'escort',
+    p2EscortRoleArg: 'escort' | 'attack' = 'attack'
   ): void {
+    let setup: MatchSetup;
+    if (typeof setupOrP1Faction === 'object') {
+      setup = setupOrP1Faction;
+    } else {
+      const p1 = setupOrP1Faction;
+      const p2 = p2FactionArg || 'forsaken';
+      const th = themeArg || 'jungle';
+      const mi = missionArg || 'extermination';
+      setup = {
+        p1Faction: p1,
+        p2Faction: p2,
+        theme: th,
+        mission: mi,
+        pointLimit: 2000,
+        p1EscortRole: p1EscortRoleArg,
+        p2EscortRole: p2EscortRoleArg,
+        playerArmy: getDefaultArmyComposition(p1, 2000),
+        aiArmy: buildAIArmy(p2, 2000)
+      };
+    }
+
     this.resetGameSession();
-    this.state.p1Faction = p1Faction;
-    this.state.p2Faction = p2Faction;
-    this.state.theme = theme;
-    this.state.mission = mission;
-    this.state.escortRole = p1EscortRole;
-    this.state.p2EscortRole = p2EscortRole;
+    this.state.matchSetup = setup;
+    this.state.p1Faction = setup.p1Faction;
+    this.state.p2Faction = setup.p2Faction;
+    this.state.theme = setup.theme;
+    this.state.mission = setup.mission;
+    this.state.pointLimit = setup.pointLimit;
+    this.state.escortRole = setup.p1EscortRole || 'escort';
+    this.state.p2EscortRole = setup.p2EscortRole || 'attack';
+    this.state.playerArmy = setup.playerArmy || getDefaultArmyComposition(setup.p1Faction, setup.pointLimit);
+    this.state.aiArmy = setup.aiArmy || buildAIArmy(setup.p2Faction, setup.pointLimit);
 
     // Initialize board terrain
-    this.scene.initBoard(theme);
+    this.scene.initBoard(setup.theme);
 
-    // Build authoritative faction rosters
-    const { rosterPlayer, rosterEnemy } = buildFactionRosters(p1Faction, p2Faction);
-    this.state.rosterPlayer = rosterPlayer;
-    this.state.rosterEnemy = rosterEnemy;
+    // Build authoritative faction rosters from selected armies
+    this.state.rosterPlayer = convertArmyToPlayerRoster(this.state.playerArmy);
+    this.state.rosterEnemy = convertArmyToEnemyRoster(this.state.aiArmy);
 
     // Domination Objectives
-    if (mission === 'domination') {
+    if (setup.mission === 'domination') {
       this.state.objectives = [
         { id: 1, c: 8, r: 28, radius: 3, controlledBy: 0, points: 0 },
         { id: 2, c: 20, r: 28, radius: 3, controlledBy: 0, points: 0 },
@@ -151,18 +176,18 @@ export class GameEngine {
     }
 
     // Deploy Enemy units immediately to the board
-    const enemyFaction = FACTIONS[p2Faction] || FACTIONS.chaos;
-    rosterEnemy.forEach(item => {
+    const enemyFaction = FACTIONS[setup.p2Faction] || FACTIONS.chaos;
+    this.state.rosterEnemy.forEach(item => {
       const uDef = UNIT_ROSTER[item.type] || UNIT_ROSTER.c_legion || UNIT_ROSTER.sm_tactical;
       const unit = this.deployUnitOnBoard(uDef, 2, item.x, item.z, false, item.name, enemyFaction);
       item.unitRef = unit;
     });
 
     // Escort VIP setup
-    if (mission === 'escort') {
+    if (setup.mission === 'escort') {
       const vipDef: UnitDef = UNIT_ROSTER.vip_courier || UNIT_ROSTER.sm_captain;
 
-      if (p1EscortRole === 'escort') {
+      if (setup.p1EscortRole === 'escort') {
         this.state.escortTargetC = 20;
         this.state.escortTargetR = 4;
         this.deployUnitOnBoard(vipDef, 1, 20, 52, true, 'Sacred Relic Courier');
@@ -178,11 +203,11 @@ export class GameEngine {
     this.scene.updateDeploymentHighlights(this.state.rosterPlayer);
     this.refreshAwareness();
 
-    const p1Name = (FACTIONS[p1Faction] || FACTIONS.marines).name;
-    const p2Name = (FACTIONS[p2Faction] || FACTIONS.chaos).name;
-    const themeName = (THEMES[theme] || THEMES.jungle).name;
-    this.dom.updateMissionHud(mission, `${p1Name} vs ${p2Name}`);
-    this.log.log(`Warzone initialized: ${themeName.toUpperCase()} theater. Mission: ${mission.toUpperCase()}. Deploy your strike force.`, 'info');
+    const p1Name = (FACTIONS[setup.p1Faction] || FACTIONS.marines).name;
+    const p2Name = (FACTIONS[setup.p2Faction] || FACTIONS.chaos).name;
+    const themeName = (THEMES[setup.theme] || THEMES.jungle).name;
+    this.dom.updateMissionHud(setup.mission, `${p1Name} vs ${p2Name} (${setup.pointLimit} pts)`);
+    this.log.log(`Warzone initialized: ${themeName.toUpperCase()} theater. Mission: ${setup.mission.toUpperCase()} (${setup.pointLimit} pts). Deploy your strike force.`, 'info');
   }
 
   public deployPlayerCard(cardKey: string, c: number, r: number): Unit | null {

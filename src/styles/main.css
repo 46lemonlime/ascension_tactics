@@ -3769,3 +3769,535 @@ kbd {
   transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   POINT LIMIT & ARMY COMPOSITION STAGE (STAGE 4)
+   ========================================================================== */
+
+/* Point Limit Box in Stage 3 */
+.sp-point-limit-box {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.sp-point-limit-label-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sp-point-limit-icon {
+  font-size: 20px;
+}
+
+.sp-point-limit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-point-limit-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold-bright);
+}
+
+.sp-point-limit-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.sp-point-limit-select-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.sp-point-limit-select {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold-bright);
+  background: #090d14;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.sp-point-limit-select:hover,
+.sp-point-limit-select:focus {
+  border-color: #fde047;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+/* ================== STAGE 4: ARMY COMPOSITION ================== */
+#sp-stage-army {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Point Budget Top Stats Bar */
+.sp-army-budget-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(10, 15, 24, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 6px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  flex-wrap: wrap;
+}
+
+.sp-budget-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 110px;
+}
+
+.sp-budget-lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+}
+
+.sp-budget-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sp-budget-val.limit {
+  color: var(--gold-bright);
+}
+
+.sp-budget-val.used {
+  color: #38bdf8;
+}
+
+.sp-budget-val.remaining {
+  color: #34d399;
+}
+
+.sp-budget-val.over {
+  color: #ef4444;
+}
+
+.sp-budget-progress-wrap {
+  flex: 1;
+  min-width: 160px;
+  height: 10px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sp-budget-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8 0%, var(--gold-bright) 70%, #34d399 100%);
+  border-radius: 5px;
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s ease;
+}
+
+.sp-budget-progress-bar.over {
+  background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+}
+
+/* Workspace Layout */
+.sp-army-workspace {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* Left Column: Available Faction Squads */
+.sp-army-roster-column {
+  flex: 1.6;
+  min-width: 0;
+  background: rgba(10, 15, 24, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.sp-army-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.sp-army-section-title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold-bright);
+}
+
+.sp-army-faction-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 3px;
+  color: var(--gold-light);
+}
+
+.sp-army-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.sp-army-btn-secondary {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 3px;
+  color: #cbd5e1;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sp-army-btn-secondary:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  color: #fff;
+}
+
+/* Units Grid */
+.sp-army-units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex: 1;
+}
+
+.sp-army-unit-card {
+  background: linear-gradient(180deg, #111827 0%, #0a0e17 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 5px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sp-army-unit-card:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sp-army-unit-card.active-selected {
+  border-color: var(--gold-bright);
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.sp-army-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.sp-army-card-identity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sp-army-card-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sp-army-card-name-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-army-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-army-card-role {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.sp-army-card-pts {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fde047;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(253, 224, 71, 0.3);
+  border-radius: 3px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.sp-army-card-weapon {
+  font-size: 10px;
+  color: #94a3b8;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-army-card-stats {
+  display: flex;
+  gap: 4px;
+}
+
+.sp-army-stat-chip {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  padding: 1px 2px;
+  text-align: center;
+}
+
+.sp-army-stat-lbl {
+  font-size: 8px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  display: block;
+}
+
+.sp-army-stat-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.sp-army-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sp-army-squad-size {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.sp-army-card-counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sp-army-counter-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e293b;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 3px;
+  color: var(--gold-bright);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sp-army-counter-btn:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #fde047;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+}
+
+.sp-army-counter-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #64748b;
+  background: #0b0f17;
+}
+
+.sp-army-counter-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 18px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Right Column: Selected Strike Force Panel */
+.sp-army-summary-column {
+  flex: 1;
+  min-width: 280px;
+  background: rgba(10, 15, 24, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.sp-army-selected-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 4px;
+  min-height: 120px;
+}
+
+.sp-army-selected-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 4px;
+  padding: 6px 10px;
+  gap: 8px;
+}
+
+.sp-army-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-army-item-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--gold-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-army-item-calc {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.sp-army-item-pts {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fde047;
+  white-space: nowrap;
+}
+
+.sp-army-empty-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #64748b;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+}
+
+.sp-army-empty-notice span {
+  font-size: 24px;
+}
+
+.sp-army-summary-footer {
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sp-army-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.sp-army-stat-row span:last-child {
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.sp-army-stat-row.highlight {
+  font-size: 13px;
+  color: var(--gold-bright);
+}
+
+.sp-army-stat-row.highlight span:last-child {
+  color: #34d399;
+}
+
+

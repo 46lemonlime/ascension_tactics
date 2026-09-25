@@ -57,6 +57,31 @@ export interface UtilityProfile {
   awarenessType: AwarenessType;
 }
 
+export type PointLimit = 1000 | 2000 | 3000 | 4000;
+
+export interface ArmyUnitSelection {
+  unitId: string;
+  quantity: number;
+}
+
+export interface ArmyComposition {
+  factionId: string;
+  units: ArmyUnitSelection[];
+  totalPoints: number;
+}
+
+export interface MatchSetup {
+  p1Faction: string;
+  p2Faction: string;
+  theme: string;
+  mission: MissionType;
+  pointLimit: PointLimit;
+  p1EscortRole?: 'escort' | 'attack';
+  p2EscortRole?: 'escort' | 'attack';
+  playerArmy?: ArmyComposition;
+  aiArmy?: ArmyComposition;
+}
+
 export interface UnitDef {
   id?: string;
   type: string;
@@ -65,6 +90,7 @@ export interface UnitDef {
   title: string;
   role?: string;
   icon: string;
+  points: number;
   isCharacter?: boolean;
   isLarge?: boolean;
   isVip?: boolean;
@@ -267,6 +293,10 @@ export interface GameState {
   p2EscortRole?: 'escort' | 'attack';
   p1Faction?: string;
   p2Faction?: string;
+  pointLimit?: PointLimit;
+  playerArmy?: ArmyComposition;
+  aiArmy?: ArmyComposition;
+  matchSetup?: MatchSetup;
 }
 
 export interface DeploymentCard {
