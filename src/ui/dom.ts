@@ -698,10 +698,10 @@ export class DOMManager {
 
     this.playerCarouselIndex += delta;
 
-    const cardWidth = 100;
-    const gap = 12;
+    const cardWidth = 130;
+    const gap = 14;
     const stride = cardWidth + gap;
-    const viewportWidth = viewport.clientWidth || 360;
+    const viewportWidth = viewport.clientWidth || 418;
     const offset = (this.playerCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
 
     if (immediate) {
@@ -718,7 +718,7 @@ export class DOMManager {
     const race = FACTION_CYCLE[normIndex] || 'random';
     this.selectedP1Faction = race;
 
-    this.syncPlayerCardHighlight(race);
+    this.syncPlayerCardHighlight(race, this.playerCarouselIndex);
     this.updatePlayerInfoBox(race);
     this.updateSinglePlayerSummary();
   }
@@ -730,10 +730,10 @@ export class DOMManager {
 
     this.aiCarouselIndex += delta;
 
-    const cardWidth = 100;
-    const gap = 12;
+    const cardWidth = 130;
+    const gap = 14;
     const stride = cardWidth + gap;
-    const viewportWidth = viewport.clientWidth || 360;
+    const viewportWidth = viewport.clientWidth || 418;
     const offset = (this.aiCarouselIndex * stride) - (viewportWidth / 2 - cardWidth / 2);
 
     if (immediate) {
@@ -750,47 +750,35 @@ export class DOMManager {
     const race = FACTION_CYCLE[normIndex] || 'random';
     this.selectedP2Faction = race;
 
-    this.syncAiCardHighlight(race);
+    this.syncAiCardHighlight(race, this.aiCarouselIndex);
     this.updateAiInfoBox(race);
     this.updateSinglePlayerSummary();
   }
 
-  private syncPlayerCardHighlight(race: string): void {
+  private syncPlayerCardHighlight(race: string, activeIndex: number): void {
     const playerTrack = document.getElementById('factions-track-player');
     if (!playerTrack) return;
     const cards = playerTrack.querySelectorAll<HTMLElement>('.sp-emblem-card');
     cards.forEach(c => {
-      const cRace = c.getAttribute('data-race');
-      const badge = c.querySelector<HTMLElement>('.sp-emblem-badge');
-      if (cRace === race) {
+      const idx = parseInt(c.getAttribute('data-index') || '-1', 10);
+      if (idx === activeIndex) {
         c.classList.add('selected-player');
-        if (badge) {
-          badge.style.display = 'block';
-          badge.textContent = race === 'random' ? 'AUTO' : 'SELECTED';
-        }
       } else {
         c.classList.remove('selected-player');
-        if (badge) badge.style.display = 'none';
       }
     });
   }
 
-  private syncAiCardHighlight(race: string): void {
+  private syncAiCardHighlight(race: string, activeIndex: number): void {
     const aiTrack = document.getElementById('factions-track-ai');
     if (!aiTrack) return;
     const cards = aiTrack.querySelectorAll<HTMLElement>('.sp-emblem-card');
     cards.forEach(c => {
-      const cRace = c.getAttribute('data-race');
-      const badge = c.querySelector<HTMLElement>('.sp-emblem-badge');
-      if (cRace === race) {
+      const idx = parseInt(c.getAttribute('data-index') || '-1', 10);
+      if (idx === activeIndex) {
         c.classList.add('selected-ai');
-        if (badge) {
-          badge.style.display = 'block';
-          badge.textContent = race === 'random' ? 'AUTO' : 'SELECTED';
-        }
       } else {
         c.classList.remove('selected-ai');
-        if (badge) badge.style.display = 'none';
       }
     });
   }
