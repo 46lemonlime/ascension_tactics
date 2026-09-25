@@ -98,8 +98,8 @@ export function getDeploymentCameraFraming(camera?: THREE.PerspectiveCamera): { 
   const projectedDepth = (deployDepth + marginZ) * sinPitch;
   const distForDepth = (projectedDepth / 2) / Math.tan(fovVUsableRad / 2);
 
-  // Overall required distance with safety clamp
-  const dist = Math.max(distForWidth, distForDepth, 180.0);
+  // Overall required distance with safety clamp, scaled for closer tactical zoom (5 scrolls ~0.7738)
+  const dist = Math.max(distForWidth, distForDepth, 180.0) * 0.77378;
 
   // Offset the camera look target slightly North so the deployment area is centered in the upper/middle viewport above the dock
   const screenCenterOffsetY = ((h - dockHeight) / 2) - (h / 2); // negative = shifted up on screen
@@ -318,13 +318,15 @@ export class CameraController {
       if (isDeployment) {
         this.frameDeploymentZone(true);
       } else {
-        // 45° Strategic view for battle mode
-        this.animateTo(new THREE.Vector3(0, 130, 220), new THREE.Vector3(0, 0, 35), 800);
+        // 45° Strategic view for battle mode (zoomed by 5 scrolls from (0, 130, 220))
+        this.animateTo(new THREE.Vector3(0, 100.6, 178.15), new THREE.Vector3(0, 0, 35), 800);
       }
     } else if (preset === 'top') {
-      this.animateTo(new THREE.Vector3(0, 260, 0.1), new THREE.Vector3(0, 0, 0), 800);
+      // Top-down tactical view (zoomed by 5 scrolls from (0, 260, 0.1))
+      this.animateTo(new THREE.Vector3(0, 201.2, 0.08), new THREE.Vector3(0, 0, 0), 800);
     } else if (preset === 'cinematic') {
-      this.animateTo(new THREE.Vector3(-120, 55, 95), new THREE.Vector3(0, 4, 0), 1000);
+      // Low-angle cinematic vista (zoomed by 5 scrolls from (-120, 55, 95))
+      this.animateTo(new THREE.Vector3(-92.85, 43.46, 73.51), new THREE.Vector3(0, 4, 0), 1000);
     } else {
       // Tactical
       const currentTarget = this.controls.target.clone();
