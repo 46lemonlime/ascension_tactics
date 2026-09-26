@@ -1350,13 +1350,15 @@
 
         <!-- MAIN UNIT FRAME (Hidden until unit is selected) -->
         <div class="unit-frame interactive" id="datasheet" style="display:none;">
-          <!-- TIER 1: THREE EQUAL STAT COLUMNS (ATTACK, DEFENSE, UTILITY) -->
-          <div class="unit-frame-tier unit-frame-combat-tier">
-            <!-- ATTACK COLUMN -->
-            <div class="combat-col attack-col">
-              <div class="combat-col-header">ATTACK</div>
-              <div class="combat-col-body">
-                <div class="equip-slot-container">
+          <!-- TOP SECTION: TWO COLUMNS (EQUIPMENT | STATS) -->
+          <div class="unit-frame-tier unit-frame-top-section">
+            <!-- LEFT COLUMN: EQUIPMENT -->
+            <div class="frame-col frame-col-equipment">
+              <div class="frame-col-header equipment-header">EQUIPMENT</div>
+              <div class="equipment-slots-list">
+                <!-- WEAPON SLOT -->
+                <div class="equipment-slot-item">
+                  <div class="equipment-slot-label">WEAPON</div>
                   <button type="button" class="equip-image-btn weapon-btn" id="ds-weapon-btn" title="Inspect Weapon Profile" aria-label="Inspect Weapon Profile">
                     <div class="equip-img-box weapon-box">
                       <span class="equip-img-label">WEP</span>
@@ -1364,22 +1366,10 @@
                     </div>
                   </button>
                 </div>
-                <div class="combat-stats-list">
-                  <div class="stat-row"><span class="stat-name">Accuracy</span><span class="stat-val" id="ds-stat-acc">4</span></div>
-                  <div class="stat-row"><span class="stat-name">Strength</span><span class="stat-val" id="ds-stat-str">5</span></div>
-                  <div class="stat-row"><span class="stat-name">Attacks</span><span class="stat-val" id="ds-stat-atk">2</span></div>
-                </div>
-              </div>
-            </div>
 
-            <!-- VERTICAL DIVIDER -->
-            <div class="unit-frame-vdivider"></div>
-
-            <!-- DEFENSE COLUMN -->
-            <div class="combat-col defense-col">
-              <div class="combat-col-header">DEFENSE</div>
-              <div class="combat-col-body">
-                <div class="equip-slot-container">
+                <!-- ARMOR SLOT -->
+                <div class="equipment-slot-item">
+                  <div class="equipment-slot-label">ARMOR</div>
                   <button type="button" class="equip-image-btn armour-btn" id="ds-armour-btn" title="Inspect Armour Profile" aria-label="Inspect Armour Profile">
                     <div class="equip-img-box armour-box">
                       <span class="equip-img-label">ARM</span>
@@ -1387,22 +1377,10 @@
                     </div>
                   </button>
                 </div>
-                <div class="combat-stats-list">
-                  <div class="stat-row"><span class="stat-name">Evasion</span><span class="stat-val" id="ds-stat-eva">4</span></div>
-                  <div class="stat-row"><span class="stat-name">Dexterity</span><span class="stat-val" id="ds-stat-dex">5</span></div>
-                  <div class="stat-row"><span class="stat-name">Agility</span><span class="stat-val" id="ds-stat-agi">4</span></div>
-                </div>
-              </div>
-            </div>
 
-            <!-- VERTICAL DIVIDER -->
-            <div class="unit-frame-vdivider"></div>
-
-            <!-- UTILITY COLUMN -->
-            <div class="combat-col utility-col">
-              <div class="combat-col-header">UTILITY</div>
-              <div class="combat-col-body">
-                <div class="equip-slot-container">
+                <!-- UTILITY SLOT -->
+                <div class="equipment-slot-item">
+                  <div class="equipment-slot-label">UTILITY</div>
                   <button type="button" class="equip-image-btn utility-btn" id="ds-utility-btn" title="Inspect Utility Capabilities" aria-label="Inspect Utility Capabilities">
                     <div class="equip-img-box utility-box">
                       <span class="equip-img-label">UTIL</span>
@@ -1410,10 +1388,44 @@
                     </div>
                   </button>
                 </div>
-                <div class="combat-stats-list">
-                  <div class="stat-row"><span class="stat-name">Movement</span><span class="stat-val" id="ds-stat-mov">6</span></div>
-                  <div class="stat-row"><span class="stat-name">Awareness</span><span class="stat-val" id="ds-stat-awa">5</span></div>
-                  <div class="stat-row"><span class="stat-name">Morale</span><span class="stat-val" id="ds-stat-mor">7</span></div>
+              </div>
+            </div>
+
+            <!-- VERTICAL DIVIDER -->
+            <div class="unit-frame-vdivider"></div>
+
+            <!-- RIGHT COLUMN: STATS -->
+            <div class="frame-col frame-col-stats">
+              <div class="frame-col-header stats-header">STATS</div>
+              <div class="stats-groups-container">
+                <!-- ATTACK STATS GROUP -->
+                <div class="stat-group stat-group-attack">
+                  <div class="stat-group-header attack-subhead">ATTACK</div>
+                  <div class="stat-group-rows">
+                    <div class="stat-row"><span class="stat-name">Accuracy</span><span class="stat-val" id="ds-stat-acc">4</span></div>
+                    <div class="stat-row"><span class="stat-name">Strength</span><span class="stat-val" id="ds-stat-str">5</span></div>
+                    <div class="stat-row"><span class="stat-name">Attacks</span><span class="stat-val" id="ds-stat-atk">2</span></div>
+                  </div>
+                </div>
+
+                <!-- DEFENSE STATS GROUP -->
+                <div class="stat-group stat-group-defense">
+                  <div class="stat-group-header defense-subhead">DEFENSE</div>
+                  <div class="stat-group-rows">
+                    <div class="stat-row"><span class="stat-name">Evasion</span><span class="stat-val" id="ds-stat-eva">4</span></div>
+                    <div class="stat-row"><span class="stat-name">Dexterity</span><span class="stat-val" id="ds-stat-dex">5</span></div>
+                    <div class="stat-row"><span class="stat-name">Agility</span><span class="stat-val" id="ds-stat-agi">4</span></div>
+                  </div>
+                </div>
+
+                <!-- UTILITY STATS GROUP -->
+                <div class="stat-group stat-group-utility">
+                  <div class="stat-group-header utility-subhead">UTILITY</div>
+                  <div class="stat-group-rows">
+                    <div class="stat-row"><span class="stat-name">Movement</span><span class="stat-val" id="ds-stat-mov">6</span></div>
+                    <div class="stat-row"><span class="stat-name">Awareness</span><span class="stat-val" id="ds-stat-awa">5</span></div>
+                    <div class="stat-row"><span class="stat-name">Morale</span><span class="stat-val" id="ds-stat-mor">7</span></div>
+                  </div>
                 </div>
               </div>
             </div>

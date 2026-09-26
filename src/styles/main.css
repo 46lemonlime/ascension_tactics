@@ -2630,25 +2630,31 @@ body,
   border-bottom: none;
 }
 
-/* --- TIER 1: THREE EQUAL STAT COLUMNS (ATTACK, DEFENSE, UTILITY) --- */
-.unit-frame-combat-tier {
+/* --- TOP SECTION: TWO COLUMNS (EQUIPMENT | STATS) --- */
+.unit-frame-top-section {
   display: flex;
-  justify-content: space-between;
   align-items: stretch;
-  gap: 8px;
+  gap: 12px;
   background: linear-gradient(180deg, rgba(25, 32, 45, 0.4) 0%, rgba(10, 14, 22, 0.2) 100%);
-  padding: 8px 10px;
+  padding: 8px 12px;
 }
 
-.combat-col {
-  flex: 1;
-  min-width: 0;
+.frame-col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.combat-col-header {
+.frame-col-equipment {
+  flex: 0 0 115px;
+}
+
+.frame-col-stats {
+  flex: 1;
+  min-width: 0;
+}
+
+.frame-col-header {
   font-family: 'Cinzel', serif;
   font-size: 10px;
   font-weight: 700;
@@ -2656,27 +2662,8 @@ body,
   text-align: center;
   padding-bottom: 3px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.attack-col .combat-col-header {
-  color: #f59e0b;
-  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-}
-
-.defense-col .combat-col-header {
-  color: #38bdf8;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-}
-
-.utility-col .combat-col-header {
-  color: #34d399;
-  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
-}
-
-.combat-col-body {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.35);
 }
 
 .unit-frame-vdivider {
@@ -2684,9 +2671,44 @@ body,
   background: linear-gradient(180deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.4) 50%, rgba(212, 175, 55, 0.05) 100%);
 }
 
-/* Interactive Equipment & Utility Image Box */
-.equip-slot-container {
-  flex-shrink: 0;
+/* Equipment Column */
+.equipment-slots-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  flex: 1;
+}
+
+.equipment-slot-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  padding: 3px 6px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.equipment-slot-item:hover {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.equipment-slot-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.equipment-slot-item:hover .equipment-slot-label {
+  color: #e2e8f0;
 }
 
 .equip-image-btn {
@@ -2700,7 +2722,7 @@ body,
 }
 
 .equip-image-btn:hover {
-  transform: translateY(-2px) scale(1.04);
+  transform: translateY(-1px) scale(1.04);
 }
 
 .equip-image-btn:active,
@@ -2709,8 +2731,8 @@ body,
 }
 
 .equip-img-box {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 38px;
   background: linear-gradient(135deg, #18202c 0%, #0d121a 100%);
   border: 1.5px solid rgba(212, 175, 55, 0.45);
   border-radius: 5px;
@@ -2735,13 +2757,10 @@ body,
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.65), inset 0 0 8px rgba(56, 189, 248, 0.2);
 }
 
-.utility-box {
-  border-color: rgba(52, 211, 153, 0.45);
-}
-
-.utility-box:hover {
+.utility-btn:hover .utility-box,
+.utility-btn.active .utility-box {
   border-color: #34d399;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.5), inset 0 0 8px rgba(52, 211, 153, 0.2);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.65), inset 0 0 8px rgba(52, 211, 153, 0.2);
 }
 
 .equip-img-label {
@@ -2749,22 +2768,57 @@ body,
   top: 1px;
   left: 3px;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 7.5px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--gold-dim);
 }
 
 .equip-img-icon {
-  font-size: 17px;
+  font-size: 16px;
   margin-top: 3px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
 }
 
-/* Combat Stats List */
-.combat-stats-list {
+/* Stats Column */
+.stats-groups-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
   flex: 1;
-  min-width: 0;
+}
+
+.stat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-group-header {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  padding-left: 2px;
+}
+
+.attack-subhead {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.defense-subhead {
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.utility-subhead {
+  color: #34d399;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+}
+
+.stat-group-rows {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -2774,9 +2828,9 @@ body,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 10.5px;
+  font-size: 10px;
   background: rgba(0, 0, 0, 0.35);
-  padding: 1.5px 5px;
+  padding: 1.5px 6px;
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
