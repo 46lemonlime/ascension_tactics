@@ -31,18 +31,69 @@ export interface ArmourProfileDetail {
 }
 
 /**
+ * Normalizes any faction identifier alias (e.g. necros, eldar, tau, dark_eldar, orcs, tyranids, chaos, marines)
+ * to its canonical wargame faction key.
+ */
+export function normalizeEquipmentFaction(fId?: string): string {
+  if (!fId) return 'ascendants';
+  const f = fId.toLowerCase().trim();
+  switch (f) {
+    case 'ascendants':
+    case 'space_marines':
+    case 'marines':
+      return 'ascendants';
+    case 'directorate':
+    case 'guard':
+    case 'astra_militarum':
+      return 'directorate';
+    case 'elyri':
+    case 'eldar':
+    case 'aeldari':
+      return 'elyri';
+    case 'veykari':
+    case 'dark_eldar':
+    case 'drukhari':
+      return 'veykari';
+    case 'ghar':
+    case 'orcs':
+    case 'orks':
+      return 'ghar';
+    case 'devourers':
+    case 'tyranids':
+      return 'devourers';
+    case 'revenant':
+    case 'necrons':
+    case 'necros':
+      return 'revenant';
+    case 'concordat':
+    case 'tau':
+      return 'concordat';
+    case 'riftborn':
+    case 'daemons':
+    case 'chaos_daemons':
+      return 'riftborn';
+    case 'forsaken':
+    case 'chaos':
+    case 'chaos_marines':
+      return 'forsaken';
+    default:
+      return f;
+  }
+}
+
+/**
  * Procedural/Specific weapon database for all units
  */
 export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
-  const faction = unitDef.factionId || 'ascendants';
+  const faction = normalizeEquipmentFaction(unitDef.factionId);
   const name = unitDef.weapon || 'Standard Armament';
   const dmg = unitDef.dmg || 2;
   const str = unitDef.s || 4;
   const attacks = (unitDef.weapons && unitDef.weapons[0]?.attacks) || (unitDef.squadSize > 1 ? 2 : 3);
   const rangeStr = unitDef.range > 2 ? `${unitDef.range}"` : 'Melee';
 
-  // Faction-specific tailored weapon profiles
-  if (faction.includes('marine') || faction === 'ascendants') {
+  // 1. Ascendants (Space Marines)
+  if (faction === 'ascendants') {
     if (name.toLowerCase().includes('plasma')) {
       return {
         name: 'MK-VII PLASMA PISTOL & RELIC BLADE',
@@ -107,6 +158,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 2. Directorate (Astra Militarum / Guard)
   if (faction === 'directorate') {
     if (name.toLowerCase().includes('autocannon') || name.toLowerCase().includes('ordnance')) {
       return {
@@ -140,6 +192,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 3. Elyri (Aeldari / Craftworld)
   if (faction === 'elyri') {
     return {
       name: 'MONOFILAMENT SHURIKEN CATAPULT',
@@ -157,6 +210,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 4. Veykari (Drukhari / Dark Eldar)
   if (faction === 'veykari') {
     return {
       name: 'SPLINTER CANNON & KLAIVE',
@@ -174,6 +228,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 5. Ghar (Orks / Greenskins)
   if (faction === 'ghar') {
     return {
       name: 'BIG SHOOTA & POWER KLAW',
@@ -191,6 +246,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 6. Devourers (Tyranids / Hive Fleet)
   if (faction === 'devourers') {
     return {
       name: 'BIO-ACID CANNON & SCYTHING TALONS',
@@ -208,6 +264,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 7. Revenant (Necrons / Undying)
   if (faction === 'revenant') {
     return {
       name: 'GAUSS DISINTEGRATOR FLAYER',
@@ -225,6 +282,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 8. Concordat (T\'au Empire)
   if (faction === 'concordat') {
     return {
       name: 'PULSE RIFLE & RAIL ACCELERATOR',
@@ -242,6 +300,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
+  // 9. Riftborn (Chaos Daemons)
   if (faction === 'riftborn') {
     return {
       name: 'WARP BLADE & HELLFIRE NEXUS',
@@ -259,20 +318,38 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // Forsaken
+  // 10. Forsaken (Chaos Space Marines)
+  if (faction === 'forsaken') {
+    return {
+      name: 'CORRUPTED BOLTER & DAEMON AXE',
+      category: 'Infernal Chaos Munition',
+      icon: '💀',
+      range: rangeStr,
+      strength: str + 1,
+      penetration: 3,
+      damage: dmg + 1,
+      attacks: attacks,
+      damageType: 'Unholy Warp-Tainted Shot',
+      effectiveAgainst: ['Armoured Infantry', 'Light Fortifications'],
+      weakAgainst: ['Consecrated Armor', 'Aura Shields'],
+      special: 'Malicious Volley: Hits trigger an immediate morale roll on the targeted squad.'
+    };
+  }
+
+  // Generic / Auxiliary Fallback
   return {
-    name: 'CORRUPTED BOLTER & DAEMON AXE',
-    category: 'Infernal Chaos Munition',
-    icon: '💀',
+    name: name.toUpperCase(),
+    category: 'Standard Tactical Armament',
+    icon: '⚔️',
     range: rangeStr,
-    strength: str + 1,
-    penetration: 3,
-    damage: dmg + 1,
+    strength: str,
+    penetration: 2,
+    damage: dmg,
     attacks: attacks,
-    damageType: 'Unholy Warp-Tainted Shot',
-    effectiveAgainst: ['Armoured Infantry', 'Light Fortifications'],
-    weakAgainst: ['Consecrated Armor', 'Aura Shields'],
-    special: 'Malicious Volley: Hits trigger an immediate morale roll on the targeted squad.'
+    damageType: 'Kinetic Ballistic / Energy',
+    effectiveAgainst: ['Infantry Cohorts', 'Light Units'],
+    weakAgainst: ['Heavy Refractor Barriers'],
+    special: 'Standard Field Issue: Reliable tactical fire.'
   };
 }
 
@@ -280,12 +357,13 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
  * Procedural/Specific armour database for all units
  */
 export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
-  const faction = unitDef.factionId || 'ascendants';
+  const faction = normalizeEquipmentFaction(unitDef.factionId);
   const sv = unitDef.armorSave || unitDef.sv || 3;
   const toughness = unitDef.toughness || unitDef.t || 4;
   const armourVal = 7 - sv; // 2+ save -> 5-6 armor score, 3+ save -> 4-5 armor score
 
-  if (faction.includes('marine') || faction === 'ascendants') {
+  // 1. Ascendants (Space Marines)
+  if (faction === 'ascendants') {
     return {
       name: 'ASCENDANT POWER ARMOUR MK-X',
       category: 'Powered Exoskeletal Ceramite',
@@ -300,6 +378,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 2. Directorate (Astra Militarum / Guard)
   if (faction === 'directorate') {
     return {
       name: 'COMPOSITE CARAPACE FLAK WEAVE',
@@ -315,6 +394,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 3. Elyri (Aeldari / Craftworld)
   if (faction === 'elyri') {
     return {
       name: 'WRAITHBONE SPIRIT-CARAPACE',
@@ -330,6 +410,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 4. Veykari (Drukhari / Dark Eldar)
   if (faction === 'veykari') {
     return {
       name: 'GHOSTPLATE SHADOW SUIT',
@@ -345,6 +426,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 5. Ghar (Orks / Greenskins)
   if (faction === 'ghar') {
     return {
       name: "'EAVY SCRAP-IRON BATTLEPLATE",
@@ -360,6 +442,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 6. Devourers (Tyranids / Hive Fleet)
   if (faction === 'devourers') {
     return {
       name: 'HARDENED CHITIN EXOSKELETON',
@@ -375,6 +458,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 7. Revenant (Necrons / Undying)
   if (faction === 'revenant') {
     return {
       name: 'LIVING METAL NECRODERMIS',
@@ -390,6 +474,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 8. Concordat (T\'au Empire)
   if (faction === 'concordat') {
     return {
       name: 'NANO-COMPOSITE BATTLESUIT ALLOY',
@@ -405,6 +490,7 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
+  // 9. Riftborn (Chaos Daemons)
   if (faction === 'riftborn') {
     return {
       name: 'WARP-DISPLACEMENT AURA',
@@ -420,18 +506,34 @@ export function getUnitArmourProfile(unitDef: UnitDef): ArmourProfileDetail {
     };
   }
 
-  // Forsaken
+  // 10. Forsaken (Chaos Space Marines)
+  if (faction === 'forsaken') {
+    return {
+      name: 'WARP-FORGED FLESHMETAL PLATE',
+      category: 'Possessed Daemon-Fused Ceramite',
+      icon: '💀',
+      armour: Math.max(5, armourVal + 2),
+      toughness: toughness,
+      resistance: 4,
+      coverage: 3,
+      protectionAgainst: ['Direct Ballistic Hits', 'Explosive Concussions'],
+      vulnerableTo: ['Sanctified Laser Cannons', 'Psychic Null Fields'],
+      special: 'Daemonic Resilience: Ignores the first point of damage inflicted by each attack.'
+    };
+  }
+
+  // Generic / Auxiliary Fallback
   return {
-    name: 'WARP-FORGED FLESHMETAL PLATE',
-    category: 'Possessed Daemon-Fused Ceramite',
-    icon: '💀',
-    armour: Math.max(5, armourVal + 2),
+    name: 'REINFORCED CARAPACE PLATING',
+    category: 'Standard Armoured Weave',
+    icon: '🛡️',
+    armour: Math.max(3, armourVal),
     toughness: toughness,
-    resistance: 4,
-    coverage: 3,
-    protectionAgainst: ['Direct Ballistic Hits', 'Explosive Concussions'],
-    vulnerableTo: ['Sanctified Laser Cannons', 'Psychic Null Fields'],
-    special: 'Daemonic Resilience: Ignores the first point of damage inflicted by each attack.'
+    resistance: 3,
+    coverage: 2,
+    protectionAgainst: ['Shrapnel', 'Small Arms'],
+    vulnerableTo: ['Heavy Anti-Tank Munitions'],
+    special: 'Standard Armor: Baseline kinetic protection.'
   };
 }
 
@@ -497,7 +599,7 @@ export function getUnitUtilityProfile(unitDef: UnitDef): UtilityProfileDetail {
 
   // Resolve Awareness Type
   let awarenessType: 'sensory' | 'vision' | 'psychic' = 'vision';
-  const faction = (unitDef.factionId || '').toLowerCase();
+  const faction = normalizeEquipmentFaction(unitDef.factionId);
 
   if (unitDef.awarenessType) {
     awarenessType = unitDef.awarenessType;
