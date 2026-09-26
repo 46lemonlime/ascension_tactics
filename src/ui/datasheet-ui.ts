@@ -6,6 +6,7 @@ export class DatasheetUI {
 
   // Equipment Buttons & Icons
   private weaponBtn: HTMLElement | null;
+  private weaponsListEl: HTMLElement | null;
   private armourBtn: HTMLElement | null;
   private utilityBtn: HTMLElement | null;
   private wepIconEl: HTMLElement | null;
@@ -82,6 +83,7 @@ export class DatasheetUI {
 
     // Equipment Buttons & Icons
     this.weaponBtn = document.getElementById('ds-weapon-btn');
+    this.weaponsListEl = document.getElementById('ds-weapons-list');
     this.armourBtn = document.getElementById('ds-armour-btn');
     this.utilityBtn = document.getElementById('ds-utility-btn');
     this.wepIconEl = document.getElementById('ds-wep-icon');
@@ -248,6 +250,9 @@ export class DatasheetUI {
   public openPopup(type: 'weapon' | 'armour' | 'utility', pin: boolean = false): void {
     // Reset buttons
     if (this.weaponBtn) this.weaponBtn.classList.remove('active');
+    if (this.weaponsListEl) {
+      this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.remove('active'));
+    }
     if (this.armourBtn) this.armourBtn.classList.remove('active');
     if (this.utilityBtn) this.utilityBtn.classList.remove('active');
 
@@ -264,6 +269,9 @@ export class DatasheetUI {
       if (pin) {
         this.pinnedPopup = 'weapon';
         if (this.weaponBtn) this.weaponBtn.classList.add('active');
+        if (this.weaponsListEl) {
+          this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.add('active'));
+        }
       }
     } else if (type === 'armour') {
       if (this.armourPopup) {
@@ -290,6 +298,9 @@ export class DatasheetUI {
     if (type === 'weapon' && this.weaponPopup) {
       this.weaponPopup.style.display = 'none';
       if (this.weaponBtn) this.weaponBtn.classList.remove('active');
+      if (this.weaponsListEl) {
+        this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.remove('active'));
+      }
       if (this.pinnedPopup === 'weapon') this.pinnedPopup = null;
     } else if (type === 'armour' && this.armourPopup) {
       this.armourPopup.style.display = 'none';
@@ -500,6 +511,50 @@ export class DatasheetUI {
     const squadSize = unit.squadSize || unitDef.squadSize || 1;
     const casualtiesCount = unit.squadCasualties?.filter(c => c).length || 0;
     const activeModels = Math.max(1, squadSize - casualtiesCount);
+
+    // Render dynamic weapon buttons with squad quantities
+    if (this.weaponsListEl) {
+      this.weaponsListEl.innerHTML = '';
+      this.currentWeaponProfiles.forEach((w) => {
+        const qty = (w as any).quantity ?? (w as any).count ?? activeModels;
+        const label = w.type === 'melee' ? 'MEL' : (this.currentWeaponProfiles.length > 1 ? 'RNG' : 'WEP');
+        const icon = w.icon || (w.type === 'melee' ? '⚔️' : '🔫');
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `equip-image-btn weapon-btn ${this.pinnedPopup === 'weapon' ? 'active' : ''}`;
+        btn.title = `Inspect ${w.name} (${qty} equipped)`;
+        btn.setAttribute('aria-label', `Inspect ${w.name} (${qty} equipped)`);
+        btn.innerHTML = `
+          <div class="equip-img-box weapon-box">
+            <span class="equip-img-label">${label}</span>
+            <span class="equip-img-icon">${icon}</span>
+            <span class="weapon-qty-badge">${qty}</span>
+          </div>
+        `;
+
+        btn.addEventListener('mouseenter', () => {
+          if (!this.pinnedPopup) {
+            this.openPopup('weapon', false);
+          }
+        });
+        btn.addEventListener('mouseleave', () => {
+          if (this.pinnedPopup !== 'weapon') {
+            this.closePopup('weapon');
+          }
+        });
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (this.pinnedPopup === 'weapon') {
+            this.closePopups();
+          } else {
+            this.openPopup('weapon', true);
+          }
+        });
+
+        this.weaponsListEl!.appendChild(btn);
+      });
+    }
 
     if (this.nameEl) this.nameEl.textContent = unit.name || unitDef.name;
     if (this.roleEl) this.roleEl.textContent = unitDef.title || 'Combat Unit';
