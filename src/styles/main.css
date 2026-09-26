@@ -2937,19 +2937,48 @@ body,
   line-height: 1.35;
 }
 
+.equipment-popup.weapon-popup-panel.dual-weapons {
+  width: 620px;
+  max-width: min(620px, 94vw);
+}
+
 /* Multi-Weapon Loadout Cards */
 .weapon-popup-entries {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 70vh;
+  max-height: 80vh;
   overflow-y: auto;
+}
+
+.weapon-popup-entries.dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.weapon-popup-entries.single-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .weapon-loadout-card {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  padding: 8px 10px;
+}
+
+.weapon-loadout-card.ranged {
+  border-top: 2px solid #38bdf8;
+}
+
+.weapon-loadout-card.melee {
+  border-top: 2px solid #f59e0b;
 }
 
 .weapon-loadout-card-header {

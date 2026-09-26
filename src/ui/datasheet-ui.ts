@@ -317,31 +317,35 @@ export class DatasheetUI {
 
     if (profiles.length === 0) return;
 
+    const isMulti = profiles.length > 1;
+    if (isMulti) {
+      this.weaponPopup.classList.add('dual-weapons');
+    } else {
+      this.weaponPopup.classList.remove('dual-weapons');
+    }
+
     let html = `
       <div class="popup-header">
-        <div class="popup-tag">WEAPON LOADOUT ${profiles.length > 1 ? `(${profiles.length} WEAPONS)` : ''}</div>
+        <div class="popup-tag">WEAPON LOADOUT ${isMulti ? `(${profiles.length} WEAPONS)` : ''}</div>
         <div class="popup-title-row">
-          <span class="popup-name" id="wep-popup-name">${profiles.length === 1 ? profiles[0].name : 'EQUIPPED ARSENAL'}</span>
+          <span class="popup-name" id="wep-popup-name">${isMulti ? 'EQUIPPED ARSENAL' : profiles[0].name}</span>
           <button type="button" class="popup-close-btn" id="wep-popup-close" title="Close" aria-label="Close">✕</button>
         </div>
       </div>
       <div class="popup-divider"></div>
-      <div class="weapon-popup-entries">
+      <div class="weapon-popup-entries ${isMulti ? 'dual-grid' : 'single-entry'}">
     `;
 
-    profiles.forEach((w, idx) => {
+    profiles.forEach((w) => {
       const typeLabel = w.type ? (w.type === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON') : (w.range.toLowerCase() === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON');
       const typeClass = w.type || (w.range.toLowerCase() === 'melee' ? 'melee' : 'ranged');
-      const isMulti = profiles.length > 1;
 
       html += `
         <div class="weapon-loadout-card ${typeClass}">
-          ${isMulti ? `
-            <div class="weapon-loadout-card-header">
-              <span class="weapon-type-pill ${typeClass}">${typeLabel}</span>
-              <span class="weapon-loadout-name">${w.icon || (typeClass === 'melee' ? '⚔️' : '🔫')} ${w.name}</span>
-            </div>
-          ` : ''}
+          <div class="weapon-loadout-card-header">
+            <span class="weapon-type-pill ${typeClass}">${typeLabel}</span>
+            <span class="weapon-loadout-name">${w.icon || (typeClass === 'melee' ? '⚔️' : '🔫')} ${w.name}</span>
+          </div>
           <div class="popup-stats-table">
             <div class="popup-stat-row">
               <span class="popup-stat-label">Range</span>
@@ -386,9 +390,6 @@ export class DatasheetUI {
           <div class="popup-special-text">${w.special}</div>
         </div>
       `;
-      if (isMulti && idx < profiles.length - 1) {
-        html += `<div class="popup-divider" style="margin: 10px 0; opacity: 0.5;"></div>`;
-      }
     });
 
     html += `</div>`;
@@ -402,6 +403,7 @@ export class DatasheetUI {
       });
     }
   }
+
 
   private populateArmourPopup(): void {
     if (!this.currentArmourProfile) return;
