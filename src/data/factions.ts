@@ -391,28 +391,50 @@ export const FACTIONS: Record<string, Faction> = {
 // Aliases for backwards compatibility across all systems
 FACTIONS.space_marines = FACTIONS.ascendants;
 FACTIONS.marines = FACTIONS.ascendants;
-
 FACTIONS.guard = FACTIONS.directorate;
 FACTIONS.astra_militarum = FACTIONS.directorate;
-
 FACTIONS.eldar = FACTIONS.elyri;
 FACTIONS.aeldari = FACTIONS.elyri;
-
 FACTIONS.dark_eldar = FACTIONS.veykari;
 FACTIONS.drukhari = FACTIONS.veykari;
-
 FACTIONS.orcs = FACTIONS.ghar;
 FACTIONS.orks = FACTIONS.ghar;
-
 FACTIONS.tyranids = FACTIONS.devourers;
-
 FACTIONS.necrons = FACTIONS.revenant;
 FACTIONS.necros = FACTIONS.revenant;
-
 FACTIONS.tau = FACTIONS.concordat;
-
 FACTIONS.daemons = FACTIONS.riftborn;
 FACTIONS.chaos_daemons = FACTIONS.riftborn;
-
 FACTIONS.chaos_marines = FACTIONS.forsaken;
 FACTIONS.chaos = FACTIONS.forsaken;
+
+// Canonical list of all 10 playable factions
+export const PLAYABLE_FACTIONS = [
+  'ascendants',
+  'directorate',
+  'elyri',
+  'veykari',
+  'ghar',
+  'devourers',
+  'revenant',
+  'concordat',
+  'riftborn',
+  'forsaken'
+] as const;
+
+export type PlayableFaction = typeof PLAYABLE_FACTIONS[number];
+
+/**
+ * Resolves a selected faction string (which may be 'random') into an authoritative playable faction ID.
+ * If selected is not 'random', returns selected directly.
+ * If excludeFaction is provided, attempts to pick a faction different from excludeFaction.
+ */
+export function resolveRandomFaction(selected: string, excludeFaction?: string): string {
+  if (selected !== 'random') {
+    return selected;
+  }
+  const pool = excludeFaction ? PLAYABLE_FACTIONS.filter(f => f !== excludeFaction) : PLAYABLE_FACTIONS;
+  const candidates = pool.length > 0 ? pool : PLAYABLE_FACTIONS;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+

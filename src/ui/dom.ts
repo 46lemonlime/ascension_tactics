@@ -1,4 +1,4 @@
-import { FACTIONS } from '../data/factions';
+import { FACTIONS, PLAYABLE_FACTIONS, resolveRandomFaction } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { MISSIONS, MISSION_CYCLE, getDefaultMissionSettings } from '../data/missions';
 import { UNIT_DEFS } from '../data/units';
@@ -32,6 +32,9 @@ export const MAP_CYCLE: string[] = [
   'tech',
   'astral',
   'corrupted',
+  'devoured',
+  'tomb',
+  'rift'
 ];
 
 export function formatUnitWeaponHtml(u: UnitDef): string {
@@ -60,6 +63,8 @@ export class DOMManager {
   // Selections
   public selectedP1Faction: string = 'random';
   public selectedP2Faction: string = 'random';
+  public resolvedP1Faction: string | null = null;
+  public resolvedP2Faction: string | null = null;
   public selectedTheme: string = 'random';
   public selectedMission: MissionType = 'extermination';
   public dominationWinPoints: number = 1000;
@@ -146,6 +151,8 @@ export class DOMManager {
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
 
+    this.resolvedP1Faction = null;
+    this.resolvedP2Faction = null;
     this.setSinglePlayerStage(1);
     this.selectMapOption(this.selectedTheme || 'random');
     this.selectMissionOption(this.selectedMission || 'extermination');
@@ -441,6 +448,13 @@ export class DOMManager {
     this.updateSinglePlayerSummary();
 
     if (stage === 5) {
+      if (this.selectedP1Faction === 'random') {
+        if (!this.resolvedP1Faction) {
+          this.resolvedP1Faction = resolveRandomFaction('random');
+        }
+      } else {
+        this.resolvedP1Faction = this.selectedP1Faction;
+      }
       this.renderArmyCompositionScreen();
     }
 
@@ -793,7 +807,7 @@ export class DOMManager {
     if (btnArmyAutofill) {
       btnArmyAutofill.addEventListener('click', () => {
         sfx('click');
-        const p1Faction = this.selectedP1Faction === 'random' ? 'ascendants' : this.selectedP1Faction;
+        const p1Faction = this.resolvedP1Faction || (this.selectedP1Faction === 'random' ? (this.resolvedP1Faction = resolveRandomFaction('random')) : this.selectedP1Faction);
         const defaultComp = getDefaultArmyComposition(p1Faction, this.battleSettings.pointLimit);
         this.selectedArmyUnits = {};
         defaultComp.units.forEach(u => {
@@ -881,7 +895,12 @@ export class DOMManager {
 
     const normIndex = ((this.playerCarouselIndex % 11) + 11) % 11;
     const race = FACTION_CYCLE[normIndex] || 'random';
-    this.selectedP1Faction = race;
+    if (this.selectedP1Faction !== race) {
+      this.selectedP1Faction = race;
+      this.resolvedP1Faction = race === 'random' ? null : race;
+      this.selectedArmyUnits = {};
+      this.currentArmyFaction = '';
+    }
 
     this.syncPlayerCardHighlight(race, this.playerCarouselIndex);
     this.updatePlayerInfoBox(race);
@@ -913,7 +932,10 @@ export class DOMManager {
 
     const normIndex = ((this.aiCarouselIndex % 11) + 11) % 11;
     const race = FACTION_CYCLE[normIndex] || 'random';
-    this.selectedP2Faction = race;
+    if (this.selectedP2Faction !== race) {
+      this.selectedP2Faction = race;
+      this.resolvedP2Faction = race === 'random' ? null : race;
+    }
 
     this.syncAiCardHighlight(race, this.aiCarouselIndex);
     this.updateAiInfoBox(race);
@@ -1261,18 +1283,6 @@ export class DOMManager {
   }
 
   private launchSkirmish(): void {
-    const factionKeys = [
-      'ascendants',
-      'directorate',
-      'elyri',
-      'veykari',
-      'ghar',
-      'devourers',
-      'revenant',
-      'concordat',
-      'riftborn',
-      'forsaken'
-    ];
     const themeKeys = [
       'jungle',
       'snow',
@@ -1286,18 +1296,13 @@ export class DOMManager {
       'rift'
     ];
 
-    // Resolve Player Faction
-    let finalP1Faction = this.selectedP1Faction;
-    if (finalP1Faction === 'random') {
-      finalP1Faction = factionKeys[Math.floor(Math.random() * factionKeys.length)];
-    }
+    // Authoritative Player Faction Resolution
+    const finalP1Faction = this.resolvedP1Faction || resolveRandomFaction(this.selectedP1Faction);
+    this.resolvedP1Faction = finalP1Faction;
 
-    // Resolve AI Faction
-    let finalP2Faction = this.selectedP2Faction;
-    if (finalP2Faction === 'random') {
-      const candidates = factionKeys.filter(f => f !== finalP1Faction);
-      finalP2Faction = candidates[Math.floor(Math.random() * candidates.length)] || 'forsaken';
-    }
+    // Authoritative AI Faction Resolution (independent roll, excluding P1 if disallowing mirror matches or picking independently)
+    const finalP2Faction = this.resolvedP2Faction || resolveRandomFaction(this.selectedP2Faction, finalP1Faction);
+    this.resolvedP2Faction = finalP2Faction;
 
     // Resolve Theme
     let finalTheme = this.selectedTheme;
@@ -1377,7 +1382,7 @@ export class DOMManager {
   }
 
   public renderArmyCompositionScreen(): void {
-    const p1Faction = this.selectedP1Faction === 'random' ? 'ascendants' : this.selectedP1Faction;
+    const p1Faction = this.resolvedP1Faction || (this.selectedP1Faction === 'random' ? (this.resolvedP1Faction = resolveRandomFaction('random')) : this.selectedP1Faction);
     const availableUnits = getFactionUnits(p1Faction);
     const factionDef = FACTIONS[p1Faction] || FACTIONS.ascendants;
     const activePointLimit = this.battleSettings.pointLimit;
@@ -1412,7 +1417,9 @@ export class DOMManager {
     // Update Faction Badge
     const badgeEl = document.getElementById('sp-army-faction-badge');
     if (badgeEl) {
-      badgeEl.textContent = this.selectedP1Faction === 'random' ? 'RANDOM (DEFAULT: ASCENDANTS)' : (factionDef.name || p1Faction).toUpperCase();
+      const isRandom = this.selectedP1Faction === 'random';
+      const fName = (factionDef.name || p1Faction).toUpperCase();
+      badgeEl.textContent = isRandom ? `RANDOM: ${fName}` : fName;
     }
 
     // Update Budget Stats Bar
