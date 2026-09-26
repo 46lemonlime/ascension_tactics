@@ -2,6 +2,7 @@ import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld, uni
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { UNIT_ROSTER } from '../data/units';
+import { MISSIONS, getDefaultMissionSettings } from '../data/missions';
 import { buildFactionRosters } from '../data/rosters';
 import { convertArmyToPlayerRoster, convertArmyToEnemyRoster, buildAIArmy, getDefaultArmyComposition } from './army-builder';
 import { updateFogOfWar, hasLineOfSight, updatePlayerAwareness, playerAwareTiles, enemyAwareTiles } from './awareness';
@@ -13,7 +14,7 @@ import { animateMovePath } from './movement';
 import { clearTweens, spawnTeleportBeam, showWorldText } from './effects';
 import { sfx } from '../audio/synth';
 import { savePlayerCamera, restorePlayerCamera, getActionCamEnabled, getActiveCameraController, animateCameraTo } from '../renderer/camera';
-import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem, MatchSetup, PointLimit, BattleSettings } from '../data/types';
+import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem, MatchSetup, PointLimit, BattleSettings, MissionSettings } from '../data/types';
 import { DEFAULT_BATTLE_SETTINGS } from '../data/settings';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
@@ -71,6 +72,7 @@ export class GameEngine {
   private createInitialState(): GameState {
     return {
       mission: 'extermination',
+      missionSettings: { type: 'extermination' },
       theme: 'jungle',
       turn: 1,
       round: 1,
@@ -166,6 +168,7 @@ export class GameEngine {
     this.state.p2Faction = setup.p2Faction;
     this.state.theme = setup.theme;
     this.state.mission = setup.mission;
+    this.state.missionSettings = setup.missionSettings || getDefaultMissionSettings(setup.mission);
     this.state.pointLimit = setup.pointLimit;
     this.state.battleSettings = setup.battleSettings;
     this.state.elapsedGameTime = 0;
@@ -203,8 +206,11 @@ export class GameEngine {
     // Escort VIP setup
     if (setup.mission === 'escort') {
       const vipDef: UnitDef = UNIT_ROSTER.vip_courier || UNIT_ROSTER.sm_captain;
+      const vipOwner = this.state.missionSettings?.type === 'vip_escort'
+        ? this.state.missionSettings.vipOwner
+        : (setup.p1EscortRole === 'escort' ? 'player' : 'ai');
 
-      if (setup.p1EscortRole === 'escort') {
+      if (vipOwner === 'player') {
         this.state.escortTargetC = 20;
         this.state.escortTargetR = 4;
         this.deployUnitOnBoard(vipDef, 1, 20, 52, true, 'Sacred Relic Courier');
@@ -223,7 +229,14 @@ export class GameEngine {
     const p1Name = (FACTIONS[setup.p1Faction] || FACTIONS.marines).name;
     const p2Name = (FACTIONS[setup.p2Faction] || FACTIONS.chaos).name;
     const themeName = (THEMES[setup.theme] || THEMES.jungle).name;
-    this.dom.updateMissionHud(setup.mission, `${p1Name} vs ${p2Name} (${setup.pointLimit} pts)`);
+
+    if (setup.mission === 'domination') {
+      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 100;
+      this.dom.updateMissionHud('Domination', `Score: 🟦 0/${winPoints} VP vs 🟨 0/${winPoints} VP`);
+    } else {
+      this.dom.updateMissionHud(setup.mission, `${p1Name} vs ${p2Name} (${setup.pointLimit} pts)`);
+    }
+
     this.dom.updateBattleHudTimers(
       this.state.turnTimeRemaining,
       0,
@@ -956,31 +969,64 @@ export class GameEngine {
         if (obj.controlledBy === 2) this.state.p2Score += 10;
       });
 
+      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 100;
       this.dom.updateMissionHud(
         'Domination',
-        `Score: 🟦 ${this.state.p1Score} VP vs 🟨 ${this.state.p2Score} VP`
+        `Score: 🟦 ${this.state.p1Score}/${winPoints} VP vs 🟨 ${this.state.p2Score}/${winPoints} VP`
       );
+
+      // Check immediate threshold victory
+      if (this.state.p1Score >= winPoints) {
+        this.dom.showGameOver(1, 'Sector domination threshold reached! Total battlefield victory.', () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
+      } else if (this.state.p2Score >= winPoints) {
+        this.dom.showGameOver(2, 'Enemy overseer reached sector domination threshold!', () => {
+          this.resetGameSession();
+          this.dom.showHomeScreen();
+        });
+      }
     }
   }
 
   public checkVictoryConditions(): void {
     const p1Alive = this.state.units.filter(u => u.player === 1 && !u.isVip && !u.dead);
-    const p2Alive = this.state.units.filter(u => u.player === 2 && !u.dead);
+    const p2Alive = this.state.units.filter(u => u.player === 2 && !u.isVip && !u.dead);
     const vip = this.state.units.find(u => u.isVip);
 
     if (this.state.mission === 'escort') {
+      const vipOwner = this.state.missionSettings?.type === 'vip_escort'
+        ? this.state.missionSettings.vipOwner
+        : (this.state.escortRole === 'escort' ? 'player' : 'ai');
+
       if (vip && (vip.wounds <= 0 || vip.dead)) {
-        this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed!', () => {
-          this.resetGameSession();
-          this.dom.showHomeScreen();
-        });
+        if (vipOwner === 'player') {
+          this.dom.showGameOver(2, 'The sacred VIP Relic Courier was destroyed! Mission failed.', () => {
+            this.resetGameSession();
+            this.dom.showHomeScreen();
+          });
+        } else {
+          this.dom.showGameOver(1, 'Enemy VIP Relic Courier intercepted and destroyed! Tactical victory.', () => {
+            this.resetGameSession();
+            this.dom.showHomeScreen();
+          });
+        }
         return;
       }
+
       if (vip && chebyshevDist(vip.c, vip.r, this.state.escortTargetC, this.state.escortTargetR) <= 2) {
-        this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship!', () => {
-          this.resetGameSession();
-          this.dom.showHomeScreen();
-        });
+        if (vipOwner === 'player') {
+          this.dom.showGameOver(1, 'VIP successfully extracted to the evacuation dropship! Tactical victory.', () => {
+            this.resetGameSession();
+            this.dom.showHomeScreen();
+          });
+        } else {
+          this.dom.showGameOver(2, 'Enemy VIP successfully extracted to the evacuation zone! Mission failed.', () => {
+            this.resetGameSession();
+            this.dom.showHomeScreen();
+          });
+        }
         return;
       }
     }

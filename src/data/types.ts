@@ -59,6 +59,11 @@ export interface UtilityProfile {
 
 export type PointLimit = 1000 | 2000 | 3000 | 4000;
 
+export type MissionSettings =
+  | { type: 'extermination' }
+  | { type: 'domination'; dominationWinPoints: number }
+  | { type: 'vip_escort'; vipOwner: 'player' | 'ai' };
+
 export interface BattleSettings {
   pointLimit: PointLimit;
   maxTurns: number | null;
@@ -82,6 +87,7 @@ export interface MatchSetup {
   p2Faction: string;
   theme: string;
   mission: MissionType;
+  missionSettings?: MissionSettings;
   battleSettings: BattleSettings;
   pointLimit?: PointLimit;
   p1EscortRole?: 'escort' | 'attack';
@@ -302,6 +308,7 @@ export interface GameState {
   p1Faction?: string;
   p2Faction?: string;
   pointLimit?: PointLimit;
+  missionSettings?: MissionSettings;
   battleSettings?: BattleSettings;
   elapsedGameTime?: number;
   turnTimeRemaining?: number | null;

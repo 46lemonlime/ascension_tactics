@@ -800,24 +800,32 @@
             Full-spectrum engagement • Free tactical maneuver • No perimeter restrictions
           </div>
 
-          <!-- ESCORT STANCE CONFIGURATION (Cleanly docked inside panel when Escort is selected) -->
-          <div id="escort-config-row" class="escort-config-inline" style="display:none;">
-            <div class="escort-role-group">
-              <span><b>🛡️ Player 1 Stance:</b></span>
-              <select id="player-escort-role">
-                <option value="escort">🛡️ Escort VIP (Reach Extraction Zone)</option>
-                <option value="attack">⚔️ Intercept VIP (Stop & Eliminate Enemy VIP)</option>
-                <option value="random">🎲 Random Stance</option>
-              </select>
+          <!-- DOMINATION CONFIGURATION (Victory Points to Win) -->
+          <div id="domination-config-row" class="mission-config-inline" style="display:none;">
+            <div class="mission-config-group">
+              <span class="mission-config-label"><b>🏆 VICTORY POINTS TO WIN:</b></span>
+              <div class="mission-config-select-wrap">
+                <select id="sp-domination-points-select" class="mission-config-select">
+                  <option value="50">50 VP (Short Skirmish)</option>
+                  <option value="75">75 VP (Standard Strike)</option>
+                  <option value="100" selected>100 VP (Standard Domination)</option>
+                  <option value="150">150 VP (Extended Engagement)</option>
+                  <option value="200">200 VP (Enduring Siege)</option>
+                </select>
+              </div>
             </div>
-            <div class="escort-role-group">
-              <span><b>💀 AI Opponent Stance:</b></span>
-              <select id="enemy-escort-role">
-                <option value="opposite">🔄 Counter-Stance (Opposite to You)</option>
-                <option value="escort">🛡️ AI Escort VIP</option>
-                <option value="attack">⚔️ AI Intercept VIP</option>
-                <option value="random">🎲 Random Stance</option>
-              </select>
+          </div>
+
+          <!-- VIP ESCORT CONFIGURATION (Single VIP Owner Selector) -->
+          <div id="vip-owner-config-row" class="mission-config-inline" style="display:none;">
+            <div class="mission-config-group">
+              <span class="mission-config-label"><b>👑 VIP OWNER:</b></span>
+              <div class="mission-config-select-wrap">
+                <select id="sp-vip-owner-select" class="mission-config-select">
+                  <option value="player" selected>🛡️ PLAYER (You Escort • AI Intercepts)</option>
+                  <option value="ai">⚔️ AI (AI Escorts • You Intercept)</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

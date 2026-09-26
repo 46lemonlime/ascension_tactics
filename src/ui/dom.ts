@@ -1,8 +1,8 @@
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
-import { MISSIONS, MISSION_CYCLE } from '../data/missions';
+import { MISSIONS, MISSION_CYCLE, getDefaultMissionSettings } from '../data/missions';
 import { UNIT_DEFS } from '../data/units';
-import type { MissionType, PointLimit, ArmyComposition, MatchSetup, ArmyUnitSelection, UnitDef, BattleSettings } from '../data/types';
+import type { MissionType, PointLimit, ArmyComposition, MatchSetup, ArmyUnitSelection, UnitDef, BattleSettings, MissionSettings } from '../data/types';
 import { DEFAULT_BATTLE_SETTINGS } from '../data/settings';
 import { sfx } from '../audio/synth';
 import { getBiomeArtwork, getMissionArtwork } from './landscape-art';
@@ -51,6 +51,8 @@ export class DOMManager {
   public selectedP2Faction: string = 'random';
   public selectedTheme: string = 'random';
   public selectedMission: MissionType = 'extermination';
+  public dominationWinPoints: number = 100;
+  public vipOwner: 'player' | 'ai' = 'player';
   public p1EscortRole: 'escort' | 'attack' | 'random' = 'escort';
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
   public battleSettings: BattleSettings = { ...DEFAULT_BATTLE_SETTINGS };
@@ -512,7 +514,13 @@ export class DOMManager {
       summaryMap.textContent = mapNames[this.selectedTheme] || 'Random Biome';
     }
     if (summaryMission) {
-      summaryMission.textContent = missionNames[this.selectedMission] || 'Extermination';
+      if (this.selectedMission === 'domination') {
+        summaryMission.textContent = `Domination (${this.dominationWinPoints} VP)`;
+      } else if (this.selectedMission === 'escort') {
+        summaryMission.textContent = `VIP Escort (${this.vipOwner === 'player' ? 'Player' : 'AI'})`;
+      } else {
+        summaryMission.textContent = missionNames[this.selectedMission] || 'Extermination';
+      }
     }
     if (summarySettings) {
       const turnsStr = this.battleSettings.maxTurns !== null ? `${this.battleSettings.maxTurns}R` : '∞';
@@ -693,18 +701,20 @@ export class DOMManager {
       });
     }
 
-    // 5. ESCORT CONFIG
-    const playerEscortSelect = document.getElementById('player-escort-role') as HTMLSelectElement;
-    const enemyEscortSelect = document.getElementById('enemy-escort-role') as HTMLSelectElement;
-
-    if (playerEscortSelect) {
-      playerEscortSelect.addEventListener('change', () => {
-        this.p1EscortRole = playerEscortSelect.value as any;
+    // 5. MISSION-SPECIFIC CONFIG SELECTORS
+    const dominationPointsSelect = document.getElementById('sp-domination-points-select') as HTMLSelectElement | null;
+    if (dominationPointsSelect) {
+      dominationPointsSelect.addEventListener('change', () => {
+        this.dominationWinPoints = parseInt(dominationPointsSelect.value, 10) || 100;
+        this.updateSinglePlayerSummary();
       });
     }
-    if (enemyEscortSelect) {
-      enemyEscortSelect.addEventListener('change', () => {
-        this.p2EscortRole = enemyEscortSelect.value as any;
+
+    const vipOwnerSelect = document.getElementById('sp-vip-owner-select') as HTMLSelectElement | null;
+    if (vipOwnerSelect) {
+      vipOwnerSelect.addEventListener('change', () => {
+        this.vipOwner = (vipOwnerSelect.value === 'ai' ? 'ai' : 'player');
+        this.updateSinglePlayerSummary();
       });
     }
 
@@ -1207,7 +1217,8 @@ export class DOMManager {
     const descEl = document.getElementById('mission-info-desc');
     const paramsEl = document.getElementById('mission-info-params');
     const featuresEl = document.getElementById('mission-info-features');
-    const escortConfigRow = document.getElementById('escort-config-row');
+    const dominationConfigRow = document.getElementById('domination-config-row');
+    const vipOwnerConfigRow = document.getElementById('vip-owner-config-row');
 
     const m = MISSIONS[missionId];
     if (!m) return;
@@ -1218,8 +1229,11 @@ export class DOMManager {
     if (paramsEl) paramsEl.innerHTML = `<strong>PARAMETERS:</strong> ${m.params}`;
     if (featuresEl) featuresEl.textContent = m.features;
 
-    if (escortConfigRow) {
-      escortConfigRow.style.display = missionId === 'escort' ? 'flex' : 'none';
+    if (dominationConfigRow) {
+      dominationConfigRow.style.display = missionId === 'domination' ? 'flex' : 'none';
+    }
+    if (vipOwnerConfigRow) {
+      vipOwnerConfigRow.style.display = missionId === 'escort' ? 'flex' : 'none';
     }
   }
 
@@ -1281,29 +1295,25 @@ export class DOMManager {
     }
 
     // Resolve Escort Roles
-    let p1Role: 'escort' | 'attack' = 'escort';
-    let p2Role: 'escort' | 'attack' = 'attack';
+    const p1Role: 'escort' | 'attack' = this.vipOwner === 'player' ? 'escort' : 'attack';
+    const p2Role: 'escort' | 'attack' = this.vipOwner === 'player' ? 'attack' : 'escort';
 
-    if (this.selectedMission === 'escort') {
-      if (this.p1EscortRole === 'random') {
-        p1Role = Math.random() < 0.5 ? 'escort' : 'attack';
-      } else {
-        p1Role = this.p1EscortRole;
-      }
-
-      if (this.p2EscortRole === 'opposite') {
-        p2Role = p1Role === 'escort' ? 'attack' : 'escort';
-      } else if (this.p2EscortRole === 'random') {
-        p2Role = Math.random() < 0.5 ? 'escort' : 'attack';
-      } else {
-        p2Role = this.p2EscortRole;
-      }
-
-      // If both picked the same stance, randomize
-      if (p1Role === p2Role) {
-        p1Role = Math.random() < 0.5 ? 'escort' : 'attack';
-        p2Role = p1Role === 'escort' ? 'attack' : 'escort';
-      }
+    // Construct authoritative typed MissionSettings
+    let missionSettings: MissionSettings;
+    if (this.selectedMission === 'domination') {
+      missionSettings = {
+        type: 'domination',
+        dominationWinPoints: this.dominationWinPoints || 100
+      };
+    } else if (this.selectedMission === 'escort') {
+      missionSettings = {
+        type: 'vip_escort',
+        vipOwner: this.vipOwner || 'player'
+      };
+    } else {
+      missionSettings = {
+        type: 'extermination'
+      };
     }
 
     // Build Player ArmyComposition
@@ -1339,6 +1349,7 @@ export class DOMManager {
       p2Faction: finalP2Faction,
       theme: finalTheme,
       mission: this.selectedMission,
+      missionSettings,
       pointLimit: activePointLimit,
       battleSettings: { ...this.battleSettings },
       p1EscortRole: p1Role,
@@ -1506,7 +1517,8 @@ export class DOMManager {
         listEl.innerHTML = `
           <div class="sp-army-empty-notice">
             <span>🛡️</span>
-            <div>No squads recruited yet.<br>Select units from the roster to build your army.</div>
+            <div class="empty-title">NO SQUADS RECRUITED</div>
+            <div class="empty-sub">Choose units from the available roster to assemble your tactical strike force.</div>
           </div>
         `;
       } else {
@@ -1521,8 +1533,21 @@ export class DOMManager {
               <span class="sp-army-item-name">${u.name}</span>
               <span class="sp-army-item-calc">${qty} squad${qty > 1 ? 's' : ''} × ${u.points || 200} pts (${qty * (u.squadSize || 1)} models)</span>
             </div>
-            <span class="sp-army-item-pts">${ptsTotal} PTS</span>
+            <div class="sp-army-item-right">
+              <span class="sp-army-item-pts">${ptsTotal} PTS</span>
+              <button class="sp-army-item-btn-remove" data-unit="${u.type}" title="Remove one squad">✕</button>
+            </div>
           `;
+
+          const btnRemove = item.querySelector('.sp-army-item-btn-remove');
+          btnRemove?.addEventListener('click', () => {
+            if ((this.selectedArmyUnits[u.type] || 0) > 0) {
+              sfx('click');
+              this.selectedArmyUnits[u.type] = (this.selectedArmyUnits[u.type] || 0) - 1;
+              this.renderArmyCompositionScreen();
+            }
+          });
+
           listEl.appendChild(item);
         });
       }

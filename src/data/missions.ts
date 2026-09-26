@@ -43,3 +43,16 @@ export const MISSIONS: Record<string, MissionDef> = {
 };
 
 export const MISSION_CYCLE: MissionType[] = Object.keys(MISSIONS) as MissionType[];
+
+export const DOMINATION_WIN_POINTS_OPTIONS = [50, 75, 100, 150, 200] as const;
+export const DEFAULT_DOMINATION_WIN_POINTS = 100;
+
+export function getDefaultMissionSettings(missionType: MissionType) {
+  if (missionType === 'domination') {
+    return { type: 'domination' as const, dominationWinPoints: DEFAULT_DOMINATION_WIN_POINTS };
+  }
+  if (missionType === 'escort') {
+    return { type: 'vip_escort' as const, vipOwner: 'player' as const };
+  }
+  return { type: 'extermination' as const };
+}
