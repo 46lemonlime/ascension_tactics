@@ -495,7 +495,7 @@ container.addEventListener('pointermove', (e: MouseEvent) => {
 
 // Mouse canvas interactions
 container.addEventListener('pointerdown', (e: MouseEvent) => {
-  if (e.target && (e.target as HTMLElement).closest('#ui-layer') && !(e.target as HTMLElement).classList.contains('instructions-tip')) {
+  if (e.target && (e.target as HTMLElement).closest('#ui-layer')) {
     return;
   }
 
