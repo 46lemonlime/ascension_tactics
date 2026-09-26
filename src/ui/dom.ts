@@ -510,17 +510,17 @@ export class DOMManager {
     };
 
     const mapNames: Record<string, string> = {
-      random: 'Random Biome',
-      jungle: 'Jungle World',
-      snow: 'Glacial World',
-      desert: 'Desert Wastes',
+      random: 'Random World',
+      jungle: 'Jungle Death World',
+      snow: 'Glacial Frost World',
+      desert: 'Desert Wastes World',
       city: 'Gothic Hive City',
-      tech: 'Space-Tech Station',
-      astral: 'Astral Crystal Spire',
-      corrupted: 'Corrupted Flesh-World',
+      tech: 'Void Mothership',
+      astral: 'Astral Crystal World',
+      corrupted: 'Corrupted Flesh World',
       devoured: 'Devoured World',
       tomb: 'Tomb World',
-      rift: 'Warp Rift World'
+      rift: 'Rift World'
     };
 
     const missionNames: Record<string, string> = {
@@ -1038,7 +1038,7 @@ export class DOMManager {
     for (let set = 0; set < 3; set++) {
       MAP_CYCLE.forEach((themeId, idx) => {
         const globalIdx = set * N + idx;
-        const theme = themeId === 'random' ? { name: 'Random Biome', icon: '🎲' } : THEMES[themeId] || { name: themeId, icon: '🌐' };
+        const theme = themeId === 'random' ? { name: 'Random World', icon: '🎲' } : THEMES[themeId] || { name: themeId, icon: '🌐' };
         const card = document.createElement('div');
         card.className = `sp-landscape-card ${globalIdx === this.mapCarouselIndex ? 'selected-map' : ''}`;
         card.setAttribute('data-map', themeId);
@@ -1145,7 +1145,7 @@ export class DOMManager {
     const featuresEl = document.getElementById('map-info-features');
 
     if (themeId === 'random') {
-      if (titleEl) titleEl.textContent = '🎲 RANDOM BIOME';
+      if (titleEl) titleEl.textContent = '🎲 RANDOM WORLD';
       if (subEl) subEl.textContent = 'DYNAMIC MYSTERY THEATER';
       if (descEl) descEl.textContent = 'Deploy into an unpredictable planetary theater with dynamic terrain obstacles, tactical hazards, and shifting environmental atmospheric conditions.';
       if (atmosphereEl) atmosphereEl.innerHTML = '<strong>ATMOSPHERE:</strong> Dynamic Environmental Conditions • Adapt to Field Terrain';

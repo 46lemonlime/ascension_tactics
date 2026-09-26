@@ -280,7 +280,7 @@ export function createBattleMatTexture(themeId: string = 'tech'): THREE.CanvasTe
       ctx.fillRect(rnd(0, 1536), rnd(0, 2048), rnd(1, 3.2), rnd(1, 3.2));
     }
   } else if (themeId === 'tech') {
-    // Space-Tech / Void Station: High-tech metallic deckplates & reactor panels
+    // Space-Tech / Void Mothership: High-tech metallic deckplates & reactor panels
     ctx.fillStyle = '#0b0f17';
     ctx.fillRect(0, 0, 1536, 2048);
 

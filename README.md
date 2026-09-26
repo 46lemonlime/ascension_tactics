@@ -58,9 +58,9 @@ A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirm
 
 ---
 
-## 🌍 Battlefield Environments (10 Playable Maps)
+## 🌍 Battlefield Environments (10 Playable Maps + Random World)
 
-Ascension Tactics features **10 distinct battlefields**, each rendered with unique procedural 3D obstacle architecture, environmental weather particle simulations, and strategic Line-of-Sight layouts:
+Ascension Tactics features **10 distinct battlefields** plus a **Random World** selector, each rendered with high-resolution thematic landscape illustrations, procedural 3D obstacle architecture, environmental weather particle simulations, and strategic Line-of-Sight layouts:
 
 1. **Jungle Death World (Alien Primeval Biosphere)**
    * *Visuals*: Towering gnarled jungle trees, dense canopy foliage, overgrown cane weeds, bleached creature skeletons, and hanging creepers.
@@ -68,19 +68,19 @@ Ascension Tactics features **10 distinct battlefields**, each rendered with uniq
 2. **Glacial Frost World (Permafrost Ridges & Ice Chasms)**
    * *Visuals*: Granite mountain peaks capped in snow, translucent glacial ice spires, and deep snow drifts.
    * *Atmosphere*: Fluttering snowflakes, pale blue ice fog, and elevated ridge choke points.
-3. **Desert Wastes (Ash Dunes & Canyon Spires)**
+3. **Desert Wastes World (Ash Dunes & Canyon Spires)**
    * *Visuals*: Stratified rock crags, wind-carved sandstone towers, saguaro cacti, and shifting ash dunes.
    * *Atmosphere*: High-velocity sandstorms, warm golden lighting, and sweeping open firing lanes.
 4. **Gothic Hive City (Industrial Ruins & Streets)**
    * *Visuals*: Concrete multi-story ruined building walls, hazard-striped barricades, structural rebar, and fallen stone pillars.
    * *Atmosphere*: Smoggy grey haze, sharp urban corners, and dense cover blocks.
-5. **Space-Tech / Void Station (Orbital Reactor & Bulkheads)**
+5. **Void Mothership (Orbital Reactor & Bulkheads)**
    * *Visuals*: Reinforced metal blast bulkheads with cyan conduits, glowing plasma reactor cores, amber fuel tanks, and beacon antenna towers.
    * *Atmosphere*: Deep space void backdrop with drifting stars and orbital corridor choke points.
-6. **Astral Crystal Spire (Harmonic Prisms & Floating Monoliths)**
+6. **Astral Crystal World (Harmonic Prisms & Floating Monoliths)**
    * *Visuals*: Prismatic cyan and violet crystal clusters, wraithbone gateway monoliths, and floating resonant energy rings.
    * *Atmosphere*: Shimmering cosmic particle motes and ethereal amethyst lighting.
-7. **Corrupted Flesh-World (Mutated Terrain & Dark Tendrils)**
+7. **Corrupted Flesh World (Mutated Terrain & Dark Tendrils)**
    * *Visuals*: Pulsing demonic bone horns, occult altars with staring ocular cysts, and writhing tendril columns.
    * *Atmosphere*: Crimson spore miasma, dark blood fog, and disturbing organic terrain.
 8. **Devoured World (Stripped Desolation & Digestion Pits)**
@@ -89,9 +89,11 @@ Ascension Tactics features **10 distinct battlefields**, each rendered with uniq
 9. **Tomb World (Living Metal Crypts & Monoliths)**
    * *Visuals*: Stepped living-metal pyramid pylons with floating Gauss apex crystals, obsidian stasis portals, and Gauss energy coils.
    * *Atmosphere*: Snapping emerald Gauss spark motes and deep obsidian metal architecture.
-10. **Warp Rift World (Dimensional Fissures & Molten Void)**
+10. **Rift World (Dimensional Fissures & Molten Void)**
     * *Visuals*: Volcanic basalt crags shattered by molten fissures, anti-gravity floating rock spires, and warp vortex monoliths.
     * *Atmosphere*: Rising fiery embers, warp purple energy auras, and bubbling molten veins.
+11. **Random World (Dynamic Mystery Theater)**
+    * *Visuals*: Unpredictable planetary theater with dynamic terrain generation and atmospheric hazards.
 
 ---
 
@@ -114,7 +116,7 @@ flowchart LR
 * Auto-sizing dynamic lore dossiers detailing combat doctrine, squad rosters, unique mechanics, and strategic strengths/weaknesses.
 
 ### Stage 2 — Select Battlefield Biome
-* 3-card landscape preview carousel of all 10 planetary theaters or **Random Biome**.
+* 3-card landscape preview carousel of all 10 planetary theaters with custom artwork or **Random World**.
 * Atmospheric hazard profiles, weather particle previews, and environmental cover descriptions.
 
 ### Stage 3 — Select Mission & Objectives
@@ -187,15 +189,17 @@ flowchart LR
 * **Top-Right In-Battle Navigation Bar**:
   * **Combat Log**: Toggle battle telemetry and dice roll history panel.
   * **Tactical Map**: Toggle radar minimap visibility with smooth layout reflow for targeting bars.
+  * **Hints / Help Notes (`!`)**: Modular tactical guide with dynamic contextual field notes, deployment controls, and camera shortcuts.
   * **Camera Options**: Switch camera presets (Command / Top / Cinematic) and toggle Action Camera tracking.
   * **Fullscreen**: Dedicated button and `F11` shortcut with live state icon sync and `ESC` isolation.
   * **Game Menu**: Centered dialog for restarting matches, returning to faction select, and accessing manual/codex.
 
-* **Unit Information Frame & Utility Capability System**:
-  * Reorganized upper stats into **3 equal columns**: `ATTACK` (Accuracy, Strength, Attacks), `DEFENSE` (Evasion, Dexterity, Agility), and `UTILITY` (Movement, Awareness, Morale).
-  * Interactive inspection buttons: `[WEP]` (Weapon Popup), `[ARM]` (Armour & Coverage Popup), and `[UTIL]` (Utility Popup).
-  * Categorical capability modeling: `MovementType` (`ground | vehicle | fly | colossus`) and `AwarenessType` (`sensory | vision | psychic`).
-  * Unit identity card with active squad model count badges, proportional HP bars, and tactical Energy bars.
+* **Unit Information Frame & Equipment System**:
+  * **Two-Column Layout**: Left section displays Core Stats (Attack: Accuracy, Strength, Attacks; Defense: Evasion, Dexterity, Agility; Utility: Movement, Awareness, Morale). Right section displays interactive Equipment slots (Weapons, Armour, Utility).
+  * **Isolated Weapon Inspection**: Each equipped weapon has its own button, icon, quantity badge, and isolated hover/click tooltip popup.
+  * **Multi-Weapon Loadouts**: Full support for multi-weapon profiles (e.g. Screamer Carnifex with Stranglethorn Cannon, Scything Talons, and Rending Claws).
+  * **Capability Modeling**: Categorical `MovementType` (`ground | vehicle | fly | colossus`) and `AwarenessType` (`sensory | vision | psychic`).
+  * **Identity Card**: Active squad model count badges, proportional HP bars, and tactical Energy bars.
 
 * **Screen-Space Anchored HUD**:
   * **End Turn Button**: Fixed to the bottom-right corner of the viewport, independent of camera state.

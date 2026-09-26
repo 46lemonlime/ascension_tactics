@@ -122,7 +122,7 @@ export class InfoPanelSizer {
       let features = '';
 
       if (themeId === 'random') {
-        title = '🎲 RANDOM BIOME';
+        title = '🎲 RANDOM WORLD';
         sub = 'DYNAMIC MYSTERY THEATER';
         desc = 'Deploy into an unpredictable planetary theater with dynamic terrain obstacles, tactical hazards, and shifting environmental atmospheric conditions.';
         atmosphere = '<strong>ATMOSPHERE:</strong> Dynamic Environmental Conditions • Adapt to Field Terrain';

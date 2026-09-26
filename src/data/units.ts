@@ -937,8 +937,8 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     hp: 10,
     m: 8,
     awareness: 16,
-    range: 20,
-    dmg: 3,
+    range: 24,
+    dmg: 4,
     meleeDmg: 5,
     ranged: true,
     hasMelee: true,
@@ -949,7 +949,48 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     sv: 2,
     color: 0x3b0764,
     trim: 0xd8b4fe,
-    weapon: 'Bio-Plasma (20") & 4x Scything Talons'
+    weapon: 'Stranglethorn Cannon (24"), Scything Talons & Rending Claws',
+    weapons: [
+      {
+        name: 'Stranglethorn Cannon',
+        type: 'ranged',
+        category: 'Bio-Organic Siege Spore Launcher',
+        icon: '🌿',
+        range: 24,
+        attacks: 3,
+        strength: 7,
+        ap: 3,
+        damage: 4,
+        damageType: 'Barbed Bio-Seed Blast',
+        special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.'
+      },
+      {
+        name: 'Scything Talons',
+        type: 'melee',
+        category: 'Bio-Organic Monomolecular Scythes',
+        icon: '🦞',
+        range: 0,
+        attacks: 4,
+        strength: 6,
+        ap: 3,
+        damage: 5,
+        damageType: 'Bio-Organic Slicing',
+        special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.'
+      },
+      {
+        name: 'Crushing Claws',
+        type: 'melee',
+        category: 'Diamond-Hard Pincer Claws',
+        icon: '🦀',
+        range: 0,
+        attacks: 2,
+        strength: 6,
+        ap: 4,
+        damage: 6,
+        damageType: 'Bio-Organic Rending',
+        special: 'Rending Strike: Wound rolls of 6 inflict critical armor penetration.'
+      }
+    ]
   },
 
   // --- 7. THE REVENANT (Necrons) ---
@@ -1682,20 +1723,29 @@ Object.values(UNIT_DEFS).forEach(def => {
     };
   }
 
-  const weaponsList: WeaponProfile[] = [];
-  if (def.rangedWeapon) weaponsList.push(def.rangedWeapon);
-  if (def.meleeWeapon) weaponsList.push(def.meleeWeapon);
-  def.weapons = weaponsList.length > 0 ? weaponsList : [
-    {
-      name: def.weapon || 'Standard Armament',
-      type: isRanged ? 'ranged' : 'melee',
-      range: def.range || 18,
-      attacks: def.squadSize || 1,
-      strength: def.s || 4,
-      ap: Math.max(0, 4 - (def.sv || 3)),
-      damage: def.dmg || 2
+  if (def.weapons && def.weapons.length > 0) {
+    if (!def.rangedWeapon) {
+      def.rangedWeapon = def.weapons.find(w => w.type === 'ranged' || w.range > 2);
     }
-  ];
+    if (!def.meleeWeapon) {
+      def.meleeWeapon = def.weapons.find(w => w.type === 'melee' || w.range <= 2);
+    }
+  } else {
+    const weaponsList: WeaponProfile[] = [];
+    if (def.rangedWeapon) weaponsList.push(def.rangedWeapon);
+    if (def.meleeWeapon) weaponsList.push(def.meleeWeapon);
+    def.weapons = weaponsList.length > 0 ? weaponsList : [
+      {
+        name: def.weapon || 'Standard Armament',
+        type: isRanged ? 'ranged' : 'melee',
+        range: def.range || 18,
+        attacks: def.squadSize || 1,
+        strength: def.s || 4,
+        ap: Math.max(0, 4 - (def.sv || 3)),
+        damage: def.dmg || 2
+      }
+    ];
+  }
 
   const isLarge = !!def.isLarge;
   const isHeavy = (def.s >= 5 || def.t >= 5) && !isLarge;

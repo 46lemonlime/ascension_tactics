@@ -295,10 +295,10 @@ export function getUnitRangedWeaponProfile(unitDef: UnitDef): WeaponProfileDetai
   // 5. Ghar
   if (faction === 'ghar') {
     return {
-      name: 'BIG SHOOTA & DAKKA GUN',
+      name: 'BIG SHOOTA',
       type: 'ranged',
       category: 'Brutal Scrap Ballistics',
-      icon: '🐗',
+      icon: '🔫',
       range: rangeStr,
       strength: str + 1,
       penetration: 2,
@@ -313,6 +313,23 @@ export function getUnitRangedWeaponProfile(unitDef: UnitDef): WeaponProfileDetai
 
   // 6. Devourers
   if (faction === 'devourers') {
+    if (name.toLowerCase().includes('stranglethorn') || name.toLowerCase().includes('carnifex') || unitDef.type === 'ty_carnifex') {
+      return {
+        name: 'STRANGLETHORN CANNON',
+        type: 'ranged',
+        category: 'Bio-Organic Siege Spore Launcher',
+        icon: '🌿',
+        range: '24"',
+        strength: 7,
+        penetration: 3,
+        damage: 4,
+        attacks: 3,
+        damageType: 'Barbed Bio-Seed Blast',
+        effectiveAgainst: ['Infantry Formations', 'Light Vehicles', 'Concentrated Squads'],
+        weakAgainst: ['Heavy Refractor Barriers', 'Void Shields'],
+        special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.'
+      };
+    }
     return {
       name: 'BIO-ACID CANNON',
       type: 'ranged',
@@ -545,7 +562,7 @@ export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail
       };
     }
     return {
-      name: 'BAYONET & TRENCH KNIFE',
+      name: 'TRENCH COMBAT KNIFE',
       type: 'melee',
       category: 'Close-Quarters Combat Blade',
       icon: '🔪',
@@ -599,20 +616,37 @@ export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail
 
   // 4. Veykari
   if (faction === 'veykari') {
+    if (name.toLowerCase().includes('klaive') || name.toLowerCase().includes('demiklaive')) {
+      return {
+        name: 'TEMPLE DEMIKLAIVES',
+        type: 'melee',
+        category: 'Cruel Executioner Blade',
+        icon: '🗡️',
+        range: 'Melee',
+        strength: str + 1,
+        penetration: 4,
+        damage: meleeDmg,
+        attacks: attacks,
+        damageType: 'Barbed Monomolecular',
+        effectiveAgainst: ['Biological Organisms', 'Light Infantry'],
+        weakAgainst: ['Synthetic Automata', 'Heavy Walkers'],
+        special: 'Torment Edge: Slain enemies inflict panic check on nearby allies.'
+      };
+    }
     return {
-      name: 'TEMPLE KLAIVE & HARM BLADES',
+      name: 'HARM BLADES',
       type: 'melee',
-      category: 'Cruel Executioner Blade',
-      icon: '🗡️',
+      category: 'Cruel Barbed Daggers',
+      icon: '🔪',
       range: 'Melee',
-      strength: str + 1,
-      penetration: 4,
+      strength: str,
+      penetration: 3,
       damage: meleeDmg,
       attacks: attacks,
       damageType: 'Barbed Monomolecular',
       effectiveAgainst: ['Biological Organisms', 'Light Infantry'],
-      weakAgainst: ['Synthetic Automata', 'Heavy Walkers'],
-      special: 'Torment Edge: Slain enemies inflict panic check on nearby allies.'
+      weakAgainst: ['Synthetic Automata'],
+      special: 'Venomous Edge: Hits inflict extra pain tokens on biological targets.'
     };
   }
 
@@ -654,27 +688,61 @@ export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail
 
   // 6. Devourers
   if (faction === 'devourers') {
+    if (name.toLowerCase().includes('rending') || name.toLowerCase().includes('stealer')) {
+      return {
+        name: 'RENDING CLAWS',
+        type: 'melee',
+        category: 'Diamond-Hard Pincer Claws',
+        icon: '🦀',
+        range: 'Melee',
+        strength: str,
+        penetration: 4,
+        damage: meleeDmg,
+        attacks: attacks + 1,
+        damageType: 'Bio-Organic Rending',
+        effectiveAgainst: ['Organic Targets', 'Armoured Infantry'],
+        weakAgainst: ['Energy Barriers'],
+        special: 'Rending Flurry: Penetrates all non-invulnerable armour on wound rolls of 6.'
+      };
+    }
     return {
-      name: 'SCYTHING TALONS & RENDING CLAWS',
+      name: 'SCYTHING TALONS',
       type: 'melee',
       category: 'Bio-Organic Monomolecular Scythes',
-      icon: '🦀',
+      icon: '🦞',
       range: 'Melee',
       strength: str,
-      penetration: 4,
+      penetration: 3,
       damage: meleeDmg,
       attacks: attacks + 1,
-      damageType: 'Bio-Organic Rending',
-      effectiveAgainst: ['Organic Targets', 'Armoured Infantry'],
+      damageType: 'Bio-Organic Slicing',
+      effectiveAgainst: ['Infantry Formations', 'Light Armour'],
       weakAgainst: ['Energy Barriers'],
-      special: 'Rending Flurry: Penetrates all non-invulnerable armour on wound rolls of 6.'
+      special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.'
     };
   }
 
   // 7. Revenant
   if (faction === 'revenant') {
+    if (name.toLowerCase().includes('warscythe') || name.toLowerCase().includes('staff') || name.toLowerCase().includes('overlord')) {
+      return {
+        name: 'HYPERPHASE WARSCYTHE',
+        type: 'melee',
+        category: 'Dimensional Phase Heavy Scythe',
+        icon: '🪓',
+        range: 'Melee',
+        strength: str + 2,
+        penetration: 4,
+        damage: meleeDmg + 1,
+        attacks: attacks,
+        damageType: 'Dimensional Phase Shift',
+        effectiveAgainst: ['Heavy Tanks', 'Shielded Walkers', 'Elite Commanders'],
+        weakAgainst: ['Phase Disrupters'],
+        special: 'Phase Cleave: Phase strikes bypass all energy shielding.'
+      };
+    }
     return {
-      name: 'HYPERPHASE BLADE & WARSCYTHE',
+      name: 'HYPERPHASE BLADE',
       type: 'melee',
       category: 'Dimensional Phase Blade',
       icon: '⚔️',
@@ -692,20 +760,37 @@ export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail
 
   // 8. Concordat
   if (faction === 'concordat') {
+    if (name.toLowerCase().includes('honor') || name.toLowerCase().includes('ethereal') || name.toLowerCase().includes('blade')) {
+      return {
+        name: 'HONOR BLADE',
+        type: 'melee',
+        category: 'Ethereal Ceremonial Blade',
+        icon: '🗡️',
+        range: 'Melee',
+        strength: str,
+        penetration: 2,
+        damage: meleeDmg,
+        attacks: attacks,
+        damageType: 'Defensive Pulse Edge',
+        effectiveAgainst: ['Light Raiders'],
+        weakAgainst: ['Heavy Exosuits'],
+        special: 'Defensive Parry: Grants +1 Evasion when engaged in melee.'
+      };
+    }
     return {
-      name: 'HONOR BLADE & COMBAT GAUNTLET',
+      name: 'PULSE COMBAT GAUNTLET',
       type: 'melee',
-      category: 'Ethereal Defensive Melee',
-      icon: '🗡️',
+      category: 'Defensive Shock Gauntlet',
+      icon: '🥊',
       range: 'Melee',
       strength: str,
       penetration: 2,
       damage: meleeDmg,
       attacks: attacks,
-      damageType: 'Defensive Pulse Edge',
+      damageType: 'Shockwave Impact',
       effectiveAgainst: ['Light Raiders'],
       weakAgainst: ['Heavy Exosuits'],
-      special: 'Defensive Parry: Grants +1 Evasion when engaged in melee.'
+      special: 'Kinetic Repulsion: Shoves enemy infantry backwards upon melee impact.'
     };
   }
 
@@ -787,6 +872,81 @@ export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail
  */
 export function getUnitWeaponProfiles(unitDef: UnitDef): WeaponProfileDetail[] {
   const profiles: WeaponProfileDetail[] = [];
+
+  // 1. If explicit weapons array is provided on the unit definition
+  if (unitDef.weapons && unitDef.weapons.length > 0) {
+    unitDef.weapons.forEach((wp, idx) => {
+      const isMelee = wp.type === 'melee' || wp.range === 0;
+      profiles.push({
+        name: wp.name.toUpperCase(),
+        type: wp.type || (isMelee ? 'melee' : 'ranged'),
+        category: wp.category || (isMelee ? 'Bio-Organic Melee Weapon' : 'Tactical Firearm'),
+        icon: wp.icon || (isMelee ? '⚔️' : '🔫'),
+        range: isMelee ? 'Melee' : `${wp.range || unitDef.range}"`,
+        strength: wp.strength || unitDef.s || 4,
+        penetration: wp.ap !== undefined ? wp.ap : 2,
+        damage: wp.damage || (isMelee ? unitDef.meleeDmg : unitDef.dmg) || 2,
+        attacks: wp.attacks || 2,
+        damageType: wp.damageType || (isMelee ? 'Kinetic Slashing' : 'Kinetic Ballistic'),
+        effectiveAgainst: (wp as any).effectiveAgainst || (isMelee ? ['Infantry Formations', 'Light Armour'] : ['Standard Infantry', 'Unarmoured Units']),
+        weakAgainst: (wp as any).weakAgainst || ['Heavy Refractor Barriers'],
+        special: wp.special || 'Standard military issue.'
+      });
+    });
+    return profiles;
+  }
+
+  // 2. Carnifex living bio-battering ram (Stranglethorn Cannon + Scything Talons + Rending Claws)
+  if (unitDef.type === 'ty_carnifex' || unitDef.title?.toLowerCase().includes('carnifex')) {
+    profiles.push({
+      name: 'STRANGLETHORN CANNON',
+      type: 'ranged',
+      category: 'Bio-Organic Siege Spore Launcher',
+      icon: '🌿',
+      range: '24"',
+      strength: 7,
+      penetration: 3,
+      damage: 4,
+      attacks: 3,
+      damageType: 'Barbed Bio-Seed Blast',
+      effectiveAgainst: ['Infantry Formations', 'Light Vehicles', 'Concentrated Squads'],
+      weakAgainst: ['Heavy Refractor Barriers', 'Void Shields'],
+      special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.'
+    });
+    profiles.push({
+      name: 'SCYTHING TALONS',
+      type: 'melee',
+      category: 'Bio-Organic Monomolecular Scythes',
+      icon: '🦞',
+      range: 'Melee',
+      strength: unitDef.s || 6,
+      penetration: 3,
+      damage: unitDef.meleeDmg || 5,
+      attacks: 4,
+      damageType: 'Bio-Organic Slicing',
+      effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Swarm Units'],
+      weakAgainst: ['Reinforced Ceramite Bunkers'],
+      special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.'
+    });
+    profiles.push({
+      name: 'RENDING CLAWS',
+      type: 'melee',
+      category: 'Diamond-Hard Pincer Claws',
+      icon: '🦀',
+      range: 'Melee',
+      strength: unitDef.s || 6,
+      penetration: 4,
+      damage: (unitDef.meleeDmg || 5) + 1,
+      attacks: 2,
+      damageType: 'Bio-Organic Rending',
+      effectiveAgainst: ['Heavy Armour', 'Tanks', 'Fortified Exoskeletons'],
+      weakAgainst: ['Displacement Phase Fields'],
+      special: 'Rending Strike: Wound rolls of 6 inflict critical armor penetration.'
+    });
+    return profiles;
+  }
+
+  // 3. Standard procedural resolution for ranged and melee
   const ranged = getUnitRangedWeaponProfile(unitDef);
   if (ranged) profiles.push(ranged);
   const melee = getUnitMeleeWeaponProfile(unitDef);

@@ -1815,7 +1815,8 @@ body,
   justify-content: center;
 }
 
-.sp-landscape-svg {
+.sp-landscape-svg,
+.sp-landscape-img {
   width: 100%;
   height: 100%;
   object-fit: cover;

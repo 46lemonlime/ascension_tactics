@@ -73,6 +73,8 @@ export class DatasheetUI {
 
   // Pinned popup state
   private pinnedPopup: 'weapon' | 'armour' | 'utility' | null = null;
+  private pinnedWeaponIndex: number | null = null;
+  private activeWeaponIndex: number | null = null;
   private currentWeaponProfile: WeaponProfileDetail | null = null;
   private currentWeaponProfiles: WeaponProfileDetail[] = [];
   private currentArmourProfile: ArmourProfileDetail | null = null;
@@ -152,24 +154,24 @@ export class DatasheetUI {
   }
 
   private initEventListeners(): void {
-    // Weapon Button Events
+    // Weapon Button Events (fallback if standalone button exists)
     if (this.weaponBtn) {
       this.weaponBtn.addEventListener('mouseenter', () => {
         if (!this.pinnedPopup) {
-          this.openPopup('weapon', false);
+          this.openWeaponPopup(0, false);
         }
       });
       this.weaponBtn.addEventListener('mouseleave', () => {
         if (this.pinnedPopup !== 'weapon') {
-          this.closePopup('weapon');
+          this.closeWeaponPopup(false);
         }
       });
       this.weaponBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (this.pinnedPopup === 'weapon') {
+        if (this.pinnedPopup === 'weapon' && this.pinnedWeaponIndex === 0) {
           this.closePopups();
         } else {
-          this.openPopup('weapon', true);
+          this.openWeaponPopup(0, true);
         }
       });
     }
@@ -247,33 +249,74 @@ export class DatasheetUI {
     });
   }
 
-  public openPopup(type: 'weapon' | 'armour' | 'utility', pin: boolean = false): void {
-    // Reset buttons
-    if (this.weaponBtn) this.weaponBtn.classList.remove('active');
+  public openWeaponPopup(weaponIndex: number, pin: boolean = false): void {
+    // Reset non-weapon buttons and popups
+    if (this.armourBtn) this.armourBtn.classList.remove('active');
+    if (this.utilityBtn) this.utilityBtn.classList.remove('active');
+    if (this.armourPopup) this.armourPopup.style.display = 'none';
+    if (this.utilityPopup) this.utilityPopup.style.display = 'none';
+
+    this.activeWeaponIndex = weaponIndex;
+
+    if (this.weaponPopup) {
+      this.populateWeaponPopup(weaponIndex);
+      this.weaponPopup.style.display = 'block';
+    }
+
+    if (pin) {
+      this.pinnedPopup = 'weapon';
+      this.pinnedWeaponIndex = weaponIndex;
+    }
+
+    // Mark only the clicked/active weapon button as active
+    if (this.weaponsListEl) {
+      const btns = this.weaponsListEl.querySelectorAll('.weapon-btn');
+      btns.forEach((b, i) => {
+        if (pin && i === weaponIndex) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  public closeWeaponPopup(force: boolean = false): void {
+    if (!force && this.pinnedPopup === 'weapon') {
+      return;
+    }
+    if (this.weaponPopup) {
+      this.weaponPopup.style.display = 'none';
+    }
     if (this.weaponsListEl) {
       this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.remove('active'));
     }
+    if (this.weaponBtn) {
+      this.weaponBtn.classList.remove('active');
+    }
+    this.activeWeaponIndex = null;
+    if (force || this.pinnedPopup === 'weapon') {
+      this.pinnedPopup = null;
+      this.pinnedWeaponIndex = null;
+    }
+  }
+
+  public openPopup(type: 'weapon' | 'armour' | 'utility', pin: boolean = false): void {
+    if (type === 'weapon') {
+      this.openWeaponPopup(0, pin);
+      return;
+    }
+
+    // Reset buttons
+    this.closeWeaponPopup(true);
     if (this.armourBtn) this.armourBtn.classList.remove('active');
     if (this.utilityBtn) this.utilityBtn.classList.remove('active');
 
     // Reset popups
-    if (this.weaponPopup) this.weaponPopup.style.display = 'none';
     if (this.armourPopup) this.armourPopup.style.display = 'none';
     if (this.utilityPopup) this.utilityPopup.style.display = 'none';
 
-    if (type === 'weapon') {
-      if (this.weaponPopup) {
-        this.populateWeaponPopup();
-        this.weaponPopup.style.display = 'block';
-      }
-      if (pin) {
-        this.pinnedPopup = 'weapon';
-        if (this.weaponBtn) this.weaponBtn.classList.add('active');
-        if (this.weaponsListEl) {
-          this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.add('active'));
-        }
-      }
-    } else if (type === 'armour') {
+    if (type === 'armour') {
       if (this.armourPopup) {
         this.populateArmourPopup();
         this.armourPopup.style.display = 'block';
@@ -295,14 +338,11 @@ export class DatasheetUI {
   }
 
   public closePopup(type: 'weapon' | 'armour' | 'utility'): void {
-    if (type === 'weapon' && this.weaponPopup) {
-      this.weaponPopup.style.display = 'none';
-      if (this.weaponBtn) this.weaponBtn.classList.remove('active');
-      if (this.weaponsListEl) {
-        this.weaponsListEl.querySelectorAll('.weapon-btn').forEach(b => b.classList.remove('active'));
-      }
-      if (this.pinnedPopup === 'weapon') this.pinnedPopup = null;
-    } else if (type === 'armour' && this.armourPopup) {
+    if (type === 'weapon') {
+      this.closeWeaponPopup(false);
+      return;
+    }
+    if (type === 'armour' && this.armourPopup) {
       this.armourPopup.style.display = 'none';
       if (this.armourBtn) this.armourBtn.classList.remove('active');
       if (this.pinnedPopup === 'armour') this.pinnedPopup = null;
@@ -314,44 +354,36 @@ export class DatasheetUI {
   }
 
   public closePopups(): void {
-    this.closePopup('weapon');
+    this.closeWeaponPopup(true);
     this.closePopup('armour');
     this.closePopup('utility');
     this.pinnedPopup = null;
+    this.pinnedWeaponIndex = null;
+    this.activeWeaponIndex = null;
   }
 
-  private populateWeaponPopup(): void {
+  private populateWeaponPopup(weaponIndex?: number): void {
     if (!this.weaponPopup) return;
-    const profiles = this.currentWeaponProfiles && this.currentWeaponProfiles.length > 0
-      ? this.currentWeaponProfiles
-      : (this.currentWeaponProfile ? [this.currentWeaponProfile] : []);
+    const idx = weaponIndex !== undefined && weaponIndex >= 0 ? weaponIndex : 0;
+    const w = this.currentWeaponProfiles[idx] || this.currentWeaponProfile;
 
-    if (profiles.length === 0) return;
+    if (!w) return;
 
-    const isMulti = profiles.length > 1;
-    if (isMulti) {
-      this.weaponPopup.classList.add('dual-weapons');
-    } else {
-      this.weaponPopup.classList.remove('dual-weapons');
-    }
+    this.weaponPopup.classList.remove('dual-weapons');
 
-    let html = `
+    const typeLabel = w.type ? (w.type === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON') : (w.range.toLowerCase() === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON');
+    const typeClass = w.type || (w.range.toLowerCase() === 'melee' ? 'melee' : 'ranged');
+
+    const html = `
       <div class="popup-header">
-        <div class="popup-tag">WEAPON LOADOUT ${isMulti ? `(${profiles.length} WEAPONS)` : ''}</div>
+        <div class="popup-tag">${typeLabel} PROFILE</div>
         <div class="popup-title-row">
-          <span class="popup-name" id="wep-popup-name">${isMulti ? 'EQUIPPED ARSENAL' : profiles[0].name}</span>
+          <span class="popup-name" id="wep-popup-name">${w.name}</span>
           <button type="button" class="popup-close-btn" id="wep-popup-close" title="Close" aria-label="Close">✕</button>
         </div>
       </div>
       <div class="popup-divider"></div>
-      <div class="weapon-popup-entries ${isMulti ? 'dual-grid' : 'single-entry'}">
-    `;
-
-    profiles.forEach((w) => {
-      const typeLabel = w.type ? (w.type === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON') : (w.range.toLowerCase() === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON');
-      const typeClass = w.type || (w.range.toLowerCase() === 'melee' ? 'melee' : 'ranged');
-
-      html += `
+      <div class="weapon-popup-entries single-entry">
         <div class="weapon-loadout-card ${typeClass}">
           <div class="weapon-loadout-card-header">
             <span class="weapon-type-pill ${typeClass}">${typeLabel}</span>
@@ -400,17 +432,16 @@ export class DatasheetUI {
           <div class="popup-section-header">SPECIAL</div>
           <div class="popup-special-text">${w.special}</div>
         </div>
-      `;
-    });
+      </div>
+    `;
 
-    html += `</div>`;
     this.weaponPopup.innerHTML = html;
 
     const closeBtn = document.getElementById('wep-popup-close');
     if (closeBtn) {
       closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.closePopup('weapon');
+        this.closePopups();
       });
     }
   }
@@ -461,8 +492,8 @@ export class DatasheetUI {
     this.currentUtilityProfile = getUnitUtilityProfile(unitDef);
 
     // If a popup is already pinned, refresh its content for the newly selected unit
-    if (this.pinnedPopup === 'weapon') {
-      this.populateWeaponPopup();
+    if (this.pinnedPopup === 'weapon' && this.pinnedWeaponIndex !== null) {
+      this.populateWeaponPopup(this.pinnedWeaponIndex);
     } else if (this.pinnedPopup === 'armour') {
       this.populateArmourPopup();
     } else if (this.pinnedPopup === 'utility') {
@@ -512,17 +543,18 @@ export class DatasheetUI {
     const casualtiesCount = unit.squadCasualties?.filter(c => c).length || 0;
     const activeModels = Math.max(1, squadSize - casualtiesCount);
 
-    // Render dynamic weapon buttons with squad quantities
+    // Render dynamic weapon buttons with squad quantities and isolated popups
     if (this.weaponsListEl) {
       this.weaponsListEl.innerHTML = '';
-      this.currentWeaponProfiles.forEach((w) => {
+      this.currentWeaponProfiles.forEach((w, idx) => {
         const qty = (w as any).quantity ?? (w as any).count ?? activeModels;
         const label = w.type === 'melee' ? 'MEL' : (this.currentWeaponProfiles.length > 1 ? 'RNG' : 'WEP');
         const icon = w.icon || (w.type === 'melee' ? '⚔️' : '🔫');
 
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `equip-image-btn weapon-btn ${this.pinnedPopup === 'weapon' ? 'active' : ''}`;
+        btn.className = `equip-image-btn weapon-btn ${this.pinnedPopup === 'weapon' && this.pinnedWeaponIndex === idx ? 'active' : ''}`;
+        btn.setAttribute('data-weapon-index', `${idx}`);
         btn.title = `Inspect ${w.name} (${qty} equipped)`;
         btn.setAttribute('aria-label', `Inspect ${w.name} (${qty} equipped)`);
         btn.innerHTML = `
@@ -534,21 +566,23 @@ export class DatasheetUI {
         `;
 
         btn.addEventListener('mouseenter', () => {
-          if (!this.pinnedPopup) {
-            this.openPopup('weapon', false);
+          if (this.pinnedPopup !== 'weapon' || this.pinnedWeaponIndex !== idx) {
+            this.openWeaponPopup(idx, false);
           }
         });
         btn.addEventListener('mouseleave', () => {
           if (this.pinnedPopup !== 'weapon') {
-            this.closePopup('weapon');
+            this.closeWeaponPopup(false);
+          } else if (this.pinnedWeaponIndex !== null && this.pinnedWeaponIndex !== idx) {
+            this.openWeaponPopup(this.pinnedWeaponIndex, true);
           }
         });
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (this.pinnedPopup === 'weapon') {
+          if (this.pinnedPopup === 'weapon' && this.pinnedWeaponIndex === idx) {
             this.closePopups();
           } else {
-            this.openPopup('weapon', true);
+            this.openWeaponPopup(idx, true);
           }
         });
 

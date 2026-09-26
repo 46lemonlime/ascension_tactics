@@ -290,6 +290,7 @@ export interface Theme {
   particleType: ParticleType;
   particleSize: number;
   particleOpacity: number;
+  image?: string;
 }
 
 export type BiomeTheme = Theme;
