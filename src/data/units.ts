@@ -1,4 +1,4 @@
-import { UnitDef, FormationType } from './types';
+import { UnitDef, FormationType, WeaponProfile } from './types';
 
 export const UNIT_DEFS: Record<string, UnitDef> = {
   // --- 1. THE ASCENDANTS (Space Marines) ---
@@ -1632,18 +1632,70 @@ Object.values(UNIT_DEFS).forEach(def => {
   def.size = def.size || (def.isLarge ? 2 : (def.baseRadius && def.baseRadius > 1.8 ? 2 : 1));
   def.tags = def.tags || [def.factionId, def.isCharacter ? 'character' : 'infantry', def.isLarge ? 'vehicle' : ''];
 
-  if (!def.weapons || def.weapons.length === 0) {
-    def.weapons = [
-      {
-        name: def.weapon || 'Standard Armament',
-        range: def.range || 18,
-        attacks: def.squadSize || 1,
-        strength: def.s || 4,
-        ap: Math.max(0, 4 - (def.sv || 3)),
-        damage: def.dmg || 2
+  const isRanged = def.ranged ?? (def.range !== undefined && def.range > 2);
+  const hasMelee = def.hasMelee ?? (def.meleeDmg !== undefined && def.meleeDmg > 0);
+
+  let rawRangedName = 'Standard Issue Weapon';
+  let rawMeleeName = 'Combat Blade';
+
+  if (def.weapon) {
+    if (def.weapon.includes('&')) {
+      const parts = def.weapon.split('&').map(p => p.trim());
+      if (parts[0].toLowerCase().includes('melee') || parts[0].toLowerCase().includes('blade') || parts[0].toLowerCase().includes('sword') || parts[0].toLowerCase().includes('axe') || parts[0].toLowerCase().includes('claw') || parts[0].toLowerCase().includes('talon') || parts[0].toLowerCase().includes('spear')) {
+        rawMeleeName = parts[0].replace(/\(.*?\)/g, '').trim() || parts[0];
+        rawRangedName = parts[1].replace(/\(.*?\)/g, '').trim() || parts[1];
+      } else {
+        rawRangedName = parts[0].replace(/\(.*?\)/g, '').trim() || parts[0];
+        rawMeleeName = parts[1].replace(/\(.*?\)/g, '').trim() || parts[1];
       }
-    ];
+    } else if (isRanged && !hasMelee) {
+      rawRangedName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
+    } else if (hasMelee && !isRanged) {
+      rawMeleeName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
+    } else {
+      rawRangedName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
+      rawMeleeName = 'Combat Arms';
+    }
   }
+
+  if (isRanged) {
+    def.rangedWeapon = {
+      name: rawRangedName,
+      type: 'ranged',
+      range: def.range || 18,
+      attacks: def.squadSize || 1,
+      strength: def.s || 4,
+      ap: Math.max(0, 4 - (def.sv || 3)),
+      damage: def.dmg || 2
+    };
+  }
+
+  if (hasMelee) {
+    def.meleeWeapon = {
+      name: rawMeleeName,
+      type: 'melee',
+      range: 1,
+      attacks: (def.isCharacter ? 3 : def.squadSize || 1),
+      strength: (def.s || 4) + (def.isLarge ? 1 : 0),
+      ap: Math.max(1, 5 - (def.sv || 3)),
+      damage: def.meleeDmg || 2
+    };
+  }
+
+  const weaponsList: WeaponProfile[] = [];
+  if (def.rangedWeapon) weaponsList.push(def.rangedWeapon);
+  if (def.meleeWeapon) weaponsList.push(def.meleeWeapon);
+  def.weapons = weaponsList.length > 0 ? weaponsList : [
+    {
+      name: def.weapon || 'Standard Armament',
+      type: isRanged ? 'ranged' : 'melee',
+      range: def.range || 18,
+      attacks: def.squadSize || 1,
+      strength: def.s || 4,
+      ap: Math.max(0, 4 - (def.sv || 3)),
+      damage: def.dmg || 2
+    }
+  ];
 
   const isLarge = !!def.isLarge;
   const isHeavy = (def.s >= 5 || def.t >= 5) && !isLarge;

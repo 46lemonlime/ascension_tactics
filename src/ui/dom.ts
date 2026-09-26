@@ -32,10 +32,21 @@ export const MAP_CYCLE: string[] = [
   'tech',
   'astral',
   'corrupted',
-  'devoured',
-  'tomb',
-  'rift'
 ];
+
+export function formatUnitWeaponHtml(u: UnitDef): string {
+  const rangedName = u.rangedWeapon?.name || (u.ranged && u.weapon && !u.weapon.includes('&') ? u.weapon.replace(/\(.*?\)/g, '').trim() : null);
+  const meleeName = u.meleeWeapon?.name || (u.hasMelee && u.weapon && !u.weapon.includes('&') ? u.weapon.replace(/\(.*?\)/g, '').trim() : null);
+
+  if (rangedName && meleeName) {
+    return `<span class="unit-wep-tag ranged" title="Ranged Weapon">🔫 ${rangedName}</span> <span class="unit-wep-sep">&bull;</span> <span class="unit-wep-tag melee" title="Melee Weapon">⚔️ ${meleeName}</span>`;
+  } else if (rangedName) {
+    return `<span class="unit-wep-tag ranged" title="Ranged Weapon">🔫 ${rangedName}</span>`;
+  } else if (meleeName) {
+    return `<span class="unit-wep-tag melee" title="Melee Weapon">⚔️ ${meleeName}</span>`;
+  }
+  return `🗡️ ${u.weapon || 'Standard Arms'}`;
+}
 
 export class DOMManager {
   // Screens & Modals
@@ -246,7 +257,7 @@ export class DOMManager {
             <span class="dossier-unit-name">${u.icon || '⚔️'} ${u.name}</span>
             <span class="dossier-unit-role">${role}</span>
           </div>
-          <div class="dossier-unit-weapon">🗡️ ${u.weapon || 'Standard Arms'}</div>
+          <div class="dossier-unit-weapon">${formatUnitWeaponHtml(u)}</div>
           <div class="dossier-stats-row">
             <div class="dossier-stat-badge">
               <div class="dossier-stat-lbl">Move</div>
@@ -1451,7 +1462,7 @@ export class DOMManager {
             </div>
             <span class="sp-army-card-pts">${u.points || 200} PTS</span>
           </div>
-          <div class="sp-army-card-weapon">🗡️ ${u.weapon || 'Standard Arms'}</div>
+          <div class="sp-army-card-weapon">${formatUnitWeaponHtml(u)}</div>
           <div class="sp-army-card-stats">
             <div class="sp-army-stat-chip">
               <span class="sp-army-stat-lbl">M</span>

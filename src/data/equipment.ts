@@ -2,6 +2,7 @@ import type { UnitDef } from './types';
 
 export interface WeaponProfileDetail {
   name: string;
+  type?: 'ranged' | 'melee';
   category: string;
   icon: string;
   image?: string;
@@ -82,22 +83,27 @@ export function normalizeEquipmentFaction(fId?: string): string {
 }
 
 /**
- * Procedural/Specific weapon database for all units
+ * Resolves the unit's dedicated RANGED weapon profile.
+ * Returns null if the unit has no ranged weapon capability.
  */
-export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
+export function getUnitRangedWeaponProfile(unitDef: UnitDef): WeaponProfileDetail | null {
+  const isRanged = unitDef.ranged ?? (unitDef.range !== undefined && unitDef.range > 2);
+  if (!isRanged) return null;
+
   const faction = normalizeEquipmentFaction(unitDef.factionId);
   const name = unitDef.weapon || 'Standard Armament';
   const dmg = unitDef.dmg || 2;
   const str = unitDef.s || 4;
   const attacks = (unitDef.weapons && unitDef.weapons[0]?.attacks) || (unitDef.squadSize > 1 ? 2 : 3);
-  const rangeStr = unitDef.range > 2 ? `${unitDef.range}"` : 'Melee';
+  const rangeStr = unitDef.range > 2 ? `${unitDef.range}"` : '24"';
 
-  // 1. Ascendants (Space Marines)
+  // 1. Ascendants
   if (faction === 'ascendants') {
     if (name.toLowerCase().includes('plasma')) {
       return {
-        name: 'MK-VII PLASMA PISTOL & RELIC BLADE',
-        category: 'Plasma / Melee Hybrid',
+        name: 'MK-VII PLASMA PISTOL',
+        type: 'ranged',
+        category: 'Superheated Plasma Projector',
         icon: '⚡',
         range: '16"',
         strength: str + 1,
@@ -107,12 +113,13 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
         damageType: 'Superheated Plasma',
         effectiveAgainst: ['Heavy Armour', 'Mechanical Walkers', 'Elite Commanders'],
         weakAgainst: ['Energy Shields', 'Heat-Resistant Chitin'],
-        special: 'Overcharge: Critical rolls yield +1 Damage. Relic Blade grants parry response in melee.'
+        special: 'Overcharge: Critical rolls yield +1 Damage.'
       };
     }
     if (name.toLowerCase().includes('assault cannon') || name.toLowerCase().includes('dreadnought')) {
       return {
-        name: 'ROTARY ASSAULT CANNON & POWER FIST',
+        name: 'ROTARY ASSAULT CANNON',
+        type: 'ranged',
         category: 'Heavy Rotary Ballistic',
         icon: '💥',
         range: '30"',
@@ -126,9 +133,10 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
         special: 'Devastating Fire: Re-rolls wound rolls of 1 against non-shielded targets.'
       };
     }
-    if (name.toLowerCase().includes('battery') || name.toLowerCase().includes('heavy')) {
+    if (name.toLowerCase().includes('battery') || name.toLowerCase().includes('heavy') || name.toLowerCase().includes('centurion')) {
       return {
         name: 'HEAVY BOLTER SUPPRESSION BATTERY',
+        type: 'ranged',
         category: 'Sustained Heavy Ballistic',
         icon: '💥',
         range: '38"',
@@ -144,6 +152,7 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     }
     return {
       name: 'GODWYN-PATTERN BOLTER',
+      type: 'ranged',
       category: 'Standard Issue Tactical Ballistic',
       icon: '🔫',
       range: rangeStr,
@@ -158,11 +167,12 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 2. Directorate (Astra Militarum / Guard)
+  // 2. Directorate
   if (faction === 'directorate') {
     if (name.toLowerCase().includes('autocannon') || name.toLowerCase().includes('ordnance')) {
       return {
         name: 'TWIN-LINKED AUTOCANNON BATTERY',
+        type: 'ranged',
         category: 'Heavy Kinetic Artillery',
         icon: '💥',
         range: '40"',
@@ -176,8 +186,26 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
         special: 'Long-Range Calibration: Target receives no cover bonuses beyond 24".'
       };
     }
+    if (name.toLowerCase().includes('earthshaker') || name.toLowerCase().includes('basilisk')) {
+      return {
+        name: 'EARTHSHAKER SIEGE CANNON',
+        type: 'ranged',
+        category: 'Long-Range Ordnance',
+        icon: '🎯',
+        range: '50"',
+        strength: 6,
+        penetration: 4,
+        damage: 5,
+        attacks: 2,
+        damageType: 'High-Explosive Heavy Shell',
+        effectiveAgainst: ['Heavy Fortifications', 'Massed Battalions'],
+        weakAgainst: ['Agile Skimmers', 'Subterranean Tunnels'],
+        special: 'Seismic Impact: Shatters cover and disrupts enemy infantry morale.'
+      };
+    }
     return {
       name: 'CANTRIC-PATTERN LAS-RIFLE',
+      type: 'ranged',
       category: 'Directed Energy Carbine',
       icon: '⚡',
       range: rangeStr,
@@ -192,10 +220,45 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 3. Elyri (Aeldari / Craftworld)
+  // 3. Elyri
   if (faction === 'elyri') {
+    if (name.toLowerCase().includes('reaper') || name.toLowerCase().includes('missile')) {
+      return {
+        name: 'REAPER MISSILE LAUNCHER',
+        type: 'ranged',
+        category: 'Aspect Heavy Missile',
+        icon: '💥',
+        range: '40"',
+        strength: 5,
+        penetration: 4,
+        damage: 3,
+        attacks: 3,
+        damageType: 'Starshot High-Explosive',
+        effectiveAgainst: ['Armoured Vehicles', 'Heavy Infantry'],
+        weakAgainst: ['Displacement Barriers'],
+        special: 'Inescapable Death: Re-rolls all failed hit rolls against exposed units.'
+      };
+    }
+    if (name.toLowerCase().includes('mind war') || name.toLowerCase().includes('psychic')) {
+      return {
+        name: 'MIND WAR PSIONIC VOLLEY',
+        type: 'ranged',
+        category: 'Psychic Projection',
+        icon: '🔮',
+        range: '24"',
+        strength: 4,
+        penetration: 4,
+        damage: 3,
+        attacks: 2,
+        damageType: 'Psionic Brain-Rend',
+        effectiveAgainst: ['Commanders', 'Biological Organisms'],
+        weakAgainst: ['Synthetic Automata', 'Null Fields'],
+        special: 'Mind Rend: Directly attacks target leadership morale.'
+      };
+    }
     return {
       name: 'MONOFILAMENT SHURIKEN CATAPULT',
+      type: 'ranged',
       category: 'Exotic Monomolecular',
       icon: '✨',
       range: rangeStr,
@@ -210,12 +273,13 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 4. Veykari (Drukhari / Dark Eldar)
+  // 4. Veykari
   if (faction === 'veykari') {
     return {
-      name: 'SPLINTER CANNON & KLAIVE',
+      name: 'SPLINTER CANNON',
+      type: 'ranged',
       category: 'Toxic Crystal Projectile',
-      icon: '🗡️',
+      icon: '🔫',
       range: rangeStr,
       strength: str,
       penetration: 3,
@@ -228,28 +292,30 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 5. Ghar (Orks / Greenskins)
+  // 5. Ghar
   if (faction === 'ghar') {
     return {
-      name: 'BIG SHOOTA & POWER KLAW',
+      name: 'BIG SHOOTA & DAKKA GUN',
+      type: 'ranged',
       category: 'Brutal Scrap Ballistics',
       icon: '🐗',
       range: rangeStr,
       strength: str + 1,
       penetration: 2,
-      damage: dmg + 1,
+      damage: dmg,
       attacks: attacks + 1,
       damageType: 'Heavy Ballistic Lead',
-      effectiveAgainst: ['Light Vehicles', 'Unprotected Infantry', 'Close Combat'],
+      effectiveAgainst: ['Light Vehicles', 'Unprotected Infantry', 'Close Formations'],
       weakAgainst: ['Precision Snipers', 'Long-Range Fortifications'],
       special: 'Dakka Volley: Extra hit generated on natural 6s during attack roll.'
     };
   }
 
-  // 6. Devourers (Tyranids / Hive Fleet)
+  // 6. Devourers
   if (faction === 'devourers') {
     return {
-      name: 'BIO-ACID CANNON & SCYTHING TALONS',
+      name: 'BIO-ACID CANNON',
+      type: 'ranged',
       category: 'Living Bio-Munition',
       icon: '👾',
       range: rangeStr,
@@ -264,16 +330,17 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 7. Revenant (Necrons / Undying)
+  // 7. Revenant
   if (faction === 'revenant') {
     return {
       name: 'GAUSS DISINTEGRATOR FLAYER',
+      type: 'ranged',
       category: 'Molecular Disintegration',
       icon: '⚡',
       range: rangeStr,
       strength: str,
       penetration: 4,
-      damage: dmg + 1,
+      damage: dmg,
       attacks: attacks,
       damageType: 'Gauss Molecular Field',
       effectiveAgainst: ['Heavy Armour', 'Tanks & Engines', 'Mechanical Plating'],
@@ -282,34 +349,53 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 8. Concordat (T\'au Empire)
+  // 8. Concordat
   if (faction === 'concordat') {
+    if (name.toLowerCase().includes('rail') || name.toLowerCase().includes('accelerator')) {
+      return {
+        name: 'RAIL ACCELERATOR SUB-MUNITION',
+        type: 'ranged',
+        category: 'Electromagnetic Kinetic Rail',
+        icon: '💠',
+        range: '36"',
+        strength: 6,
+        penetration: 4,
+        damage: 4,
+        attacks: 2,
+        damageType: 'Hypervelocity Slug',
+        effectiveAgainst: ['Heavy Armour', 'Mechanical Walkers', 'Bunkers'],
+        weakAgainst: ['Phase Displacement Screens'],
+        special: 'Sub-Munition Penetration: Hits ignore all cover bonuses.'
+      };
+    }
     return {
-      name: 'PULSE RIFLE & RAIL ACCELERATOR',
+      name: 'PULSE RIFLE',
+      type: 'ranged',
       category: 'Advanced Plasma Induction',
       icon: '💠',
       range: rangeStr,
-      strength: str + 1,
+      strength: str,
       penetration: 3,
-      damage: dmg + 1,
+      damage: dmg,
       attacks: attacks,
-      damageType: 'Induction Plasma / Rail Sub-Munition',
-      effectiveAgainst: ['Heavy Armour', 'Mechanical Walkers', 'Long-Range Targets'],
+      damageType: 'Induction Plasma',
+      effectiveAgainst: ['Medium Armour', 'Infantry Cohorts', 'Long-Range Targets'],
       weakAgainst: ['Energy Shields', 'Heat-Resistant Targets'],
       special: 'Target Lock: Markerlight coordination grants +1 Accuracy at extreme ranges.'
     };
   }
 
-  // 9. Riftborn (Chaos Daemons)
+  // 9. Riftborn
   if (faction === 'riftborn') {
     return {
-      name: 'WARP BLADE & HELLFIRE NEXUS',
+      name: 'HELLFIRE WARP NEXUS',
+      type: 'ranged',
       category: 'Dimensional Warpfire',
       icon: '🌀',
       range: rangeStr,
       strength: str + 1,
       penetration: 4,
-      damage: dmg + 1,
+      damage: dmg,
       attacks: attacks,
       damageType: 'Dimensional Warpfire',
       effectiveAgainst: ['Mortal Armies', 'Standard Armor', 'Sanity/Morale'],
@@ -318,16 +404,34 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // 10. Forsaken (Chaos Space Marines)
+  // 10. Forsaken
   if (faction === 'forsaken') {
+    if (name.toLowerCase().includes('pistol') || name.toLowerCase().includes('warp pistol')) {
+      return {
+        name: 'WARP PISTOL',
+        type: 'ranged',
+        category: 'Corrupted Plasma Pistol',
+        icon: '🔥',
+        range: '16"',
+        strength: str + 1,
+        penetration: 3,
+        damage: dmg,
+        attacks: 2,
+        damageType: 'Unholy Plasma Flame',
+        effectiveAgainst: ['Close Assault Cohorts', 'Armoured Infantry'],
+        weakAgainst: ['Aura Shields'],
+        special: 'Hellfire Blast: Ignores cover within 8".'
+      };
+    }
     return {
-      name: 'CORRUPTED BOLTER & DAEMON AXE',
-      category: 'Infernal Chaos Munition',
+      name: 'CORRUPTED BOLTER',
+      type: 'ranged',
+      category: 'Infernal Chaos Ballistics',
       icon: '💀',
       range: rangeStr,
       strength: str + 1,
       penetration: 3,
-      damage: dmg + 1,
+      damage: dmg,
       attacks: attacks,
       damageType: 'Unholy Warp-Tainted Shot',
       effectiveAgainst: ['Armoured Infantry', 'Light Fortifications'],
@@ -336,21 +440,388 @@ export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
     };
   }
 
-  // Generic / Auxiliary Fallback
+  // Generic / Auxiliary Fallback Ranged
   return {
-    name: name.toUpperCase(),
-    category: 'Standard Tactical Armament',
-    icon: '⚔️',
+    name: name.replace(/\(.*?\)/g, '').split('&')[0].trim().toUpperCase() || 'TACTICAL FIREARM',
+    type: 'ranged',
+    category: 'Standard Tactical Ballistics',
+    icon: '🔫',
     range: rangeStr,
     strength: str,
     penetration: 2,
     damage: dmg,
     attacks: attacks,
-    damageType: 'Kinetic Ballistic / Energy',
-    effectiveAgainst: ['Infantry Cohorts', 'Light Units'],
+    damageType: 'Kinetic Ballistics',
+    effectiveAgainst: ['Infantry Cohorts', 'Light Targets'],
     weakAgainst: ['Heavy Refractor Barriers'],
     special: 'Standard Field Issue: Reliable tactical fire.'
   };
+}
+
+/**
+ * Resolves the unit's dedicated MELEE weapon profile.
+ * Returns null if the unit has no melee weapon capability.
+ */
+export function getUnitMeleeWeaponProfile(unitDef: UnitDef): WeaponProfileDetail | null {
+  const hasMelee = unitDef.hasMelee ?? (unitDef.meleeDmg !== undefined && unitDef.meleeDmg > 0);
+  if (!hasMelee) return null;
+
+  const faction = normalizeEquipmentFaction(unitDef.factionId);
+  const name = unitDef.weapon || 'Melee Weapon';
+  const meleeDmg = unitDef.meleeDmg || 2;
+  const str = (unitDef.s || 4) + (unitDef.isLarge ? 1 : 0);
+  const attacks = (unitDef.weapons && unitDef.weapons[1]?.attacks) || (unitDef.isCharacter ? 3 : unitDef.squadSize > 1 ? 2 : 3);
+
+  // 1. Ascendants
+  if (faction === 'ascendants') {
+    if (name.toLowerCase().includes('blade') || name.toLowerCase().includes('captain') || name.toLowerCase().includes('relic')) {
+      return {
+        name: 'RELIC POWER BLADE',
+        type: 'melee',
+        category: 'Master-Crafted Power Blade',
+        icon: '⚔️',
+        range: 'Melee',
+        strength: str + 1,
+        penetration: 4,
+        damage: meleeDmg + 1,
+        attacks: 3,
+        damageType: 'Disruption Energy Edge',
+        effectiveAgainst: ['Heavy Infantry', 'Enemy Commanders', 'Monster Hulls'],
+        weakAgainst: ['Phase Displacement Fields'],
+        special: 'Relic Edge: Ignores enemy parry and deals heavy structural damage in close combat.'
+      };
+    }
+    if (name.toLowerCase().includes('fist') || name.toLowerCase().includes('dreadnought') || name.toLowerCase().includes('drill') || name.toLowerCase().includes('centurion')) {
+      return {
+        name: 'HYDRAULIC POWER FIST',
+        type: 'melee',
+        category: 'Crushing Exo-Melee',
+        icon: '🥊',
+        range: 'Melee',
+        strength: str + 2,
+        penetration: 4,
+        damage: meleeDmg + 2,
+        attacks: 3,
+        damageType: 'Crushing Kinetic / Disruption',
+        effectiveAgainst: ['Armoured Tanks', 'Walkers', 'Fortifications'],
+        weakAgainst: ['Agile Swarms'],
+        special: 'Concussive Smite: Crushing strikes bypass heavy vehicle plating.'
+      };
+    }
+    return {
+      name: 'AUSTERE CHAINSWORD',
+      type: 'melee',
+      category: 'Motorized Monomolecular Blade',
+      icon: '🗡️',
+      range: 'Melee',
+      strength: str,
+      penetration: 2,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Serrated Rotary Teeth',
+      effectiveAgainst: ['Light Infantry', 'Unarmoured Flesh'],
+      weakAgainst: ['Heavy Exo-Plating'],
+      special: 'Rip & Tear: Additional attack generated on natural 6s in melee.'
+    };
+  }
+
+  // 2. Directorate
+  if (faction === 'directorate') {
+    if (name.toLowerCase().includes('sabre') || name.toLowerCase().includes('marshal')) {
+      return {
+        name: 'REGIMENTAL POWER SABRE',
+        type: 'melee',
+        category: 'Officer Melee Weapon',
+        icon: '🗡️',
+        range: 'Melee',
+        strength: str,
+        penetration: 3,
+        damage: meleeDmg,
+        attacks: 3,
+        damageType: 'Power Field Edge',
+        effectiveAgainst: ['Enemy Officers', 'Light Infantry'],
+        weakAgainst: ['Heavy Monsters'],
+        special: 'High Command Duelist: +1 WS in close-quarters duels.'
+      };
+    }
+    return {
+      name: 'BAYONET & TRENCH KNIFE',
+      type: 'melee',
+      category: 'Close-Quarters Combat Blade',
+      icon: '🔪',
+      range: 'Melee',
+      strength: str,
+      penetration: 1,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Steel Blade Piercing',
+      effectiveAgainst: ['Unarmoured Infantry'],
+      weakAgainst: ['Heavy Power Armour'],
+      special: 'Trench Charge: Re-rolls 1s to hit on the turn unit enters melee.'
+    };
+  }
+
+  // 3. Elyri
+  if (faction === 'elyri') {
+    if (name.toLowerCase().includes('spear') || name.toLowerCase().includes('singing')) {
+      return {
+        name: 'SINGING PSYCHIC SPEAR',
+        type: 'melee',
+        category: 'Psionic Rune Weapon',
+        icon: '🔱',
+        range: 'Melee',
+        strength: str + 1,
+        penetration: 4,
+        damage: meleeDmg + 1,
+        attacks: 3,
+        damageType: 'Psychoreactive Force',
+        effectiveAgainst: ['Monsters', 'Armoured Hulls', 'Elite Units'],
+        weakAgainst: ['Anti-Psionic Wards'],
+        special: 'Witchblade: Always wounds on a 2+ in melee against non-vehicles.'
+      };
+    }
+    return {
+      name: 'WRAITHBONE POWER BLADE',
+      type: 'melee',
+      category: 'Acrobatic Aspect Blade',
+      icon: '⚔️',
+      range: 'Melee',
+      strength: str,
+      penetration: 3,
+      damage: meleeDmg,
+      attacks: attacks + 1,
+      damageType: 'Monomolecular Edge',
+      effectiveAgainst: ['Armoured Infantry', 'Living Flesh'],
+      weakAgainst: ['Energy Forcefields'],
+      special: 'Acrobatic Strike: Strikes first in melee combat when charging.'
+    };
+  }
+
+  // 4. Veykari
+  if (faction === 'veykari') {
+    return {
+      name: 'TEMPLE KLAIVE & HARM BLADES',
+      type: 'melee',
+      category: 'Cruel Executioner Blade',
+      icon: '🗡️',
+      range: 'Melee',
+      strength: str + 1,
+      penetration: 4,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Barbed Monomolecular',
+      effectiveAgainst: ['Biological Organisms', 'Light Infantry'],
+      weakAgainst: ['Synthetic Automata', 'Heavy Walkers'],
+      special: 'Torment Edge: Slain enemies inflict panic check on nearby allies.'
+    };
+  }
+
+  // 5. Ghar
+  if (faction === 'ghar') {
+    if (name.toLowerCase().includes('klaw') || name.toLowerCase().includes('power')) {
+      return {
+        name: 'HYDRAULIC POWER KLAW',
+        type: 'melee',
+        category: 'Crushing Industrial Pincer',
+        icon: '🦞',
+        range: 'Melee',
+        strength: str + 2,
+        penetration: 4,
+        damage: meleeDmg + 2,
+        attacks: attacks,
+        damageType: 'Pneumatic Shearing Metal',
+        effectiveAgainst: ['Tanks', 'Heavy Walkers', 'Fortifications'],
+        weakAgainst: ['Agile Skimmers'],
+        special: 'Armor Snip: Deals double damage against mechanical and armored targets.'
+      };
+    }
+    return {
+      name: "HEAVY 'EAVY CHOPPA",
+      type: 'melee',
+      category: 'Brutal Serrated Axe',
+      icon: '🪓',
+      range: 'Melee',
+      strength: str + 1,
+      penetration: 2,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Brutal Slashing',
+      effectiveAgainst: ['Infantry Cohorts', 'Scrap Metal'],
+      weakAgainst: ['Energy Shields'],
+      special: 'Waaagh Frenzy: +1 Strength when fighting multiple models.'
+    };
+  }
+
+  // 6. Devourers
+  if (faction === 'devourers') {
+    return {
+      name: 'SCYTHING TALONS & RENDING CLAWS',
+      type: 'melee',
+      category: 'Bio-Organic Monomolecular Scythes',
+      icon: '🦀',
+      range: 'Melee',
+      strength: str,
+      penetration: 4,
+      damage: meleeDmg,
+      attacks: attacks + 1,
+      damageType: 'Bio-Organic Rending',
+      effectiveAgainst: ['Organic Targets', 'Armoured Infantry'],
+      weakAgainst: ['Energy Barriers'],
+      special: 'Rending Flurry: Penetrates all non-invulnerable armour on wound rolls of 6.'
+    };
+  }
+
+  // 7. Revenant
+  if (faction === 'revenant') {
+    return {
+      name: 'HYPERPHASE BLADE & WARSCYTHE',
+      type: 'melee',
+      category: 'Dimensional Phase Blade',
+      icon: '⚔️',
+      range: 'Melee',
+      strength: str + 1,
+      penetration: 4,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Dimensional Phase Shift',
+      effectiveAgainst: ['Heavy Tanks', 'Shielded Walkers', 'Elite Commanders'],
+      weakAgainst: ['Phase Disrupters'],
+      special: 'Phase Cleave: Phase strikes bypass all energy shielding.'
+    };
+  }
+
+  // 8. Concordat
+  if (faction === 'concordat') {
+    return {
+      name: 'HONOR BLADE & COMBAT GAUNTLET',
+      type: 'melee',
+      category: 'Ethereal Defensive Melee',
+      icon: '🗡️',
+      range: 'Melee',
+      strength: str,
+      penetration: 2,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Defensive Pulse Edge',
+      effectiveAgainst: ['Light Raiders'],
+      weakAgainst: ['Heavy Exosuits'],
+      special: 'Defensive Parry: Grants +1 Evasion when engaged in melee.'
+    };
+  }
+
+  // 9. Riftborn
+  if (faction === 'riftborn') {
+    return {
+      name: 'WARP-FORGED HELLBLADE',
+      type: 'melee',
+      category: 'Corrupted Hellforged Blade',
+      icon: '🗡️',
+      range: 'Melee',
+      strength: str + 1,
+      penetration: 4,
+      damage: meleeDmg + 1,
+      attacks: attacks + 1,
+      damageType: 'Daemonic Fire Cleave',
+      effectiveAgainst: ['Mortal Armies', 'Standard Armor'],
+      weakAgainst: ['Sanctified Aegis Fields'],
+      special: 'Hellfire Cleave: Critical hits in melee inflict permanent burning.'
+    };
+  }
+
+  // 10. Forsaken
+  if (faction === 'forsaken') {
+    if (name.toLowerCase().includes('axe') || name.toLowerCase().includes('daemon axe') || name.toLowerCase().includes('lord') || name.toLowerCase().includes('chainaxe')) {
+      return {
+        name: 'WARP-FORGED DAEMON AXE',
+        type: 'melee',
+        category: 'Demonic Melee Cleaver',
+        icon: '🪓',
+        range: 'Melee',
+        strength: str + 1,
+        penetration: 4,
+        damage: meleeDmg + 1,
+        attacks: 3,
+        damageType: 'Warp-Infused Cleave',
+        effectiveAgainst: ['Armoured Infantry', 'Commanders', 'Monster Hulls'],
+        weakAgainst: ['Consecrated Shields'],
+        special: 'Soul Cleaver: Brutal close-combat cleave that rends heavy armour.'
+      };
+    }
+    return {
+      name: 'CORRUPTED CHAINSWORD',
+      type: 'melee',
+      category: 'Barbed Motorized Blade',
+      icon: '🗡️',
+      range: 'Melee',
+      strength: str,
+      penetration: 2,
+      damage: meleeDmg,
+      attacks: attacks,
+      damageType: 'Serrated Rotary Teeth',
+      effectiveAgainst: ['Infantry Cohorts', 'Flesh'],
+      weakAgainst: ['Heavy Exo-Plating'],
+      special: 'Blood Tithe: Generates +1 attack when eliminating enemy models in melee.'
+    };
+  }
+
+  // Generic Melee Fallback
+  return {
+    name: name.replace(/\(.*?\)/g, '').split('&').pop()?.trim().toUpperCase() || 'COMBAT BLADES',
+    type: 'melee',
+    category: 'Standard Close Combat Arms',
+    icon: '⚔️',
+    range: 'Melee',
+    strength: str,
+    penetration: 2,
+    damage: meleeDmg,
+    attacks: attacks,
+    damageType: 'Kinetic Edge',
+    effectiveAgainst: ['Light Units', 'Infantry Cohorts'],
+    weakAgainst: ['Heavy Armor Plating'],
+    special: 'Standard Close Quarters: Reliable melee response.'
+  };
+}
+
+/**
+ * Returns all distinct weapon profiles (both ranged and melee if applicable) for a given unit.
+ */
+export function getUnitWeaponProfiles(unitDef: UnitDef): WeaponProfileDetail[] {
+  const profiles: WeaponProfileDetail[] = [];
+  const ranged = getUnitRangedWeaponProfile(unitDef);
+  if (ranged) profiles.push(ranged);
+  const melee = getUnitMeleeWeaponProfile(unitDef);
+  if (melee) profiles.push(melee);
+
+  if (profiles.length === 0) {
+    const fallback = getUnitWeaponProfile(unitDef);
+    if (fallback) profiles.push(fallback);
+  }
+  return profiles;
+}
+
+/**
+ * Procedural/Specific primary weapon database for all units (backwards compatible).
+ * Returns the primary weapon (ranged weapon if available, otherwise melee weapon).
+ */
+export function getUnitWeaponProfile(unitDef: UnitDef): WeaponProfileDetail {
+  return (
+    getUnitRangedWeaponProfile(unitDef) ||
+    getUnitMeleeWeaponProfile(unitDef) || {
+      name: (unitDef.weapon || 'Standard Armament').toUpperCase(),
+      type: 'ranged',
+      category: 'Standard Tactical Armament',
+      icon: '⚔️',
+      range: unitDef.range > 2 ? `${unitDef.range}"` : 'Melee',
+      strength: unitDef.s || 4,
+      penetration: 2,
+      damage: unitDef.dmg || 2,
+      attacks: unitDef.squadSize > 1 ? 2 : 3,
+      damageType: 'Kinetic Ballistic / Energy',
+      effectiveAgainst: ['Infantry Cohorts', 'Light Units'],
+      weakAgainst: ['Heavy Refractor Barriers'],
+      special: 'Standard Field Issue: Reliable tactical fire.'
+    }
+  );
 }
 
 /**

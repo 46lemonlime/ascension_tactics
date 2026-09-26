@@ -400,6 +400,9 @@ export class GameEngine {
       ranged: unitDef.ranged ?? true,
       hasMelee: unitDef.hasMelee ?? true,
       meleeDmg: unitDef.meleeDmg || 2,
+      rangedWeapon: unitDef.rangedWeapon,
+      meleeWeapon: unitDef.meleeWeapon,
+      weapons: unitDef.weapons ? [...unitDef.weapons] : [],
       model: new THREE.Group()
     };
 

@@ -1,5 +1,5 @@
 import type { Unit, UnitDef } from '../data/types';
-import { getUnitWeaponProfile, getUnitArmourProfile, getUnitUtilityProfile, WeaponProfileDetail, ArmourProfileDetail, UtilityProfileDetail } from '../data/equipment';
+import { getUnitWeaponProfile, getUnitWeaponProfiles, getUnitArmourProfile, getUnitUtilityProfile, WeaponProfileDetail, ArmourProfileDetail, UtilityProfileDetail } from '../data/equipment';
 
 export class DatasheetUI {
   private panel: HTMLElement | null;
@@ -73,6 +73,7 @@ export class DatasheetUI {
   // Pinned popup state
   private pinnedPopup: 'weapon' | 'armour' | 'utility' | null = null;
   private currentWeaponProfile: WeaponProfileDetail | null = null;
+  private currentWeaponProfiles: WeaponProfileDetail[] = [];
   private currentArmourProfile: ArmourProfileDetail | null = null;
   private currentUtilityProfile: UtilityProfileDetail | null = null;
 
@@ -309,30 +310,97 @@ export class DatasheetUI {
   }
 
   private populateWeaponPopup(): void {
-    if (!this.currentWeaponProfile) return;
-    const w = this.currentWeaponProfile;
+    if (!this.weaponPopup) return;
+    const profiles = this.currentWeaponProfiles && this.currentWeaponProfiles.length > 0
+      ? this.currentWeaponProfiles
+      : (this.currentWeaponProfile ? [this.currentWeaponProfile] : []);
 
-    if (this.wepNameEl) this.wepNameEl.textContent = w.name;
-    if (this.wepRangeEl) this.wepRangeEl.textContent = w.range;
-    if (this.wepStrEl) this.wepStrEl.textContent = `${w.strength}`;
-    if (this.wepPenEl) this.wepPenEl.textContent = `${w.penetration}`;
-    if (this.wepDmgEl) this.wepDmgEl.textContent = `${w.damage}`;
-    if (this.wepAtkEl) this.wepAtkEl.textContent = `${w.attacks}`;
-    if (this.wepDmgTypeEl) this.wepDmgTypeEl.textContent = w.damageType;
+    if (profiles.length === 0) return;
 
-    if (this.wepEffectiveEl) {
-      this.wepEffectiveEl.innerHTML = w.effectiveAgainst
-        .map(eff => `<li><span class="popup-list-icon check">✓</span> ${eff}</li>`)
-        .join('');
+    let html = `
+      <div class="popup-header">
+        <div class="popup-tag">WEAPON LOADOUT ${profiles.length > 1 ? `(${profiles.length} WEAPONS)` : ''}</div>
+        <div class="popup-title-row">
+          <span class="popup-name" id="wep-popup-name">${profiles.length === 1 ? profiles[0].name : 'EQUIPPED ARSENAL'}</span>
+          <button type="button" class="popup-close-btn" id="wep-popup-close" title="Close" aria-label="Close">✕</button>
+        </div>
+      </div>
+      <div class="popup-divider"></div>
+      <div class="weapon-popup-entries">
+    `;
+
+    profiles.forEach((w, idx) => {
+      const typeLabel = w.type ? (w.type === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON') : (w.range.toLowerCase() === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON');
+      const typeClass = w.type || (w.range.toLowerCase() === 'melee' ? 'melee' : 'ranged');
+      const isMulti = profiles.length > 1;
+
+      html += `
+        <div class="weapon-loadout-card ${typeClass}">
+          ${isMulti ? `
+            <div class="weapon-loadout-card-header">
+              <span class="weapon-type-pill ${typeClass}">${typeLabel}</span>
+              <span class="weapon-loadout-name">${w.icon || (typeClass === 'melee' ? '⚔️' : '🔫')} ${w.name}</span>
+            </div>
+          ` : ''}
+          <div class="popup-stats-table">
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Range</span>
+              <span class="popup-stat-value">${w.range}</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Strength</span>
+              <span class="popup-stat-value">${w.strength}</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Penetration</span>
+              <span class="popup-stat-value">${w.penetration}</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Damage</span>
+              <span class="popup-stat-value">${w.damage}</span>
+            </div>
+            <div class="popup-stat-row">
+              <span class="popup-stat-label">Attacks</span>
+              <span class="popup-stat-value">${w.attacks}</span>
+            </div>
+          </div>
+          
+          <div class="popup-section-header">DAMAGE TYPE</div>
+          <div class="popup-type-badge">${w.damageType}</div>
+
+          ${w.effectiveAgainst && w.effectiveAgainst.length > 0 ? `
+            <div class="popup-section-header">EFFECTIVE AGAINST</div>
+            <ul class="popup-list effective-list">
+              ${w.effectiveAgainst.map(eff => `<li><span class="popup-list-icon check">✓</span> ${eff}</li>`).join('')}
+            </ul>
+          ` : ''}
+
+          ${w.weakAgainst && w.weakAgainst.length > 0 ? `
+            <div class="popup-section-header">WEAK AGAINST</div>
+            <ul class="popup-list weak-list">
+              ${w.weakAgainst.map(weak => `<li><span class="popup-list-icon cross">✕</span> ${weak}</li>`).join('')}
+            </ul>
+          ` : ''}
+
+          <div class="popup-section-header">SPECIAL</div>
+          <div class="popup-special-text">${w.special}</div>
+        </div>
+      `;
+      if (isMulti && idx < profiles.length - 1) {
+        html += `<div class="popup-divider" style="margin: 10px 0; opacity: 0.5;"></div>`;
+      }
+    });
+
+    html += `</div>`;
+    this.weaponPopup.innerHTML = html;
+
+    const closeBtn = document.getElementById('wep-popup-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closePopup('weapon');
+      });
     }
-
-    if (this.wepWeakEl) {
-      this.wepWeakEl.innerHTML = w.weakAgainst
-        .map(weak => `<li><span class="popup-list-icon cross">✕</span> ${weak}</li>`)
-        .join('');
-    }
-
-    if (this.wepSpecialEl) this.wepSpecialEl.textContent = w.special;
   }
 
   private populateArmourPopup(): void {
@@ -374,7 +442,8 @@ export class DatasheetUI {
     this.panel.style.display = 'flex';
 
     // Retrieve full equipment and utility profiles
-    this.currentWeaponProfile = getUnitWeaponProfile(unitDef);
+    this.currentWeaponProfiles = getUnitWeaponProfiles(unitDef);
+    this.currentWeaponProfile = this.currentWeaponProfiles[0] || getUnitWeaponProfile(unitDef);
     this.currentArmourProfile = getUnitArmourProfile(unitDef);
     this.currentUtilityProfile = getUnitUtilityProfile(unitDef);
 
@@ -393,7 +462,7 @@ export class DatasheetUI {
     const strength = unitDef.s || 4;
     const attacks = this.currentWeaponProfile.attacks || 2;
 
-    if (this.wepIconEl) this.wepIconEl.textContent = this.currentWeaponProfile.icon || '🔫';
+    if (this.wepIconEl) this.wepIconEl.textContent = this.currentWeaponProfile.icon || (this.currentWeaponProfiles.length > 1 ? '⚔️' : '🔫');
     if (this.statAccEl) this.statAccEl.textContent = `${accuracy}`;
     if (this.statStrEl) this.statStrEl.textContent = `${strength}`;
     if (this.statAtkEl) this.statAtkEl.textContent = `${attacks}`;

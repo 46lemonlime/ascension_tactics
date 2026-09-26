@@ -250,8 +250,12 @@ export function resolveAttack(
     const isHit = hitRoll >= reqHit;
 
     sfx.dice();
+    const usedWeaponName = isMeleeCombat
+      ? (attacker.meleeWeapon?.name || attacker.def?.meleeWeapon?.name || 'Melee Weapons')
+      : (attacker.rangedWeapon?.name || attacker.def?.rangedWeapon?.name || 'Ranged Weapons');
+
     logCombat(
-      `<b>${attacker.name}</b> attacks <b>${target.name}</b> with <i>${attacker.def?.weapon || 'Weapons'}</i> (${weaponDesc}):`,
+      `<b>${attacker.name}</b> attacks <b>${target.name}</b> with <i>${usedWeaponName}</i> (${weaponDesc}):`,
       'combat'
     );
     logCombat(

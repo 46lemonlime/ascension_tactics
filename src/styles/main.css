@@ -2937,6 +2937,80 @@ body,
   line-height: 1.35;
 }
 
+/* Multi-Weapon Loadout Cards */
+.weapon-popup-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.weapon-loadout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weapon-loadout-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.weapon-type-pill {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.weapon-type-pill.ranged {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.weapon-type-pill.melee {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.weapon-loadout-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+/* Unit Weapon Tags in Dossier / Cards */
+.unit-wep-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: #e2e8f0;
+}
+
+.unit-wep-tag.ranged {
+  color: #93c5fd;
+}
+
+.unit-wep-tag.melee {
+  color: #fcd34d;
+}
+
+.unit-wep-sep {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
+}
+
 
 .actions-group {
   display: flex;

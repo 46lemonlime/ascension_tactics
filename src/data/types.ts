@@ -13,11 +13,16 @@ export type ParticleType = 'rain' | 'sand' | 'snow' | 'stars' | 'astral' | 'corr
 
 export interface WeaponProfile {
   name: string;
+  type?: 'ranged' | 'melee';
+  category?: string;
+  icon?: string;
   range: number;
   attacks: number;
   strength: number;
   ap: number;
   damage: number;
+  damageType?: string;
+  special?: string;
 }
 
 export interface UnitPhysicalProfile {
@@ -133,6 +138,8 @@ export interface UnitDef {
   ranged: boolean;
   hasMelee: boolean;
   weapon: string;
+  rangedWeapon?: WeaponProfile;
+  meleeWeapon?: WeaponProfile;
   weapons?: WeaponProfile[];
   tags?: string[];
   color: number;
@@ -215,6 +222,9 @@ export interface Unit {
   ranged: boolean;
   hasMelee: boolean;
   meleeDmg: number;
+  rangedWeapon?: WeaponProfile;
+  meleeWeapon?: WeaponProfile;
+  weapons?: WeaponProfile[];
   model: THREE.Group;
 }
 
