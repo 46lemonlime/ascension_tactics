@@ -36,16 +36,16 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: 'Domination',
     subtitle: 'Strategic Node Control • Victory Points',
     icon: '🚩',
-    desc: 'Capture and secure 3 strategic tactical beacons (Alpha, Bravo, Charlie) situated across the central frontline. Hold nodes at round end to accumulate Victory Points. First to 100 VP or highest score at Round 8 wins.',
-    params: '3 Strategic Beacons (Nodes 1, 2, 3) • Target: 100 VP • 8 Rounds Limit',
+    desc: 'Capture and secure 3 strategic tactical beacons (Alpha, Bravo, Charlie) situated across the central frontline. Hold nodes at round end to accumulate Victory Points. Reach the designated Victory Points threshold or highest score at match conclusion to win.',
+    params: '3 Strategic Beacons (Nodes 1, 2, 3) • Target: 1000 VP • Strategic Node Control',
     features: 'Area zone control • Multi-front engagement • Dynamic VP accumulation'
   }
 };
 
 export const MISSION_CYCLE: MissionType[] = Object.keys(MISSIONS) as MissionType[];
 
-export const DOMINATION_WIN_POINTS_OPTIONS = [50, 75, 100, 150, 200] as const;
-export const DEFAULT_DOMINATION_WIN_POINTS = 100;
+export const DOMINATION_WIN_POINTS_OPTIONS = [1000, 1500, 2000, 2500] as const;
+export const DEFAULT_DOMINATION_WIN_POINTS = 1000;
 
 export function getDefaultMissionSettings(missionType: MissionType) {
   if (missionType === 'domination') {

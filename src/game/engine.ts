@@ -231,7 +231,7 @@ export class GameEngine {
     const themeName = (THEMES[setup.theme] || THEMES.jungle).name;
 
     if (setup.mission === 'domination') {
-      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 100;
+      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 1000;
       this.dom.updateMissionHud('Domination', `Score: 🟦 0/${winPoints} VP vs 🟨 0/${winPoints} VP`);
     } else {
       this.dom.updateMissionHud(setup.mission, `${p1Name} vs ${p2Name} (${setup.pointLimit} pts)`);
@@ -969,7 +969,7 @@ export class GameEngine {
         if (obj.controlledBy === 2) this.state.p2Score += 10;
       });
 
-      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 100;
+      const winPoints = this.state.missionSettings?.type === 'domination' ? this.state.missionSettings.dominationWinPoints : 1000;
       this.dom.updateMissionHud(
         'Domination',
         `Score: 🟦 ${this.state.p1Score}/${winPoints} VP vs 🟨 ${this.state.p2Score}/${winPoints} VP`

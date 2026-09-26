@@ -51,7 +51,7 @@ export class DOMManager {
   public selectedP2Faction: string = 'random';
   public selectedTheme: string = 'random';
   public selectedMission: MissionType = 'extermination';
-  public dominationWinPoints: number = 100;
+  public dominationWinPoints: number = 1000;
   public vipOwner: 'player' | 'ai' = 'player';
   public p1EscortRole: 'escort' | 'attack' | 'random' = 'escort';
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
@@ -705,7 +705,7 @@ export class DOMManager {
     const dominationPointsSelect = document.getElementById('sp-domination-points-select') as HTMLSelectElement | null;
     if (dominationPointsSelect) {
       dominationPointsSelect.addEventListener('change', () => {
-        this.dominationWinPoints = parseInt(dominationPointsSelect.value, 10) || 100;
+        this.dominationWinPoints = parseInt(dominationPointsSelect.value, 10) || 1000;
         this.updateSinglePlayerSummary();
       });
     }
@@ -1303,7 +1303,7 @@ export class DOMManager {
     if (this.selectedMission === 'domination') {
       missionSettings = {
         type: 'domination',
-        dominationWinPoints: this.dominationWinPoints || 100
+        dominationWinPoints: this.dominationWinPoints || 1000
       };
     } else if (this.selectedMission === 'escort') {
       missionSettings = {
