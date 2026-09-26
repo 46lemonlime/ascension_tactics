@@ -618,6 +618,7 @@ function animate(now: number) {
 
   if (engine.state.phase === 'battle') {
     PhysicsEngine.step(dt, engine.state.units);
+    engine.updateTimers(dt);
   }
 
   scene.render(dt);

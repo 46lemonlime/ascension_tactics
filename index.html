@@ -336,6 +336,11 @@
         <div class="sp-step-connector"></div>
         <div class="sp-step-pill" id="sp-step-pill-4" data-step="4">
           <span class="sp-step-num">4</span>
+          <span class="sp-step-text">SETTINGS</span>
+        </div>
+        <div class="sp-step-connector"></div>
+        <div class="sp-step-pill" id="sp-step-pill-5" data-step="5">
+          <span class="sp-step-num">5</span>
           <span class="sp-step-text">ARMY</span>
         </div>
       </div>
@@ -815,17 +820,31 @@
               </select>
             </div>
           </div>
-          <!-- MATCH POINT LIMIT SELECTOR -->
-          <div class="sp-point-limit-box">
-            <div class="sp-point-limit-label-group">
-              <span class="sp-point-limit-icon">⚖️</span>
-              <div class="sp-point-limit-text">
-                <span class="sp-point-limit-heading">POINT LIMIT</span>
-                <span class="sp-point-limit-sub">Authoritative tactical budget for both Player and AI warhosts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. STAGE 4: BATTLE SETTINGS -->
+    <div id="sp-stage-settings" class="sp-stage-container" style="display:none;">
+      <div class="sp-stage-header">
+        <h2 class="sp-stage-title">BATTLE SETTINGS</h2>
+        <p class="sp-stage-subtitle">Configure match limits, turn timers, and operational parameters for both commanders.</p>
+      </div>
+
+      <div class="sp-settings-container">
+        <div class="sp-settings-grid">
+          <!-- 1. POINT LIMIT -->
+          <div class="sp-setting-card">
+            <div class="sp-setting-icon-header">
+              <span class="sp-setting-icon">⚖️</span>
+              <div class="sp-setting-titles">
+                <h3 class="sp-setting-title">POINT LIMIT</h3>
+                <span class="sp-setting-sub">Army composition points cap</span>
               </div>
             </div>
-            <div class="sp-point-limit-select-wrap">
-              <select id="sp-point-limit-select" class="sp-point-limit-select">
+            <p class="sp-setting-desc">Sets the maximum tactical points both Player 1 and the AI Opponent may spend when assembling their strike forces.</p>
+            <div class="sp-setting-control-wrap">
+              <select id="sp-settings-point-limit" class="sp-setting-select">
                 <option value="1000">1000 PTS (Combat Patrol)</option>
                 <option value="2000" selected>2000 PTS (Standard Incursion)</option>
                 <option value="3000">3000 PTS (Strike Force)</option>
@@ -833,11 +852,77 @@
               </select>
             </div>
           </div>
+
+          <!-- 2. MAX TURNS / ROUNDS -->
+          <div class="sp-setting-card">
+            <div class="sp-setting-icon-header">
+              <span class="sp-setting-icon">🔄</span>
+              <div class="sp-setting-titles">
+                <h3 class="sp-setting-title">MAX ROUNDS</h3>
+                <span class="sp-setting-sub">Engagement round duration limit</span>
+              </div>
+            </div>
+            <p class="sp-setting-desc">The maximum number of combat rounds before tactical exhaustion is reached and victory score is computed.</p>
+            <div class="sp-setting-control-wrap">
+              <select id="sp-settings-max-turns" class="sp-setting-select">
+                <option value="20">20 Rounds</option>
+                <option value="30">30 Rounds</option>
+                <option value="40" selected>40 Rounds (Standard)</option>
+                <option value="50">50 Rounds</option>
+                <option value="60">60 Rounds</option>
+                <option value="unlimited">UNLIMITED (∞)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 3. MAX GAME TIME -->
+          <div class="sp-setting-card">
+            <div class="sp-setting-icon-header">
+              <span class="sp-setting-icon">⏱️</span>
+              <div class="sp-setting-titles">
+                <h3 class="sp-setting-title">MAX MATCH TIME</h3>
+                <span class="sp-setting-sub">Overall battlefield match clock</span>
+              </div>
+            </div>
+            <p class="sp-setting-desc">Real-time match time limit. When expired, the skirmish terminates immediately and highest VP or strength claims victory.</p>
+            <div class="sp-setting-control-wrap">
+              <select id="sp-settings-game-time" class="sp-setting-select">
+                <option value="600">10 Minutes</option>
+                <option value="1200">20 Minutes</option>
+                <option value="1800" selected>30 Minutes (Standard)</option>
+                <option value="2700">45 Minutes</option>
+                <option value="3600">60 Minutes</option>
+                <option value="unlimited">UNLIMITED (∞)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4. MAX TIME PER TURN -->
+          <div class="sp-setting-card">
+            <div class="sp-setting-icon-header">
+              <span class="sp-setting-icon">⏳</span>
+              <div class="sp-setting-titles">
+                <h3 class="sp-setting-title">TURN TIME LIMIT</h3>
+                <span class="sp-setting-sub">Action clock per command phase</span>
+              </div>
+            </div>
+            <p class="sp-setting-desc">Maximum time allowed for a single commander's turn. If the countdown reaches zero, the turn automatically advances.</p>
+            <div class="sp-setting-control-wrap">
+              <select id="sp-settings-turn-time" class="sp-setting-select">
+                <option value="30">30 Seconds (Blitz)</option>
+                <option value="60">60 Seconds (Rapid)</option>
+                <option value="90">90 Seconds (Tactical)</option>
+                <option value="120" selected>120 Seconds (Standard)</option>
+                <option value="180">180 Seconds (Deliberate)</option>
+                <option value="unlimited">UNLIMITED (∞)</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 5. STAGE 4: ARMY COMPOSITION -->
+    <!-- 6. STAGE 5: ARMY COMPOSITION -->
     <div id="sp-stage-army" class="sp-stage-container" style="display:none;">
       <div class="sp-stage-header">
         <h2 class="sp-stage-title">ARMY COMPOSITION</h2>
@@ -934,6 +1019,11 @@
           <span class="sp-summary-label">MISSION:</span>
           <span class="sp-summary-val" id="sp-summary-mission">Extermination</span>
         </div>
+        <div class="sp-summary-sep">•</div>
+        <div class="sp-summary-item">
+          <span class="sp-summary-label">SETTINGS:</span>
+          <span class="sp-summary-val" id="sp-summary-settings">2000 PTS • 40R</span>
+        </div>
       </div>
 
       <!-- Forward / Launch Action Button -->
@@ -1026,7 +1116,9 @@
 
     <!-- MISSION & ROUND STATUS HUD BAR -->
     <div id="mission-hud-bar" class="interactive" style="display:none;">
-      <div class="hud-round-pill" id="hud-round-badge">ROUND 1 / 8</div>
+      <div class="hud-round-pill" id="hud-round-badge">ROUND 1 / 40</div>
+      <div class="hud-timer-badge turn-timer" id="hud-turn-timer" title="Turn Time Limit">⏳ 120s</div>
+      <div class="hud-timer-badge game-timer" id="hud-game-timer" title="Match Elapsed Time">⏱️ 00:00 / 30:00</div>
       <div class="hud-mission-title" id="hud-mission-title">EXTERMINATION</div>
       <div class="hud-mission-details" id="hud-mission-details">Squads: 🟦 6 vs 🟨 6</div>
     </div>

@@ -13,7 +13,8 @@ import { animateMovePath } from './movement';
 import { clearTweens, spawnTeleportBeam, showWorldText } from './effects';
 import { sfx } from '../audio/synth';
 import { savePlayerCamera, restorePlayerCamera, getActionCamEnabled, getActiveCameraController, animateCameraTo } from '../renderer/camera';
-import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem, MatchSetup, PointLimit } from '../data/types';
+import type { GameState, Unit, UnitDef, MissionType, DeploymentCard, EnemyRosterItem, MatchSetup, PointLimit, BattleSettings } from '../data/types';
+import { DEFAULT_BATTLE_SETTINGS } from '../data/settings';
 import type { GameScene } from '../renderer/scene';
 import type { CombatLogUI } from '../ui/combat-log';
 import type { DatasheetUI } from '../ui/datasheet-ui';
@@ -36,6 +37,7 @@ export class GameEngine {
   public isExecutingAiTurn: boolean = false;
   public isBusy: boolean = false;
   private nextUnitId: number = 1;
+  private lastRenderedSecond: number = -1;
 
   constructor(
     scene: GameScene,
@@ -84,7 +86,10 @@ export class GameEngine {
       escortTargetC: 20,
       escortTargetR: 4,
       rosterPlayer: [],
-      rosterEnemy: []
+      rosterEnemy: [],
+      battleSettings: { ...DEFAULT_BATTLE_SETTINGS },
+      elapsedGameTime: 0,
+      turnTimeRemaining: DEFAULT_BATTLE_SETTINGS.maxTurnTimeSeconds
     };
   }
 
@@ -110,6 +115,10 @@ export class GameEngine {
     this.state.rosterEnemy = [];
     this.state.objectives = [];
     this.nextUnitId = 1;
+    this.state.battleSettings = this.state.matchSetup?.battleSettings || { ...DEFAULT_BATTLE_SETTINGS };
+    this.state.elapsedGameTime = 0;
+    this.state.turnTimeRemaining = this.state.battleSettings.maxTurnTimeSeconds;
+    this.lastRenderedSecond = -1;
 
     const cockpit = document.getElementById('gameplay-cockpit');
     if (cockpit) cockpit.style.display = 'none';
@@ -129,6 +138,9 @@ export class GameEngine {
     let setup: MatchSetup;
     if (typeof setupOrP1Faction === 'object') {
       setup = setupOrP1Faction;
+      if (!setup.battleSettings) {
+        setup.battleSettings = { ...DEFAULT_BATTLE_SETTINGS, pointLimit: setup.pointLimit || 2000 };
+      }
     } else {
       const p1 = setupOrP1Faction;
       const p2 = p2FactionArg || 'forsaken';
@@ -140,6 +152,7 @@ export class GameEngine {
         theme: th,
         mission: mi,
         pointLimit: 2000,
+        battleSettings: { ...DEFAULT_BATTLE_SETTINGS },
         p1EscortRole: p1EscortRoleArg,
         p2EscortRole: p2EscortRoleArg,
         playerArmy: getDefaultArmyComposition(p1, 2000),
@@ -154,6 +167,10 @@ export class GameEngine {
     this.state.theme = setup.theme;
     this.state.mission = setup.mission;
     this.state.pointLimit = setup.pointLimit;
+    this.state.battleSettings = setup.battleSettings;
+    this.state.elapsedGameTime = 0;
+    this.state.turnTimeRemaining = setup.battleSettings.maxTurnTimeSeconds;
+    this.lastRenderedSecond = -1;
     this.state.escortRole = setup.p1EscortRole || 'escort';
     this.state.p2EscortRole = setup.p2EscortRole || 'attack';
     this.state.playerArmy = setup.playerArmy || getDefaultArmyComposition(setup.p1Faction, setup.pointLimit);
@@ -207,6 +224,13 @@ export class GameEngine {
     const p2Name = (FACTIONS[setup.p2Faction] || FACTIONS.chaos).name;
     const themeName = (THEMES[setup.theme] || THEMES.jungle).name;
     this.dom.updateMissionHud(setup.mission, `${p1Name} vs ${p2Name} (${setup.pointLimit} pts)`);
+    this.dom.updateBattleHudTimers(
+      this.state.turnTimeRemaining,
+      0,
+      this.state.battleSettings.maxGameTimeSeconds,
+      1,
+      this.state.battleSettings.maxTurns
+    );
     this.log.log(`Warzone initialized: ${themeName.toUpperCase()} theater. Mission: ${setup.mission.toUpperCase()} (${setup.pointLimit} pts). Deploy your strike force.`, 'info');
   }
 
@@ -376,13 +400,21 @@ export class GameEngine {
     this.state.phase = 'battle';
     this.state.turn = 1;
     this.state.round = 1;
+    this.state.turnTimeRemaining = this.state.battleSettings.maxTurnTimeSeconds;
 
     // Show gameplay cockpit
     const cockpit = document.getElementById('gameplay-cockpit');
     if (cockpit) cockpit.style.display = 'flex';
 
     this.refreshAwareness();
-    this.dom.updateTurnBanner(1, 1, 'battle');
+    this.dom.updateTurnBanner(1, 1, 'battle', this.state.battleSettings.maxTurns);
+    this.dom.updateBattleHudTimers(
+      this.state.turnTimeRemaining,
+      this.state.elapsedGameTime,
+      this.state.battleSettings.maxGameTimeSeconds,
+      1,
+      this.state.battleSettings.maxTurns
+    );
     sfx('horn');
     this.log.log('Deployment complete! Combat commences.', 'alert');
   }
@@ -674,6 +706,8 @@ export class GameEngine {
   public endTurn(): void {
     if (this.state.phase !== 'battle') return;
 
+    this.state.turnTimeRemaining = this.state.battleSettings.maxTurnTimeSeconds;
+
     if (this.state.turn === 1) {
       this.selectUnit(null);
       savePlayerCamera();
@@ -681,7 +715,14 @@ export class GameEngine {
       this.state.turn = 2;
       const btn = document.getElementById('btn-end-turn') as HTMLButtonElement | null;
       if (btn) btn.disabled = true;
-      this.dom.updateTurnBanner(2, this.state.round, 'battle');
+      this.dom.updateTurnBanner(2, this.state.round, 'battle', this.state.battleSettings.maxTurns);
+      this.dom.updateBattleHudTimers(
+        this.state.turnTimeRemaining,
+        this.state.elapsedGameTime,
+        this.state.battleSettings.maxGameTimeSeconds,
+        this.state.round,
+        this.state.battleSettings.maxTurns
+      );
       sfx('horn');
       this.startAiTurn();
     } else {
@@ -695,9 +736,85 @@ export class GameEngine {
 
       const btn = document.getElementById('btn-end-turn') as HTMLButtonElement | null;
       if (btn) btn.disabled = false;
-      this.dom.updateTurnBanner(1, this.state.round, 'battle');
+      this.dom.updateTurnBanner(1, this.state.round, 'battle', this.state.battleSettings.maxTurns);
+      this.dom.updateBattleHudTimers(
+        this.state.turnTimeRemaining,
+        this.state.elapsedGameTime,
+        this.state.battleSettings.maxGameTimeSeconds,
+        this.state.round,
+        this.state.battleSettings.maxTurns
+      );
       sfx('horn');
       this.checkVictoryConditions();
+    }
+  }
+
+  public updateTimers(dt: number): void {
+    if (this.state.phase !== 'battle') return;
+
+    this.state.elapsedGameTime += dt;
+
+    // Check Max Game Time Limit
+    if (
+      this.state.battleSettings.maxGameTimeSeconds !== null &&
+      this.state.elapsedGameTime >= this.state.battleSettings.maxGameTimeSeconds
+    ) {
+      this.handleGameTimeExpired();
+      return;
+    }
+
+    // Check Max Turn Time Limit
+    if (
+      this.state.battleSettings.maxTurnTimeSeconds !== null &&
+      this.state.turnTimeRemaining !== null
+    ) {
+      this.state.turnTimeRemaining -= dt;
+      if (this.state.turnTimeRemaining <= 0) {
+        this.state.turnTimeRemaining = this.state.battleSettings.maxTurnTimeSeconds;
+        if (this.state.turn === 1 && !this.isBusy && !this.isExecutingAiTurn) {
+          this.log.log('Turn time limit reached! Turn ended automatically.', 'alert');
+          this.endTurn();
+          return;
+        }
+      }
+    }
+
+    // Throttle DOM HUD timer updates to whole-second transitions
+    const currentSec = Math.floor(this.state.elapsedGameTime);
+    if (currentSec !== this.lastRenderedSecond) {
+      this.lastRenderedSecond = currentSec;
+      this.dom.updateBattleHudTimers(
+        this.state.turnTimeRemaining,
+        this.state.elapsedGameTime,
+        this.state.battleSettings.maxGameTimeSeconds,
+        this.state.round,
+        this.state.battleSettings.maxTurns
+      );
+    }
+  }
+
+  private handleGameTimeExpired(): void {
+    const p1Alive = this.state.units.filter(u => u.player === 1 && !u.isVip && !u.dead);
+    const p2Alive = this.state.units.filter(u => u.player === 2 && !u.dead);
+
+    if (this.state.mission === 'domination') {
+      const winner = this.state.p1Score > this.state.p2Score ? 1 : (this.state.p2Score > this.state.p1Score ? 2 : 0);
+      const msg = winner === 0
+        ? `Match time limit expired! Stalemate: ${this.state.p1Score} VP each.`
+        : `Match time limit expired! Final Score: ${this.state.p1Score} to ${this.state.p2Score} VP.`;
+      this.dom.showGameOver(winner, msg, () => {
+        this.resetGameSession();
+        this.dom.showHomeScreen();
+      });
+    } else {
+      const winner = p1Alive.length > p2Alive.length ? 1 : (p2Alive.length > p1Alive.length ? 2 : 0);
+      const msg = winner === 0
+        ? `Match time limit expired! Both forces tied with ${p1Alive.length} squads remaining.`
+        : `Match time limit expired! Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}.`;
+      this.dom.showGameOver(winner, msg, () => {
+        this.resetGameSession();
+        this.dom.showHomeScreen();
+      });
     }
   }
 
@@ -884,16 +1001,23 @@ export class GameEngine {
       return;
     }
 
-    if (this.state.round > 8) {
+    const maxTurns = this.state.battleSettings.maxTurns;
+    if (maxTurns !== null && this.state.round > maxTurns) {
       if (this.state.mission === 'domination') {
-        const winner = this.state.p1Score >= this.state.p2Score ? 1 : 2;
-        this.dom.showGameOver(winner, `Match concluded after 8 rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score}`, () => {
+        const winner = this.state.p1Score > this.state.p2Score ? 1 : (this.state.p2Score > this.state.p1Score ? 2 : 0);
+        const msg = winner === 0
+          ? `Match concluded after ${maxTurns} rounds. Stalemate: ${this.state.p1Score} VP each.`
+          : `Match concluded after ${maxTurns} rounds. Final Score: ${this.state.p1Score} to ${this.state.p2Score} VP.`;
+        this.dom.showGameOver(winner, msg, () => {
           this.resetGameSession();
           this.dom.showHomeScreen();
         });
       } else {
-        const winner = p1Alive.length >= p2Alive.length ? 1 : 2;
-        this.dom.showGameOver(winner, `Match round limit reached. Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}`, () => {
+        const winner = p1Alive.length > p2Alive.length ? 1 : (p2Alive.length > p1Alive.length ? 2 : 0);
+        const msg = winner === 0
+          ? `Match round limit reached (${maxTurns} rounds). Both forces tied with ${p1Alive.length} squads remaining.`
+          : `Match round limit reached (${maxTurns} rounds). Surviving Squads: ${p1Alive.length} vs ${p2Alive.length}.`;
+        this.dom.showGameOver(winner, msg, () => {
           this.resetGameSession();
           this.dom.showHomeScreen();
         });

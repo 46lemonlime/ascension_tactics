@@ -2,7 +2,8 @@ import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { MISSIONS, MISSION_CYCLE } from '../data/missions';
 import { UNIT_DEFS } from '../data/units';
-import type { MissionType, PointLimit, ArmyComposition, MatchSetup, ArmyUnitSelection, UnitDef } from '../data/types';
+import type { MissionType, PointLimit, ArmyComposition, MatchSetup, ArmyUnitSelection, UnitDef, BattleSettings } from '../data/types';
+import { DEFAULT_BATTLE_SETTINGS } from '../data/settings';
 import { sfx } from '../audio/synth';
 import { getBiomeArtwork, getMissionArtwork } from './landscape-art';
 import { InfoPanelSizer } from './panel-sizer';
@@ -52,12 +53,13 @@ export class DOMManager {
   public selectedMission: MissionType = 'extermination';
   public p1EscortRole: 'escort' | 'attack' | 'random' = 'escort';
   public p2EscortRole: 'opposite' | 'escort' | 'attack' | 'random' = 'opposite';
+  public battleSettings: BattleSettings = { ...DEFAULT_BATTLE_SETTINGS };
   public selectedPointLimit: PointLimit = 2000;
   public selectedArmyUnits: Record<string, number> = {};
   public currentArmyFaction: string = '';
 
-  // Single Player Flow Stage (1: Faction, 2: Map, 3: Mission, 4: Army Composition)
-  public currentSinglePlayerStage: 1 | 2 | 3 | 4 = 1;
+  // Single Player Flow Stage (1: Faction, 2: Map, 3: Mission, 4: Battle Settings, 5: Army Composition)
+  public currentSinglePlayerStage: 1 | 2 | 3 | 4 | 5 = 1;
 
   private playerCarouselIndex: number = 11;
   private aiCarouselIndex: number = 11;
@@ -356,26 +358,29 @@ export class DOMManager {
     `;
   }
 
-  public setSinglePlayerStage(stage: 1 | 2 | 3 | 4): void {
+  public setSinglePlayerStage(stage: 1 | 2 | 3 | 4 | 5): void {
     this.currentSinglePlayerStage = stage;
 
     const stageFaction = document.getElementById('sp-stage-faction');
     const stageMap = document.getElementById('sp-stage-map');
     const stageMission = document.getElementById('sp-stage-mission');
+    const stageSettings = document.getElementById('sp-stage-settings');
     const stageArmy = document.getElementById('sp-stage-army');
 
     if (stageFaction) stageFaction.style.display = stage === 1 ? 'flex' : 'none';
     if (stageMap) stageMap.style.display = stage === 2 ? 'flex' : 'none';
     if (stageMission) stageMission.style.display = stage === 3 ? 'flex' : 'none';
-    if (stageArmy) stageArmy.style.display = stage === 4 ? 'flex' : 'none';
+    if (stageSettings) stageSettings.style.display = stage === 4 ? 'flex' : 'none';
+    if (stageArmy) stageArmy.style.display = stage === 5 ? 'flex' : 'none';
 
     // Update Stepper Pills
     const pill1 = document.getElementById('sp-step-pill-1');
     const pill2 = document.getElementById('sp-step-pill-2');
     const pill3 = document.getElementById('sp-step-pill-3');
     const pill4 = document.getElementById('sp-step-pill-4');
+    const pill5 = document.getElementById('sp-step-pill-5');
 
-    [pill1, pill2, pill3, pill4].forEach(p => p?.classList.remove('active', 'completed'));
+    [pill1, pill2, pill3, pill4, pill5].forEach(p => p?.classList.remove('active', 'completed'));
 
     if (stage === 1) {
       pill1?.classList.add('active');
@@ -391,6 +396,12 @@ export class DOMManager {
       pill2?.classList.add('completed');
       pill3?.classList.add('completed');
       pill4?.classList.add('active');
+    } else if (stage === 5) {
+      pill1?.classList.add('completed');
+      pill2?.classList.add('completed');
+      pill3?.classList.add('completed');
+      pill4?.classList.add('completed');
+      pill5?.classList.add('active');
     }
 
     // Update Navigation Button Text
@@ -405,15 +416,18 @@ export class DOMManager {
       if (nextText) nextText.textContent = 'NEXT: SELECT MISSION';
     } else if (stage === 3) {
       if (backText) backText.textContent = 'BACK TO MAP';
-      if (nextText) nextText.textContent = 'NEXT: RECRUIT ARMY';
+      if (nextText) nextText.textContent = 'NEXT: BATTLE SETTINGS';
     } else if (stage === 4) {
       if (backText) backText.textContent = 'BACK TO MISSION';
+      if (nextText) nextText.textContent = 'NEXT: RECRUIT ARMY';
+    } else if (stage === 5) {
+      if (backText) backText.textContent = 'BACK TO SETTINGS';
       if (nextText) nextText.textContent = 'COMMENCE DEPLOYMENT ⚔️';
     }
 
     this.updateSinglePlayerSummary();
 
-    if (stage === 4) {
+    if (stage === 5) {
       this.renderArmyCompositionScreen();
     }
 
@@ -438,6 +452,7 @@ export class DOMManager {
     const summaryAi = document.getElementById('sp-summary-ai-faction');
     const summaryMap = document.getElementById('sp-summary-map');
     const summaryMission = document.getElementById('sp-summary-mission');
+    const summarySettings = document.getElementById('sp-summary-settings');
 
     const factionNames: Record<string, string> = {
       random: 'Random Army',
@@ -498,6 +513,10 @@ export class DOMManager {
     }
     if (summaryMission) {
       summaryMission.textContent = missionNames[this.selectedMission] || 'Extermination';
+    }
+    if (summarySettings) {
+      const turnsStr = this.battleSettings.maxTurns !== null ? `${this.battleSettings.maxTurns}R` : '∞';
+      summarySettings.textContent = `${this.battleSettings.pointLimit} PTS • ${turnsStr}`;
     }
   }
 
@@ -689,27 +708,55 @@ export class DOMManager {
       });
     }
 
-    // 6. STEPPER PILL NAVIGATION & POINT LIMIT
-    const pointLimitSelect = document.getElementById('sp-point-limit-select') as HTMLSelectElement | null;
-    if (pointLimitSelect) {
-      pointLimitSelect.addEventListener('change', () => {
-        this.selectedPointLimit = parseInt(pointLimitSelect.value, 10) as PointLimit;
+    // 6. STAGE 4 BATTLE SETTINGS SELECTORS
+    const settingPointLimit = document.getElementById('sp-settings-point-limit') as HTMLSelectElement | null;
+    if (settingPointLimit) {
+      settingPointLimit.addEventListener('change', () => {
+        this.battleSettings.pointLimit = parseInt(settingPointLimit.value, 10) as PointLimit;
+        this.selectedPointLimit = this.battleSettings.pointLimit;
         this.updateSinglePlayerSummary();
-        if (this.currentSinglePlayerStage === 4) {
-          this.renderArmyCompositionScreen();
-        }
       });
     }
 
+    const settingMaxTurns = document.getElementById('sp-settings-max-turns') as HTMLSelectElement | null;
+    if (settingMaxTurns) {
+      settingMaxTurns.addEventListener('change', () => {
+        const val = settingMaxTurns.value;
+        this.battleSettings.maxTurns = val === 'unlimited' ? null : parseInt(val, 10);
+        this.updateSinglePlayerSummary();
+      });
+    }
+
+    const settingGameTime = document.getElementById('sp-settings-game-time') as HTMLSelectElement | null;
+    if (settingGameTime) {
+      settingGameTime.addEventListener('change', () => {
+        const val = settingGameTime.value;
+        this.battleSettings.maxGameTimeSeconds = val === 'unlimited' ? null : parseInt(val, 10);
+        this.updateSinglePlayerSummary();
+      });
+    }
+
+    const settingTurnTime = document.getElementById('sp-settings-turn-time') as HTMLSelectElement | null;
+    if (settingTurnTime) {
+      settingTurnTime.addEventListener('change', () => {
+        const val = settingTurnTime.value;
+        this.battleSettings.maxTurnTimeSeconds = val === 'unlimited' ? null : parseInt(val, 10);
+        this.updateSinglePlayerSummary();
+      });
+    }
+
+    // Stepper Pill Navigation
     const pill1 = document.getElementById('sp-step-pill-1');
     const pill2 = document.getElementById('sp-step-pill-2');
     const pill3 = document.getElementById('sp-step-pill-3');
     const pill4 = document.getElementById('sp-step-pill-4');
+    const pill5 = document.getElementById('sp-step-pill-5');
 
     if (pill1) pill1.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(1); });
     if (pill2) pill2.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(2); });
     if (pill3) pill3.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(3); });
     if (pill4) pill4.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(4); });
+    if (pill5) pill5.addEventListener('click', () => { sfx('click'); this.setSinglePlayerStage(5); });
 
     // Army Composition Screen Action Buttons
     const btnArmyReset = document.getElementById('btn-army-reset');
@@ -726,7 +773,7 @@ export class DOMManager {
       btnArmyAutofill.addEventListener('click', () => {
         sfx('click');
         const p1Faction = this.selectedP1Faction === 'random' ? 'ascendants' : this.selectedP1Faction;
-        const defaultComp = getDefaultArmyComposition(p1Faction, this.selectedPointLimit);
+        const defaultComp = getDefaultArmyComposition(p1Faction, this.battleSettings.pointLimit);
         this.selectedArmyUnits = {};
         defaultComp.units.forEach(u => {
           this.selectedArmyUnits[u.unitId] = u.quantity;
@@ -751,7 +798,7 @@ export class DOMManager {
         if (this.currentSinglePlayerStage === 1) {
           this.showHomeScreen();
         } else {
-          this.setSinglePlayerStage((this.currentSinglePlayerStage - 1) as 1 | 2 | 3 | 4);
+          this.setSinglePlayerStage((this.currentSinglePlayerStage - 1) as 1 | 2 | 3 | 4 | 5);
         }
       });
     }
@@ -760,8 +807,8 @@ export class DOMManager {
     if (btnSpNext) {
       btnSpNext.addEventListener('click', () => {
         sfx('click');
-        if (this.currentSinglePlayerStage < 4) {
-          this.setSinglePlayerStage((this.currentSinglePlayerStage + 1) as 1 | 2 | 3 | 4);
+        if (this.currentSinglePlayerStage < 5) {
+          this.setSinglePlayerStage((this.currentSinglePlayerStage + 1) as 1 | 2 | 3 | 4 | 5);
         } else {
           this.launchSkirmish();
         }
@@ -1270,10 +1317,12 @@ export class DOMManager {
       if (uDef) playerTotalPoints += (uDef.points || 200) * sel.quantity;
     });
 
+    const activePointLimit = this.battleSettings.pointLimit;
+
     // Fallback if empty
     let playerArmy: ArmyComposition;
     if (playerUnitSelections.length === 0) {
-      playerArmy = buildAIArmy(finalP1Faction, this.selectedPointLimit);
+      playerArmy = buildAIArmy(finalP1Faction, activePointLimit);
     } else {
       playerArmy = {
         factionId: finalP1Faction,
@@ -1283,14 +1332,15 @@ export class DOMManager {
     }
 
     // Build AI Army independently
-    const aiArmy = buildAIArmy(finalP2Faction, this.selectedPointLimit);
+    const aiArmy = buildAIArmy(finalP2Faction, activePointLimit);
 
     const setup: MatchSetup = {
       p1Faction: finalP1Faction,
       p2Faction: finalP2Faction,
       theme: finalTheme,
       mission: this.selectedMission,
-      pointLimit: this.selectedPointLimit,
+      pointLimit: activePointLimit,
+      battleSettings: { ...this.battleSettings },
       p1EscortRole: p1Role,
       p2EscortRole: p2Role,
       playerArmy,
@@ -1308,11 +1358,13 @@ export class DOMManager {
     const p1Faction = this.selectedP1Faction === 'random' ? 'ascendants' : this.selectedP1Faction;
     const availableUnits = getFactionUnits(p1Faction);
     const factionDef = FACTIONS[p1Faction] || FACTIONS.ascendants;
+    const activePointLimit = this.battleSettings.pointLimit;
+    this.selectedPointLimit = activePointLimit;
 
     // If faction changed or not initialized, populate default army
     if (this.currentArmyFaction !== p1Faction || Object.keys(this.selectedArmyUnits).length === 0) {
       this.currentArmyFaction = p1Faction;
-      const defaultComp = getDefaultArmyComposition(p1Faction, this.selectedPointLimit);
+      const defaultComp = getDefaultArmyComposition(p1Faction, activePointLimit);
       this.selectedArmyUnits = {};
       defaultComp.units.forEach(u => {
         this.selectedArmyUnits[u.unitId] = u.quantity;
@@ -1333,7 +1385,7 @@ export class DOMManager {
       }
     });
 
-    const pointsRemaining = this.selectedPointLimit - pointsUsed;
+    const pointsRemaining = activePointLimit - pointsUsed;
 
     // Update Faction Badge
     const badgeEl = document.getElementById('sp-army-faction-badge');
@@ -1347,19 +1399,19 @@ export class DOMManager {
     const remVal = document.getElementById('sp-army-rem-val');
     const progBar = document.getElementById('sp-army-progress-bar');
 
-    if (limitVal) limitVal.textContent = `${this.selectedPointLimit} PTS`;
+    if (limitVal) limitVal.textContent = `${activePointLimit} PTS`;
     if (usedVal) {
-      usedVal.textContent = `${pointsUsed} / ${this.selectedPointLimit}`;
-      usedVal.className = `sp-budget-val used ${pointsUsed > this.selectedPointLimit ? 'over' : ''}`;
+      usedVal.textContent = `${pointsUsed} / ${activePointLimit}`;
+      usedVal.className = `sp-budget-val used ${pointsUsed > activePointLimit ? 'over' : ''}`;
     }
     if (remVal) {
       remVal.textContent = `${pointsRemaining} PTS`;
       remVal.className = `sp-budget-val remaining ${pointsRemaining < 0 ? 'over' : ''}`;
     }
     if (progBar) {
-      const pct = Math.min(100, Math.max(0, (pointsUsed / this.selectedPointLimit) * 100));
+      const pct = Math.min(100, Math.max(0, (pointsUsed / activePointLimit) * 100));
       progBar.style.width = `${pct}%`;
-      if (pointsUsed > this.selectedPointLimit) {
+      if (pointsUsed > activePointLimit) {
         progBar.classList.add('over');
       } else {
         progBar.classList.remove('over');
@@ -1484,21 +1536,21 @@ export class DOMManager {
     if (totalSquadsEl) totalSquadsEl.textContent = totalSquads.toString();
     if (totalModelsEl) totalModelsEl.textContent = totalModels.toString();
     if (pctEl) {
-      const pct = Math.round((pointsUsed / this.selectedPointLimit) * 100);
-      pctEl.textContent = `${pct}% (${pointsUsed}/${this.selectedPointLimit} pts)`;
+      const pct = Math.round((pointsUsed / activePointLimit) * 100);
+      pctEl.textContent = `${pct}% (${pointsUsed}/${activePointLimit} pts)`;
     }
 
     // Validate Next Button
     const nextBtn = document.getElementById('btn-sp-next') as HTMLButtonElement | null;
-    if (nextBtn && this.currentSinglePlayerStage === 4) {
-      const isValid = pointsUsed > 0 && pointsUsed <= this.selectedPointLimit;
+    if (nextBtn && this.currentSinglePlayerStage === 5) {
+      const isValid = pointsUsed > 0 && pointsUsed <= activePointLimit;
       nextBtn.disabled = !isValid;
       nextBtn.style.opacity = isValid ? '1' : '0.5';
       nextBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
     }
   }
 
-  public updateTurnBanner(player: number, round: number, phase: string): void {
+  public updateTurnBanner(player: number, round: number, phase: string, maxTurns: number | null = 40): void {
     const banner = document.getElementById('banner');
     if (banner) {
       banner.textContent = phase === 'deployment' ? 'DEPLOYMENT PHASE' : (player === 1 ? 'YOUR TURN' : 'ENEMY TURN');
@@ -1510,7 +1562,51 @@ export class DOMManager {
 
     const roundBadge = document.getElementById('hud-round-badge');
     if (roundBadge) {
-      roundBadge.textContent = `ROUND ${round} / 8`;
+      const maxStr = maxTurns !== null ? maxTurns.toString() : '∞';
+      roundBadge.textContent = `ROUND ${round} / ${maxStr}`;
+    }
+  }
+
+  public updateBattleHudTimers(
+    turnTimeRemaining: number | null,
+    elapsedGameTime: number,
+    maxGameTime: number | null,
+    currentRound: number,
+    maxTurns: number | null
+  ): void {
+    const roundBadge = document.getElementById('hud-round-badge');
+    if (roundBadge) {
+      const maxTStr = maxTurns !== null ? maxTurns.toString() : '∞';
+      roundBadge.textContent = `ROUND ${currentRound} / ${maxTStr}`;
+    }
+
+    const turnTimer = document.getElementById('hud-turn-timer');
+    if (turnTimer) {
+      if (turnTimeRemaining === null) {
+        turnTimer.textContent = '⏳ ∞';
+        turnTimer.classList.remove('warning');
+      } else {
+        const sec = Math.max(0, Math.ceil(turnTimeRemaining));
+        turnTimer.textContent = `⏳ ${sec}s`;
+        if (sec <= 15) {
+          turnTimer.classList.add('warning');
+        } else {
+          turnTimer.classList.remove('warning');
+        }
+      }
+    }
+
+    const gameTimer = document.getElementById('hud-game-timer');
+    if (gameTimer) {
+      const formatTime = (secs: number) => {
+        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+      };
+
+      const elapsedStr = formatTime(elapsedGameTime);
+      const maxStr = maxGameTime !== null ? formatTime(maxGameTime) : '∞';
+      gameTimer.textContent = `⏱️ ${elapsedStr} / ${maxStr}`;
     }
   }
 

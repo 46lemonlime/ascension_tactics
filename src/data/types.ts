@@ -59,6 +59,13 @@ export interface UtilityProfile {
 
 export type PointLimit = 1000 | 2000 | 3000 | 4000;
 
+export interface BattleSettings {
+  pointLimit: PointLimit;
+  maxTurns: number | null;
+  maxGameTimeSeconds: number | null;
+  maxTurnTimeSeconds: number | null;
+}
+
 export interface ArmyUnitSelection {
   unitId: string;
   quantity: number;
@@ -75,7 +82,8 @@ export interface MatchSetup {
   p2Faction: string;
   theme: string;
   mission: MissionType;
-  pointLimit: PointLimit;
+  battleSettings: BattleSettings;
+  pointLimit?: PointLimit;
   p1EscortRole?: 'escort' | 'attack';
   p2EscortRole?: 'escort' | 'attack';
   playerArmy?: ArmyComposition;
@@ -294,6 +302,9 @@ export interface GameState {
   p1Faction?: string;
   p2Faction?: string;
   pointLimit?: PointLimit;
+  battleSettings?: BattleSettings;
+  elapsedGameTime?: number;
+  turnTimeRemaining?: number | null;
   playerArmy?: ArmyComposition;
   aiArmy?: ArmyComposition;
   matchSetup?: MatchSetup;
