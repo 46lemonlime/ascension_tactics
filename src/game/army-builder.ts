@@ -152,11 +152,15 @@ export function convertArmyToPlayerRoster(army: ArmyComposition): DeploymentCard
       const isMulti = sel.quantity > 1;
       const suffix = isMulti ? (i === 0 ? ' Alpha' : i === 1 ? ' Beta' : ` Squad ${i + 1}`) : '';
       const name = `${uDef.name}${suffix}`;
+      const role = uDef.role || (uDef.isCharacter ? 'COMMANDER' : uDef.isLarge ? 'HEAVY ENGINE' : (uDef.squadSize > 1 ? 'SQUAD' : 'INFANTRY'));
+      const icon = uDef.icon || (uDef.isCharacter ? '👑' : uDef.isLarge ? '🤖' : '⚔️');
 
       cards.push({
         key: `p_sq_${sel.unitId}_${cardIdx++}`,
         type: sel.unitId,
         name,
+        role,
+        icon,
         isVip: false,
         placed: false,
         x: null,

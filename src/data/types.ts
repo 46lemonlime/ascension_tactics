@@ -321,6 +321,8 @@ export interface DeploymentCard {
   key: string;
   type: string;
   name: string;
+  role?: string;
+  icon?: string;
   isVip?: boolean;
   placed: boolean;
   x: number | null;

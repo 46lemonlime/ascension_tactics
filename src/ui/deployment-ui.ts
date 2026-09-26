@@ -59,19 +59,10 @@ export class DeploymentUI {
       this.startBtn.disabled = !allPlaced;
     }
 
-    const factionIcons: Record<string, string> = {
-      hero: '👑',
-      infantry: '🛡️',
-      fast: '⚡',
-      heavy: '💥',
-      vehicle: '🤖',
-      monster: '👾'
-    };
-
     roster.forEach(card => {
       const uDef = UNIT_ROSTER[card.type];
-      const role = uDef?.role || 'infantry';
-      const icon = factionIcons[role] || '⚔️';
+      const icon = card.icon || uDef?.icon || (uDef?.isCharacter ? '👑' : uDef?.isLarge ? '🤖' : '⚔️');
+      const role = card.role || (uDef?.role ? uDef.role.toUpperCase() : (uDef?.isCharacter ? 'COMMANDER' : uDef?.isLarge ? 'HEAVY ENGINE' : (uDef?.squadSize && uDef.squadSize > 1 ? 'SQUAD' : 'INFANTRY')));
 
       const cardEl = document.createElement('div');
       cardEl.className = `deploy-card ${card.placed ? 'placed' : ''} ${card.key === this.selectedCardKey ? 'selected' : ''}`;

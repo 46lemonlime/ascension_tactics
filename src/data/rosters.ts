@@ -1,4 +1,5 @@
 import type { DeploymentCard, EnemyRosterItem } from './types';
+import { UNIT_DEFS } from './units';
 
 export interface FactionSquadConfig {
   key: string;
@@ -148,16 +149,23 @@ export function buildFactionRosters(pFactId: string, eFactId: string): {
   const pSquads = FACTION_SQUADS[pKey] || FACTION_SQUADS.ascendants;
   const eSquads = FACTION_SQUADS[eKey] || FACTION_SQUADS.forsaken;
 
-  const rosterPlayer: DeploymentCard[] = pSquads.map(s => ({
-    key: s.key,
-    type: s.type,
-    name: s.name,
-    isVip: false,
-    placed: false,
-    x: null,
-    z: null,
-    unitRef: null
-  }));
+  const rosterPlayer: DeploymentCard[] = pSquads.map(s => {
+    const uDef = UNIT_DEFS[s.type];
+    const role = uDef?.role || (uDef?.isCharacter ? 'COMMANDER' : uDef?.isLarge ? 'HEAVY ENGINE' : 'SQUAD');
+    const icon = uDef?.icon || (uDef?.isCharacter ? '👑' : uDef?.isLarge ? '🤖' : '⚔️');
+    return {
+      key: s.key,
+      type: s.type,
+      name: s.name,
+      role,
+      icon,
+      isVip: false,
+      placed: false,
+      x: null,
+      z: null,
+      unitRef: null
+    };
+  });
 
   const enemyPositions = [
     { x: 20, z: 2 },
