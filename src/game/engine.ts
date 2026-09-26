@@ -21,6 +21,7 @@ import type { CombatLogUI } from '../ui/combat-log';
 import type { DatasheetUI } from '../ui/datasheet-ui';
 import type { MinimapRadar } from '../ui/minimap-radar';
 import type { DOMManager } from '../ui/dom';
+import { HelpNotesSystem, HELP_NOTES } from '../ui/help-notes';
 import * as THREE from 'three';
 
 export class GameEngine {
@@ -30,6 +31,7 @@ export class GameEngine {
   public datasheet: DatasheetUI;
   public minimap: MinimapRadar;
   public dom: DOMManager;
+  public helpNotes?: HelpNotesSystem;
   public physics: PhysicsEngine;
 
   public selectedUnitId: number | null = null;
@@ -45,13 +47,15 @@ export class GameEngine {
     log: CombatLogUI,
     datasheet: DatasheetUI,
     minimap: MinimapRadar,
-    dom: DOMManager
+    dom: DOMManager,
+    helpNotes?: HelpNotesSystem
   ) {
     this.scene = scene;
     this.log = log;
     this.datasheet = datasheet;
     this.minimap = minimap;
     this.dom = dom;
+    this.helpNotes = helpNotes;
     this.physics = new PhysicsEngine();
 
     this.state = this.createInitialState();
@@ -127,6 +131,7 @@ export class GameEngine {
 
     this.datasheet.hide();
     this.log.clear();
+    this.helpNotes?.clearHistory();
   }
 
   public startNewGame(
@@ -245,6 +250,7 @@ export class GameEngine {
       this.state.battleSettings.maxTurns
     );
     this.log.log(`Warzone initialized: ${themeName.toUpperCase()} theater. Mission: ${setup.mission.toUpperCase()} (${setup.pointLimit} pts). Deploy your strike force.`, 'info');
+    this.helpNotes?.show(HELP_NOTES.deployment);
   }
 
   public deployPlayerCard(cardKey: string, c: number, r: number): Unit | null {
@@ -433,6 +439,7 @@ export class GameEngine {
     );
     sfx('horn');
     this.log.log('Deployment complete! Combat commences.', 'alert');
+    this.helpNotes?.show(HELP_NOTES.movement);
   }
 
   public selectUnit(unitId: number | null): void {
@@ -462,6 +469,10 @@ export class GameEngine {
         }
 
         this.datasheet.showUnit(unit, unitDef);
+
+        if (unit.player === 1 && !unit.isVip && this.state.phase === 'battle') {
+          this.helpNotes?.show(HELP_NOTES.combat);
+        }
 
         // If player unit, simultaneously compute and highlight:
         // 1. Shooting Range (Amber 0xf59e0b, opacity 0.16) for all valid in-range tiles with LoS

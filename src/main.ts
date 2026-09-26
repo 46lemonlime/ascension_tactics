@@ -5,6 +5,7 @@ import { DatasheetUI } from './ui/datasheet-ui';
 import { MinimapRadar } from './ui/minimap-radar';
 import { DeploymentUI } from './ui/deployment-ui';
 import { DOMManager } from './ui/dom';
+import { HelpNotesSystem, HELP_NOTES } from './ui/help-notes';
 import { GameEngine } from './game/engine';
 import { DEPLOYMENT_ZONES, chebyshevDist } from './data/constants';
 import { updateTweens } from './game/effects';
@@ -22,14 +23,16 @@ const datasheet = new DatasheetUI();
 const minimap = new MinimapRadar(scene.cameraController);
 const deploymentUi = new DeploymentUI();
 const dom = new DOMManager();
+const helpNotes = new HelpNotesSystem();
 
-const engine = new GameEngine(scene, log, datasheet, minimap, dom);
+const engine = new GameEngine(scene, log, datasheet, minimap, dom, helpNotes);
 
 // Start with title / home screen
 dom.showHomeScreen();
 
 // Wire Single Player launch from Race Select Modal
 dom.onStartGame = (setup) => {
+  helpNotes.clearHistory();
   engine.startNewGame(setup);
 
   deploymentUi.show(true);
@@ -70,11 +73,13 @@ deploymentUi.onStartBattle = () => {
 // ================== TOP-RIGHT IN-BATTLE NAVIGATION & MENUS ==================
 const navBtnLogs = document.getElementById('nav-btn-logs');
 const navBtnMap = document.getElementById('nav-btn-map');
+const navBtnHints = document.getElementById('nav-btn-hints');
 const navBtnCamera = document.getElementById('nav-btn-camera');
 const navBtnFullscreen = document.getElementById('nav-btn-fullscreen');
 const navBtnMenu = document.getElementById('nav-btn-menu');
 
 const cameraOptionsPopup = document.getElementById('camera-options-popup');
+const helpNotesPopup = document.getElementById('help-notes-popup');
 const menuOptionsPopup = document.getElementById('menu-options-popup');
 
 const popCamCommand = document.getElementById('pop-cam-command');
@@ -108,9 +113,8 @@ const setGameMenuOpen = (open: boolean) => {
   }
   navBtnMenu?.classList.toggle('active', open);
   if (open) {
-    // Close camera popup when Game Menu opens
-    if (cameraOptionsPopup) cameraOptionsPopup.style.display = 'none';
-    navBtnCamera?.classList.remove('active');
+    // Close popups when Game Menu opens
+    closePopups();
   }
 };
 
@@ -121,7 +125,9 @@ const toggleGameMenu = () => {
 // Popup Visibility Management
 const closePopups = () => {
   if (cameraOptionsPopup) cameraOptionsPopup.style.display = 'none';
+  if (helpNotesPopup) helpNotesPopup.style.display = 'none';
   navBtnCamera?.classList.remove('active');
+  navBtnHints?.classList.remove('active');
 };
 
 const togglePopup = (popup: HTMLElement | null, btn: HTMLElement | null) => {
@@ -178,7 +184,15 @@ if (navBtnMap) {
   });
 }
 
-// 3. CAMERA OPTIONS
+// 3. HINTS & HELP NOTES
+if (navBtnHints) {
+  navBtnHints.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePopup(helpNotesPopup, navBtnHints);
+  });
+}
+
+// 4. CAMERA OPTIONS
 if (navBtnCamera) {
   navBtnCamera.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -400,7 +414,7 @@ if (popMenuExit) {
 document.addEventListener('click', (e) => {
   const target = e.target as HTMLElement | null;
   if (!target) return;
-  if (!target.closest('#top-nav-bar') && !target.closest('#camera-options-popup')) {
+  if (!target.closest('#top-nav-bar') && !target.closest('#camera-options-popup') && !target.closest('#help-notes-popup')) {
     closePopups();
   }
 });
@@ -556,7 +570,7 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
       hideConfirmModal();
       return;
     }
-    if (cameraOptionsPopup && cameraOptionsPopup.style.display === 'block') {
+    if ((cameraOptionsPopup && cameraOptionsPopup.style.display === 'block') || (helpNotesPopup && helpNotesPopup.style.display === 'block')) {
       closePopups();
       return;
     }

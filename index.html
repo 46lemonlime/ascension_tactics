@@ -1068,6 +1068,14 @@
           </svg>
         </button>
 
+        <button class="nav-btn" id="nav-btn-hints" title="Hints" aria-label="Hints" aria-pressed="false">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </button>
+
         <button class="nav-btn" id="nav-btn-camera" title="Camera Options" aria-label="Camera Options">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="23 7 16 12 23 17 23 7"></polygon>
@@ -1098,6 +1106,25 @@
           </svg>
         </button>
 
+        <!-- HELP NOTES POPUP PANEL -->
+        <div id="help-notes-popup" class="nav-popup-panel help-notes-popup" style="display:none;">
+          <div class="nav-popup-header">
+            <span class="nav-popup-title">HELP NOTES</span>
+          </div>
+          <div class="nav-popup-content">
+            <div class="nav-toggle-row">
+              <span class="nav-toggle-label">Help Notes</span>
+              <button class="nav-toggle-switch active" id="pop-help-notes-toggle" aria-label="Enable help notes">
+                <span class="nav-toggle-state" id="pop-help-notes-state">ON</span>
+              </button>
+            </div>
+            <div class="nav-popup-divider"></div>
+            <div class="help-notes-history-list" id="help-notes-history-list">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+
         <!-- CAMERA OPTIONS POPUP PANEL -->
         <div id="camera-options-popup" class="nav-popup-panel" style="display:none;">
           <div class="nav-popup-header">
@@ -1118,6 +1145,20 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- CONTEXTUAL HELP NOTE TOAST BANNER -->
+    <div id="help-note-toast" class="help-note-toast interactive" style="display:none;" role="region" aria-label="Help Note">
+      <div class="help-note-toast-header">
+        <div class="help-note-toast-identity">
+          <span class="help-note-toast-icon">💡</span>
+          <span class="help-note-toast-title" id="help-note-toast-title">DEPLOYMENT</span>
+        </div>
+        <button type="button" class="help-note-close-btn" id="help-note-toast-close" title="Close" aria-label="Close help note">✕</button>
+      </div>
+      <div class="help-note-toast-body" id="help-note-toast-body">
+        Click squad card — Click the glowing southern zone to deploy your squad.
       </div>
     </div>
 
