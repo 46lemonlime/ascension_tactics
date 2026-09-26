@@ -95,11 +95,57 @@ Ascension Tactics features **10 distinct battlefields**, each rendered with uniq
 
 ---
 
-## 🎮 Game Modes & Missions
+## 🎮 Pre-Battle Selection Flow (5 Distinct Stages)
 
-* **Extermination (Standard Skirmish)**: Annihilate the enemy force down to the last squad.
-* **Domination**: Capture and hold 3 strategic relay objectives across the central sectors.
-* **VIP Escort**: Defend or assassinate a VIP Courier navigating across hazardous contested terrain.
+Ascension Tactics features a complete 5-stage setup sequence prior to tactical deployment:
+
+```mermaid
+flowchart LR
+    A["1. Select Factions"] --> B["2. Select Battlefield Biome"]
+    B --> C["3. Select Mission"]
+    C --> D["4. Battle Settings"]
+    D --> E["5. Army Composition"]
+    E --> F["6. Tactical Deployment"]
+    F --> G["7. Warzone Battle"]
+```
+
+### Stage 1 — Select Factions
+* Independent carousels for **Player 1** and the **AI Opponent** across all 10 playable factions or **Random Selection**.
+* Auto-sizing dynamic lore dossiers detailing combat doctrine, squad rosters, unique mechanics, and strategic strengths/weaknesses.
+
+### Stage 2 — Select Battlefield Biome
+* 3-card landscape preview carousel of all 10 planetary theaters or **Random Biome**.
+* Atmospheric hazard profiles, weather particle previews, and environmental cover descriptions.
+
+### Stage 3 — Select Mission & Objectives
+* **Extermination**: Total sector purge. Victory by complete annihilation or squad superiority at round limit.
+* **Domination**: Strategic capture and control of 3 central frontline beacons (Alpha, Bravo, Charlie).
+  * **Victory Points To Win Selector**: Choose from `1000` (Default), `1500`, `2000`, or `2500` Victory Points. Live score tracking in HUD with instant victory upon reaching the target.
+* **VIP Escort**: Asymmetric extraction versus interception.
+  * **VIP Owner Selector**: Choose `PLAYER` (you protect and extract your Sacred Relic Courier from south to north while AI intercepts) or `AI` (AI escorts its VIP from north to south while you intercept).
+
+### Stage 4 — Battle Settings
+* **Point Limit**: Authoritative army recruitment cap (`1000 PTS`, `2000 PTS` [Default], `3000 PTS`, `4000 PTS`).
+* **Max Combat Rounds**: Match round limit (`5`, `8` [Default], `10`, `15`, `20`, or `Unlimited ∞`).
+* **Match Time Limit**: Overall game clock (`10m`, `15m` [Default], `20m`, `30m`, `45m`, `60m`, or `Unlimited ∞`).
+* **Turn Time Limit**: Per-turn countdown timer (`30s`, `45s`, `60s` [Default], `90s`, `120s`, or `Unlimited ∞`).
+
+### Stage 5 — Tactical Army Composition
+* **Interactive Roster Recruitment**: Browse full faction unit datasheets with points cost, squad sizes, movement, range, damage, wounds, and armor saves.
+* **Live Budget Bar**: Real-time tracking of points used vs. point limit with visual warning upon reaching or exceeding cap.
+* **Affordability Constraints**: Unit increment buttons ($+$) dynamically disable when the cost exceeds remaining points.
+* **Selected Summary Dock**: Review all recruited squads with model counts, total cost breakdown, and quick item-level removal ($✕$) controls.
+* **Validation**: Disallows deployment progression unless at least 1 unit is recruited and total points are within the match point limit.
+* **Independent AI Recruitment**: AI automatically drafts a strategic army composition tailored to its chosen faction and the matching point limit.
+
+---
+
+## ⏱️ In-Battle HUD Timers & Telemetry
+
+* **Round Counter Badge**: Displays `ROUND X / MAX_ROUNDS` (e.g. `ROUND 1 / 8`).
+* **Turn Countdown Timer**: Active turn timer (`⏳ 60s`) with automatic red pulse warning when under 15 seconds remaining. Automatically advances turn when expired.
+* **Game Clock**: Live match timer (`⏱️ MM:SS / MAX_TIME`) tracking total engagement duration.
+* **Dynamic Mission HUD**: Renders live objective statuses (e.g. `Score: 🟦 420/1000 VP vs 🟨 310/1000 VP` in Domination).
 
 ---
 
