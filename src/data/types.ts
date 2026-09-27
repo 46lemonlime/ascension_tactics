@@ -12,17 +12,24 @@ export type FormationType = 'line' | 'column' | 'wedge' | 'loose' | 'block';
 export type ParticleType = 'rain' | 'sand' | 'snow' | 'stars' | 'astral' | 'corruption' | 'acid' | 'gauss' | 'rift' | 'none';
 
 export interface WeaponProfile {
+  id?: string;
   name: string;
   type?: 'ranged' | 'melee';
   category?: string;
   icon?: string;
+  image?: string;
   range: number;
+  rangeDisplay?: string;
   attacks: number;
   strength: number;
   ap: number;
+  penetration?: number;
   damage: number;
   damageType?: string;
+  effectiveAgainst?: string[];
+  weakAgainst?: string[];
   special?: string;
+  allowedFactions?: string[];
 }
 
 export interface UnitPhysicalProfile {
@@ -137,10 +144,11 @@ export interface UnitDef {
   awareness: number;
   ranged: boolean;
   hasMelee: boolean;
-  weapon: string;
+  weapon?: string;
+  weaponIds?: string[];
+  weapons?: WeaponProfile[];
   rangedWeapon?: WeaponProfile;
   meleeWeapon?: WeaponProfile;
-  weapons?: WeaponProfile[];
   tags?: string[];
   color: number;
   trim: number;

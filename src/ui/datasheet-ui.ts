@@ -371,8 +371,9 @@ export class DatasheetUI {
 
     this.weaponPopup.classList.remove('dual-weapons');
 
-    const typeLabel = w.type ? (w.type === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON') : (w.range.toLowerCase() === 'melee' ? 'MELEE WEAPON' : 'RANGED WEAPON');
-    const typeClass = w.type || (w.range.toLowerCase() === 'melee' ? 'melee' : 'ranged');
+    const isMelee = w.type === 'melee' || w.range === 0;
+    const typeLabel = isMelee ? 'MELEE WEAPON' : 'RANGED WEAPON';
+    const typeClass = isMelee ? 'melee' : 'ranged';
 
     const html = `
       <div class="popup-header">

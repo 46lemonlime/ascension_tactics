@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Unit } from '../data/types';
+import type { Unit, WeaponProfile } from '../data/types';
 import { cheb, worldX, worldZ, COLS, TILE_SIZE, key } from '../data/constants';
 import { sfx } from '../audio/synth';
 import { logCombat } from '../ui/combat-log';
@@ -171,8 +171,37 @@ export function resolveAttack(
   attacker.hasAttacked = true;
 
   const targetDist = cheb(attacker, target);
-  const isMeleeCombat = targetDist <= 1 && attacker.hasMelee;
-  const attackDamage = isMeleeCombat ? (attacker.meleeDmg || 2) : (attacker.dmg || 2);
+  const availableWeapons: WeaponProfile[] = (attacker.weapons && attacker.weapons.length > 0)
+    ? attacker.weapons
+    : (attacker.def?.weapons || []);
+
+  const isMeleeCombat = targetDist <= 1.5 && (attacker.hasMelee || availableWeapons.some(w => w.type === 'melee' || w.range <= 2));
+
+  let chosenWeapon: WeaponProfile | null = null;
+  if (isMeleeCombat) {
+    const meleeOptions = availableWeapons.filter(w => w.type === 'melee' || w.range <= 2);
+    if (meleeOptions.length > 0) {
+      chosenWeapon = meleeOptions.reduce((best, w) => (w.damage > best.damage ? w : best), meleeOptions[0]);
+    } else if (attacker.meleeWeapon) {
+      chosenWeapon = attacker.meleeWeapon;
+    }
+  } else {
+    const rangedOptions = availableWeapons.filter(w => (w.type === 'ranged' || w.range > 2) && w.range >= targetDist);
+    if (rangedOptions.length > 0) {
+      chosenWeapon = rangedOptions.reduce((best, w) => (w.damage > best.damage ? w : best), rangedOptions[0]);
+    } else if (attacker.rangedWeapon && attacker.rangedWeapon.range >= targetDist) {
+      chosenWeapon = attacker.rangedWeapon;
+    }
+  }
+
+  if (!chosenWeapon) {
+    chosenWeapon = isMeleeCombat
+      ? (attacker.meleeWeapon || attacker.def?.meleeWeapon || availableWeapons[0] || null)
+      : (attacker.rangedWeapon || attacker.def?.rangedWeapon || availableWeapons[0] || null);
+  }
+
+  const attackDamage = chosenWeapon?.damage || (isMeleeCombat ? (attacker.meleeDmg || 2) : (attacker.dmg || 2));
+  const usedWeaponName = chosenWeapon?.name || (isMeleeCombat ? 'Melee Strike' : 'Ranged Volley');
   const weaponDesc = isMeleeCombat ? 'Melee Strike' : 'Ranged Volley';
 
   const preActionCamPos = camera.position.clone();
@@ -250,9 +279,6 @@ export function resolveAttack(
     const isHit = hitRoll >= reqHit;
 
     sfx.dice();
-    const usedWeaponName = isMeleeCombat
-      ? (attacker.meleeWeapon?.name || attacker.def?.meleeWeapon?.name || 'Melee Weapons')
-      : (attacker.rangedWeapon?.name || attacker.def?.rangedWeapon?.name || 'Ranged Weapons');
 
     logCombat(
       `<b>${attacker.name}</b> attacks <b>${target.name}</b> with <i>${usedWeaponName}</i> (${weaponDesc}):`,

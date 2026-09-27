@@ -1,5 +1,6 @@
 import { UnitDef, FormationType, WeaponProfile } from './types';
 
+
 export const UNIT_DEFS: Record<string, UnitDef> = {
   // --- 1. THE ASCENDANTS (Space Marines) ---
   sm_captain: {
@@ -25,6 +26,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 2,
     color: 0x1d4ed8,
+    weaponIds: ['sm_plasma_pistol','sm_relic_blade'],
     trim: 0xf59e0b,
     weapon: 'Plasma Pistol (16") & Relic Blade (Melee)'
   },
@@ -50,6 +52,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x2563eb,
+    weaponIds: ['sm_godwyn_bolter'],
     trim: 0xd97706,
     weapon: 'Godwyn-pattern Bolters (26" Volley)'
   },
@@ -76,6 +79,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x3b82f6,
+    weaponIds: ['sm_bolt_pistol','sm_chainsword'],
     trim: 0xf59e0b,
     weapon: 'Bolt Pistols (14") & Chainswords (Melee)'
   },
@@ -101,6 +105,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x1e40af,
+    weaponIds: ['sm_heavy_bolter_battery'],
     trim: 0xd97706,
     weapon: 'Heavy Bolter Battery (38" Suppression)'
   },
@@ -127,6 +132,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 2,
     color: 0x1e3a8a,
+    weaponIds: ['sm_centurion_missiles','sm_siege_drills'],
     trim: 0xf59e0b,
     weapon: 'Siege Drills & Chest Missile Battery (38")'
   },
@@ -155,6 +161,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 2,
     color: 0x1d4ed8,
+    weaponIds: ['sm_assault_cannon','sm_power_fist'],
     trim: 0xf59e0b,
     weapon: 'Assault Cannon (30" Rotary) & Power Fist'
   },
@@ -183,6 +190,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 3,
     color: 0x3f6212,
+    weaponIds: ['dir_bolt_pistol','dir_power_sabre'],
     trim: 0xd97706,
     weapon: 'Master-Crafted Bolt Pistol (20") & Power Sabre'
   },
@@ -208,6 +216,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x4d7c0f,
+    weaponIds: ['dir_las_rifle','dir_trench_knife'],
     trim: 0xd97706,
     weapon: 'Las-Rifles (24" Rapid Volley)'
   },
@@ -233,6 +242,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 4,
     color: 0x3f6212,
+    weaponIds: ['dir_autocannon_battery'],
     trim: 0xb45309,
     weapon: 'Twin Autocannons (40" Anti-Armor)'
   },
@@ -259,6 +269,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 3,
     color: 0x4d7c0f,
+    weaponIds: ['dir_heavy_plasma_cannon','dir_stomp_melee'],
     trim: 0xf59e0b,
     weapon: 'Heavy Plasma Cannon (32") & Stomp Melee'
   },
@@ -287,6 +298,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 3,
     color: 0x365314,
+    weaponIds: ['dir_earthshaker_cannon'],
     trim: 0xd97706,
     weapon: 'Earthshaker Siege Cannon (50" High Explosive)'
   },
@@ -315,6 +327,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 8,
     sv: 2,
     color: 0x3f6212,
+    weaponIds: ['dir_battle_cannon','dir_sponson_bolters'],
     trim: 0xf59e0b,
     weapon: 'Heavy Battle Cannon (42") & Sponson Bolters'
   },
@@ -343,6 +356,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 3,
     color: 0x0f172a,
+    weaponIds: ['eld_mind_war','eld_singing_spear'],
     trim: 0xfde68a,
     weapon: 'Mind War (24" Psychic Snipe) & Singing Spear'
   },
@@ -369,6 +383,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x991b1b,
+    weaponIds: ['eld_shuriken_pistol','eld_power_sword'],
     trim: 0xfef08a,
     weapon: 'Shuriken Pistols (14") & Power Swords (Melee)'
   },
@@ -394,6 +409,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 3,
     color: 0x020617,
+    weaponIds: ['eld_reaper_launcher'],
     trim: 0xd97706,
     weapon: 'Reaper Missile Launchers (40" Starshot)'
   },
@@ -419,6 +435,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x1e293b,
+    weaponIds: ['eld_shuriken_catapult'],
     trim: 0x38bdf8,
     weapon: 'Shuriken Catapults (24" Monofilament Volley)'
   },
@@ -445,6 +462,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 4,
     color: 0x0f172a,
+    weaponIds: ['eld_distortion_cannon'],
     trim: 0xfde68a,
     weapon: 'Distortion Cannon (42" Warp Vortex)'
   },
@@ -473,6 +491,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 3,
     color: 0x0284c7,
+    weaponIds: ['eld_bright_lance','eld_ghostglaive'],
     trim: 0xfde68a,
     weapon: 'Bright Lance (36" Anti-Armor) & Ghostglaive'
   },
@@ -501,6 +520,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 2,
     color: 0x042f2e,
+    weaponIds: ['de_splinter_pistol','de_huskblade'],
     trim: 0x10b981,
     weapon: 'Splinter Pistol (20") & Huskblade (Melee)'
   },
@@ -527,6 +547,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 3,
     color: 0x0f172a,
+    weaponIds: ['de_tormentor','de_demiklaive'],
     trim: 0x10b981,
     weapon: 'Tormentors (14") & Demiklaives (Melee)'
   },
@@ -552,6 +573,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x022c22,
+    weaponIds: ['de_dark_lance'],
     trim: 0xa7f3d0,
     weapon: 'Dark Lances (36" Lance Piercing)'
   },
@@ -577,6 +599,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x065f46,
+    weaponIds: ['de_splinter_rifle','de_harm_blades'],
     trim: 0x34d399,
     weapon: 'Splinter Rifles (26" Toxic Needle Volley)'
   },
@@ -603,6 +626,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 3,
     color: 0x064e3b,
+    weaponIds: ['de_heat_lance','de_macro_scalpels'],
     trim: 0x10b981,
     weapon: 'Heat Lance (28") & Macro-Scalpels (Melee)'
   },
@@ -631,6 +655,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 4,
     color: 0x042f2e,
+    weaponIds: ['de_triple_dark_lances'],
     trim: 0x34d399,
     weapon: 'Triple Dark Lances (42" Anti-Armor)'
   },
@@ -659,6 +684,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 3,
     color: 0x15803d,
+    weaponIds: ['ork_kombi_shoota','ork_power_klaw'],
     trim: 0xd97706,
     weapon: 'Kombi-Shoota (18") & Massive Power Klaw'
   },
@@ -685,6 +711,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 4,
     color: 0x16a34a,
+    weaponIds: ['ork_slugga','ork_big_choppa'],
     trim: 0xb45309,
     weapon: 'Sluggas (14") & Big Choppas (Melee)'
   },
@@ -710,6 +737,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 5,
     color: 0x15803d,
+    weaponIds: ['ork_deffgun'],
     trim: 0x78350f,
     weapon: 'Scrap Deffguns (34" Heavy Dakka)'
   },
@@ -736,6 +764,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 5,
     color: 0x166534,
+    weaponIds: ['ork_dakka_shoota','ork_choppa'],
     trim: 0x92400e,
     weapon: 'Dakka Shootas (20") & Choppas'
   },
@@ -762,6 +791,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 4,
     color: 0x15803d,
+    weaponIds: ['ork_traktor_kannon'],
     trim: 0xd97706,
     weapon: 'Traktor Kannon (40" Heavy Artillery)'
   },
@@ -790,6 +820,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 3,
     color: 0x166534,
+    weaponIds: ['ork_rokkit_launcha','ork_buzz_saws'],
     trim: 0xb45309,
     weapon: 'Twin Rokkit Launchas (24") & Dual Buzz Saws'
   },
@@ -818,6 +849,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 2,
     color: 0x4a044e,
+    weaponIds: ['ty_heavy_venom_cannon','ty_scything_talons'],
     trim: 0xd8b4fe,
     weapon: 'Heavy Venom Cannon (28") & Scything Talons'
   },
@@ -843,6 +875,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 4,
     color: 0x581c87,
+    weaponIds: ['ty_deathspitter','ty_scything_talons'],
     trim: 0xc084fc,
     weapon: 'Deathspitters (26" Bio-Volley)'
   },
@@ -869,6 +902,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 5,
     color: 0x3b0764,
+    weaponIds: ['ty_flesh_hooks','ty_rending_claws'],
     trim: 0xa855f7,
     weapon: 'Flesh Hooks (14") & Rending Claws (Melee)'
   },
@@ -894,6 +928,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 6,
     color: 0x6b21a8,
+    weaponIds: ['ty_fleshborer'],
     trim: 0xe9d5ff,
     weapon: 'Fleshborers (20" Swarm Volley)'
   },
@@ -920,6 +955,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 4,
     color: 0x581c87,
+    weaponIds: ['ty_spore_mine_cannon'],
     trim: 0xc084fc,
     weapon: 'Spore Mine Cannon (44" Organic Mortar)'
   },
@@ -948,49 +984,9 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 2,
     color: 0x3b0764,
+    weaponIds: ['ty_stranglethorn_cannon', 'ty_crushing_claws'],
     trim: 0xd8b4fe,
-    weapon: 'Stranglethorn Cannon (24"), Scything Talons & Rending Claws',
-    weapons: [
-      {
-        name: 'Stranglethorn Cannon',
-        type: 'ranged',
-        category: 'Bio-Organic Siege Spore Launcher',
-        icon: '🌿',
-        range: 24,
-        attacks: 3,
-        strength: 7,
-        ap: 3,
-        damage: 4,
-        damageType: 'Barbed Bio-Seed Blast',
-        special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.'
-      },
-      {
-        name: 'Scything Talons',
-        type: 'melee',
-        category: 'Bio-Organic Monomolecular Scythes',
-        icon: '🦞',
-        range: 0,
-        attacks: 4,
-        strength: 6,
-        ap: 3,
-        damage: 5,
-        damageType: 'Bio-Organic Slicing',
-        special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.'
-      },
-      {
-        name: 'Crushing Claws',
-        type: 'melee',
-        category: 'Diamond-Hard Pincer Claws',
-        icon: '🦀',
-        range: 0,
-        attacks: 2,
-        strength: 6,
-        ap: 4,
-        damage: 6,
-        damageType: 'Bio-Organic Rending',
-        special: 'Rending Strike: Wound rolls of 6 inflict critical armor penetration.'
-      }
-    ]
+    weapon: 'Stranglethorn Cannon (24") & Crushing Claws (Melee)'
   },
 
   // --- 7. THE REVENANT (Necrons) ---
@@ -1017,6 +1013,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 2,
     color: 0x334155,
+    weaponIds: ['nec_staff_of_light','nec_warscythe'],
     trim: 0x22c55e,
     weapon: 'Staff of Light (20") & Hyperphase Warscythe'
   },
@@ -1042,6 +1039,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 3,
     color: 0x1e293b,
+    weaponIds: ['nec_gauss_blaster'],
     trim: 0x22c55e,
     weapon: 'Twin Gauss Blasters (28" Volley)'
   },
@@ -1068,6 +1066,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 3,
     color: 0x0f172a,
+    weaponIds: ['nec_plasmacyte_darts','nec_hyperphase_threshers'],
     trim: 0x4ade80,
     weapon: 'Plasmacyte Darts (14") & Hyperphase Threshers'
   },
@@ -1093,6 +1092,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 4,
     color: 0x475569,
+    weaponIds: ['nec_gauss_flayer'],
     trim: 0x22c55e,
     weapon: 'Gauss Flayers (24" Disintegration)'
   },
@@ -1119,6 +1119,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 3,
     color: 0x1e293b,
+    weaponIds: ['nec_enmitic_exterminator'],
     trim: 0x22c55e,
     weapon: 'Enmitic Exterminator (44" Annihilation Ray)'
   },
@@ -1147,6 +1148,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 3,
     color: 0x334155,
+    weaponIds: ['nec_doomsday_blaster'],
     trim: 0x4ade80,
     weapon: 'Doomsday Blaster (40" Titanic Beam)'
   },
@@ -1175,6 +1177,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 2,
     color: 0xc2410c,
+    weaponIds: ['tau_burst_cannon','tau_fusion_blaster','tau_pulse_gauntlet'],
     trim: 0x06b6d4,
     weapon: 'Twin Burst Cannons (26") & Fusion Blaster'
   },
@@ -1200,6 +1203,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0xd97706,
+    weaponIds: ['tau_long_pulse_rifle'],
     trim: 0x22d3ee,
     weapon: 'Long-barrel Pulse Rifles (34" Volley)'
   },
@@ -1225,6 +1229,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x9a3412,
+    weaponIds: ['tau_stealth_burst_cannon'],
     trim: 0x38bdf8,
     weapon: 'Burst Cannons (22" Suppression)'
   },
@@ -1250,6 +1255,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 5,
     color: 0xb45309,
+    weaponIds: ['tau_rail_rifle'],
     trim: 0x67e8f9,
     weapon: 'Hyper-velocity Rail Rifles (42" Snipe)'
   },
@@ -1276,6 +1282,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 2,
     color: 0x9a3412,
+    weaponIds: ['tau_twin_heavy_rail_rifle','tau_missile_pod'],
     trim: 0x06b6d4,
     weapon: 'Twin Heavy Rail Rifles (44") & Missile Pods'
   },
@@ -1304,6 +1311,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 3,
     color: 0xc2410c,
+    weaponIds: ['tau_long_railgun','tau_burst_cannon'],
     trim: 0x22d3ee,
     weapon: 'Long-barrel Railgun (48" Hyper-Kinetic)'
   },
@@ -1332,6 +1340,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x4c1d95,
+    weaponIds: ['rb_warp_flux','rb_dimensional_blade'],
     trim: 0xf43f5e,
     weapon: 'Warp Flux Blast (20") & Dimensional Blade'
   },
@@ -1358,6 +1367,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 4,
     color: 0x831843,
+    weaponIds: ['rb_rift_darts','rb_hellblade'],
     trim: 0xf43f5e,
     weapon: 'Rift Darts (14") & Hellblades (Melee)'
   },
@@ -1384,6 +1394,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 4,
     color: 0x312e81,
+    weaponIds: ['rb_tail_spikes','rb_lamprey_bite'],
     trim: 0x38bdf8,
     weapon: 'Warp Tail Spikes (16") & Lamprey Bites'
   },
@@ -1410,6 +1421,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 5,
     color: 0x6d28d9,
+    weaponIds: ['rb_coruscating_warpfire','rb_warp_claws'],
     trim: 0xec4899,
     weapon: 'Coruscating Warpfire (24" Shifting Flame)'
   },
@@ -1436,6 +1448,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 6,
     sv: 3,
     color: 0x581c87,
+    weaponIds: ['rb_rift_shockwave','rb_brass_horns'],
     trim: 0xf43f5e,
     weapon: 'Rift Shockwave (20") & Brass Horns'
   },
@@ -1464,6 +1477,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 2,
     color: 0x3b0764,
+    weaponIds: ['rb_void_rift_beam','rb_great_cleaver'],
     trim: 0xf43f5e,
     weapon: 'Void Rift Beam (30") & Great Cleaver'
   },
@@ -1492,6 +1506,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 2,
     color: 0x991b1b,
+    weaponIds: ['c_warp_pistol','c_daemon_axe'],
     trim: 0xb45309,
     weapon: 'Warp Pistol (16") & Daemon Axe (Melee)'
   },
@@ -1517,6 +1532,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0xb91c1c,
+    weaponIds: ['c_corrupted_bolter','c_corrupted_chainsword'],
     trim: 0x78350f,
     weapon: 'Corrupted Bolters (26" Volley)'
   },
@@ -1543,6 +1559,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 3,
     color: 0x7f1d1d,
+    weaponIds: ['c_warp_pistol','c_chainaxe'],
     trim: 0xb45309,
     weapon: 'Warp Pistols (14") & Chainaxes (Melee)'
   },
@@ -1568,6 +1585,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 3,
     sv: 6,
     color: 0x451a03,
+    weaponIds: ['c_scavenged_autogun','c_cultist_blade'],
     trim: 0x78350f,
     weapon: 'Scavenged Autoguns (20")'
   },
@@ -1594,6 +1612,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 5,
     sv: 2,
     color: 0x7f1d1d,
+    weaponIds: ['c_fleshmetal_heavy_cannon','c_fleshmetal_drill'],
     trim: 0xb45309,
     weapon: 'Fleshmetal Heavy Cannons (36" Warp Volley)'
   },
@@ -1622,6 +1641,7 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 7,
     sv: 3,
     color: 0x991b1b,
+    weaponIds: ['c_defiler_battle_cannon','c_spiked_claws'],
     trim: 0x78350f,
     weapon: 'Battle Cannon (36" Explosive) & Spiked Claws'
   },
@@ -1651,100 +1671,35 @@ export const UNIT_DEFS: Record<string, UnitDef> = {
     t: 4,
     sv: 2,
     color: 0xf59e0b,
+    weaponIds: ['neutral_arc_pistol','neutral_deflector_field'],
     trim: 0x38bdf8,
     weapon: 'Personal Deflector Field & Arc Pistol (16")'
   }
 };
 
 // Enrich all UNIT_DEFS with physical profiles, dynamic formations, morale schemas, and combat profile fields
+import { getUnitWeaponProfiles, validateUnitEquipment } from './equipment';
+
 Object.values(UNIT_DEFS).forEach(def => {
-  def.id = def.id || def.type;
-  def.points = def.points !== undefined ? def.points : (def.isCharacter ? 400 : def.isLarge ? 500 : 200);
-  def.wounds = def.wounds !== undefined ? def.wounds : def.hp;
-  def.hp = def.wounds;
-  def.movement = def.movement !== undefined ? def.movement : def.m;
-  def.m = def.movement;
-  def.leadership = def.leadership !== undefined ? def.leadership : 7;
-  def.toughness = def.toughness !== undefined ? def.toughness : def.t;
-  def.t = def.toughness;
   def.armorSave = def.armorSave !== undefined ? def.armorSave : def.sv;
   def.sv = def.armorSave;
   def.role = def.role || def.title || (def.isCharacter ? 'Commander' : def.isLarge ? 'Heavy Support' : 'Troops');
   def.size = def.size || (def.isLarge ? 2 : (def.baseRadius && def.baseRadius > 1.8 ? 2 : 1));
   def.tags = def.tags || [def.factionId, def.isCharacter ? 'character' : 'infantry', def.isLarge ? 'vehicle' : ''];
 
-  const isRanged = def.ranged ?? (def.range !== undefined && def.range > 2);
-  const hasMelee = def.hasMelee ?? (def.meleeDmg !== undefined && def.meleeDmg > 0);
+  // 1. Authoritatively resolve all equipped weapon profiles from equipment.ts
+  const resolvedWeapons = getUnitWeaponProfiles(def);
+  def.weapons = resolvedWeapons;
 
-  let rawRangedName = 'Standard Issue Weapon';
-  let rawMeleeName = 'Combat Blade';
+  // 2. Derive legacy convenience accessors
+  def.rangedWeapon = resolvedWeapons.find(w => w.type === 'ranged' || (w.range !== undefined && w.range > 2));
+  def.meleeWeapon = resolvedWeapons.find(w => w.type === 'melee' || (w.range !== undefined && w.range <= 2));
+  def.ranged = def.rangedWeapon !== undefined;
+  def.hasMelee = def.meleeWeapon !== undefined;
 
-  if (def.weapon) {
-    if (def.weapon.includes('&')) {
-      const parts = def.weapon.split('&').map(p => p.trim());
-      if (parts[0].toLowerCase().includes('melee') || parts[0].toLowerCase().includes('blade') || parts[0].toLowerCase().includes('sword') || parts[0].toLowerCase().includes('axe') || parts[0].toLowerCase().includes('claw') || parts[0].toLowerCase().includes('talon') || parts[0].toLowerCase().includes('spear')) {
-        rawMeleeName = parts[0].replace(/\(.*?\)/g, '').trim() || parts[0];
-        rawRangedName = parts[1].replace(/\(.*?\)/g, '').trim() || parts[1];
-      } else {
-        rawRangedName = parts[0].replace(/\(.*?\)/g, '').trim() || parts[0];
-        rawMeleeName = parts[1].replace(/\(.*?\)/g, '').trim() || parts[1];
-      }
-    } else if (isRanged && !hasMelee) {
-      rawRangedName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
-    } else if (hasMelee && !isRanged) {
-      rawMeleeName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
-    } else {
-      rawRangedName = def.weapon.replace(/\(.*?\)/g, '').trim() || def.weapon;
-      rawMeleeName = 'Combat Arms';
-    }
-  }
-
-  if (isRanged) {
-    def.rangedWeapon = {
-      name: rawRangedName,
-      type: 'ranged',
-      range: def.range || 18,
-      attacks: def.squadSize || 1,
-      strength: def.s || 4,
-      ap: Math.max(0, 4 - (def.sv || 3)),
-      damage: def.dmg || 2
-    };
-  }
-
-  if (hasMelee) {
-    def.meleeWeapon = {
-      name: rawMeleeName,
-      type: 'melee',
-      range: 1,
-      attacks: (def.isCharacter ? 3 : def.squadSize || 1),
-      strength: (def.s || 4) + (def.isLarge ? 1 : 0),
-      ap: Math.max(1, 5 - (def.sv || 3)),
-      damage: def.meleeDmg || 2
-    };
-  }
-
-  if (def.weapons && def.weapons.length > 0) {
-    if (!def.rangedWeapon) {
-      def.rangedWeapon = def.weapons.find(w => w.type === 'ranged' || w.range > 2);
-    }
-    if (!def.meleeWeapon) {
-      def.meleeWeapon = def.weapons.find(w => w.type === 'melee' || w.range <= 2);
-    }
-  } else {
-    const weaponsList: WeaponProfile[] = [];
-    if (def.rangedWeapon) weaponsList.push(def.rangedWeapon);
-    if (def.meleeWeapon) weaponsList.push(def.meleeWeapon);
-    def.weapons = weaponsList.length > 0 ? weaponsList : [
-      {
-        name: def.weapon || 'Standard Armament',
-        type: isRanged ? 'ranged' : 'melee',
-        range: def.range || 18,
-        attacks: def.squadSize || 1,
-        strength: def.s || 4,
-        ap: Math.max(0, 4 - (def.sv || 3)),
-        damage: def.dmg || 2
-      }
-    ];
+  // 3. Fallback weapon summary string if missing
+  if (!def.weapon) {
+    def.weapon = resolvedWeapons.map(w => w.name).join(' & ');
   }
 
   const isLarge = !!def.isLarge;
@@ -1787,6 +1742,12 @@ Object.values(UNIT_DEFS).forEach(def => {
     recoverRate: 15,
     casualtyPenalty: 20
   };
+
+  // Development-time validation of equipment integrity
+  const validation = validateUnitEquipment(def);
+  if (!validation.valid) {
+    console.warn(`[Equipment Validation Error] Unit "${def.name}" (${def.type}):`, validation.errors);
+  }
 });
 
 export const UNIT_ROSTER = UNIT_DEFS;

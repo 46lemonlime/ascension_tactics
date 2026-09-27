@@ -1,60 +1,72 @@
 # ⚔️ ASCENSION TACTICS 3D (Grimdark Tactics)
 
-A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirmish game built with **Three.js** and **TypeScript**. Features **10 Distinct Playable Factions**, procedural high-detail 3D miniatures on beveled wargaming bases, tactical line-of-sight analysis, deterministic over-the-shoulder action cameras, realistic vehicle kinematics, and an interactive Codex.
+A high-performance, browser-based **Warhammer 40,000 / Grimdark** tactical skirmish game built with **Three.js** and **TypeScript**. Features **10 Distinct Playable Factions** with custom high-resolution heraldic emblems, procedural high-detail 3D miniatures on wargaming bases, universal multi-weapon equipment architecture, tactical line-of-sight analysis, deterministic over-the-shoulder action cameras, realistic vehicle kinematics, and an interactive Codex.
 
 ---
 
 ## 🛡️ Playable Factions (10 Armies)
 
+Each faction features dedicated high-resolution emblems, distinct battlefield doctrines, specialized unit rosters, and unique mechanics:
+
 1. **The Ascendants (Space Marines / Adeptus Astartes)**
    * *Aesthetics*: Cobalt blue power armor, gold trim, purity seals, and jump packs.
-   * *Playstyle*: Elite `3+` armor saves, versatile 18" bolt rifles, heavy devastators, and fast assault squads.
-   * *Units*: Castellan Vorn, Tactical Squad, Assault Squad, Devastator Squad, Predator Tank.
+   * *Emblem*: Golden eagle crest framed by heavy wargaming shields.
+   * *Playstyle*: Elite `3+` armor saves, versatile 26" bolt rifles, heavy devastators, and fast assault squads.
+   * *Units*: Captain, Tactical Marines, Assault Marines, Devastators, Dreadnought, Predator Tank.
 
-2. **The Forsaken (Chaos Space Marines / Heretic Astartes)**
-   * *Aesthetics*: Crimson red armor, warped horn spires, brass trim, and daemon blades.
-   * *Playstyle*: Aggressive close-range firefights, brutal melee charges, and cultist meatshields.
-   * *Units*: Lord Malakar, Chaos Legionaries, Raptor Jump Pack Squad, Cultist Mob, Chaos Predator.
-
-3. **The Devourers (Tyranids / Hive Fleet)**
-   * *Aesthetics*: Bio-chitin carapace, bone scything talons, and chitinous appendages.
-   * *Playstyle*: Fast swarm advances, rending bio-claws, and bio-plasma heavy artillery.
-   * *Units*: Hive Tyrant, Tyranid Warriors, Genestealers, Termagant Swarms, Carnifex.
-
-4. **The Concordat (T'au Empire / Hunter Cadre)**
-   * *Aesthetics*: Ochre sand plating, angular sensor antennae, and plasma glow lenses.
-   * *Playstyle*: Extreme long-range pulse rifles (24"), rail snipers (28"), and hover battlesuits.
-   * *Units*: Commander Shas'O, Fire Warriors, Stealth Battlesuits, Pathfinders, Hammerhead Gunship.
-
-5. **The Directorate (Astra Militarum / Imperial Guard)**
+2. **The Directorate (Astra Militarum / Imperial Guard)**
    * *Aesthetics*: Olive drab flak armor, fabric fatigues, angular rimmed helmets, and continuous tracked armor.
+   * *Emblem*: Golden winged skull emblem over olive industrial roundel.
    * *Playstyle*: Industrial mass infantry fire, heavy ordnance weapon teams, scout sentinels, and devastating long-range siege artillery.
-   * *Units*: Field Marshal Vance, Shock Troopers, Heavy Ordnance Teams, Sentinel Walkers, Basilisk Siege Howitzers, Directorate Battle Tanks.
+   * *Units*: Commander, Shock Troopers, Heavy Weapons Teams, Kasrkin, Ogryns, Leman Russ Battle Tank.
 
-6. **The Riftborn (Chaos Daemons / Warp Entities)**
-   * *Aesthetics*: Obsidian horns, twisting demonic limbs, hellblades, and glowing warpfire emanations.
-   * *Playstyle*: Terrifying melee disruption, unnatural resilience, and reality-warping speed.
-   * *Units*: Daemon Prince, Bloodletter Packs, Plaguebearer Phalanxes, Daemonette Stalkers, Greater Daemons.
-
-7. **The Ghar (Orks / Greenskins)**
-   * *Aesthetics*: Bulky green muscle, scrap-iron armor plates, and crude mechanical weaponry.
-   * *Playstyle*: Overwhelming numbers, high damage melee choppas, and reckless dakka.
-   * *Units*: Warboss, Ork Boyz, Nobz, Stormboyz, Battlewagons.
-
-8. **The Revenant (Necrons / Undying Dynasties)**
-   * *Aesthetics*: Skeletal living metal, Gauss green energy cores, and ancient hieroglyphic armor.
-   * *Playstyle*: Reanimation protocols, devastating Gauss flayers, and indestructible monolith walkers.
-   * *Units*: Overlord, Necron Warriors, Immortals, Skorpekh Destroyers, Heavy Destroyers.
-
-9. **The Elyri (Aeldari / Craftworld Eldar)**
+3. **The Elyri (Aeldari / Craftworld Eldar)**
    * *Aesthetics*: Sleek wraithbone crests, gemstone inlays, and aerodynamic jump fins.
-   * *Playstyle*: Unrivaled agility, pinpoint Shuriken weaponry, and specialized aspect warriors.
-   * *Units*: Autarch, Guardian Defenders, Dire Avengers, Howling Banshees, Wraithguard.
+   * *Emblem*: Luminescent psychic eye with celestial geometric rings and runes.
+   * *Playstyle*: Unrivaled agility (M8–M12), pinpoint Shuriken storms, and specialized aspect warriors.
+   * *Units*: Autarch, Guardian Defenders, Dire Avengers, Howling Banshees, Dark Reapers, Wraithguard.
 
-10. **The Veykari (Drukhari / Dark Eldar)**
-    * *Aesthetics*: Spiked obsidian armor, barbed blade crests, and toxic emerald blades.
-    * *Playstyle*: Lightning-fast hit-and-run raids, splinter cannons, and combat drug enhancements.
-    * *Units*: Archon, Kabalite Warriors, Wyches, Incubi, Ravager Skimmers.
+4. **The Veykari (Drukhari / Dark Eldar)**
+   * *Aesthetics*: Spiked obsidian armor, barbed blade crests, and toxic emerald blades.
+   * *Emblem*: Dark violet biomechanical raptor crest with razor bladed arcs.
+   * *Playstyle*: Lightning-fast hit-and-run raids, poison splinter fire, Incubi klaives, and objective looting.
+   * *Units*: Archon, Kabalite Warriors, Wyches, Incubi, Scourges, Ravager Skimmers.
+
+5. **The Ghar (Orks / Greenskins)**
+   * *Aesthetics*: Bulky green muscle, scrap-iron armor plates, and crude mechanical weaponry.
+   * *Emblem*: Camo skull with crossed heavy choppas, rockets, stikkbombs, and Dakka drums.
+   * *Playstyle*: Overwhelming numbers, high damage melee power klaws, scrap artillery, and reckless Dakka.
+   * *Units*: Warboss, Boyz, Nobz, Lootas, Stormboyz, Meganobz.
+
+6. **The Devourers (Tyranids / Hive Fleet)**
+   * *Aesthetics*: Bio-chitin carapace, bone scything talons, and chitinous appendages.
+   * *Emblem*: Violet bio-chitin skull crest with predatory mandibles and glowing psychic aura.
+   * *Playstyle*: Fast swarm advances, rending bio-claws, living spore artillery, and multi-weapon bio-monsters.
+   * *Units*: Hive Tyrant, Tyranid Warriors, Genestealers, Hormagaunts, Termagants, Carnifex.
+
+7. **The Revenant (Necrons / Undying Dynasties)**
+   * *Aesthetics*: Skeletal living metal, Gauss green energy cores, and ancient hieroglyphic armor.
+   * *Emblem*: Cybernetic golden necron pharaoh skull with emerald third eye and stasis glyphs.
+   * *Playstyle*: Reanimation protocols, devastating Gauss flayers, and indestructible monolith walkers.
+   * *Units*: Overlord, Necron Warriors, Immortals, Flayed Ones, Lychguards, Skorpekh Destroyers.
+
+8. **The Concordat (T'au Empire / Hunter Cadre)**
+   * *Aesthetics*: Ochre sand plating, angular sensor antennae, and plasma glow lenses.
+   * *Emblem*: High-tech crystal geometric pyramid with orbital resonance rings.
+   * *Playstyle*: Extreme long-range pulse rifles (34"), rail snipers (48"), markerlight networks, and hover battlesuits.
+   * *Units*: Commander, Fire Warriors, Crisis Battlesuits, Stealth Battlesuits, Pathfinders, Broadside.
+
+9. **The Riftborn (Chaos Daemons / Warp Entities)**
+   * *Aesthetics*: Obsidian horns, twisting demonic limbs, hellblades, and glowing warpfire emanations.
+   * *Emblem*: Demonic eight-pointed star crest surrounded by roaring warpfire.
+   * *Playstyle*: Terrifying melee disruption, unnatural resilience, and reality-warping speed.
+   * *Units*: Daemon Prince, Bloodletters, Plaguebearers, Daemonettes, Greater Daemons.
+
+10. **The Forsaken (Chaos Space Marines / Heretic Astartes)**
+    * *Aesthetics*: Crimson red armor, warped horn spires, brass trim, and daemon blades.
+    * *Emblem*: Spiked star crest with horned daemon skull and hellfire runic trim.
+    * *Playstyle*: Aggressive close-range firefights, brutal melee charges, and cultist meatshields.
+    * *Units*: Chaos Lord, Chaos Legionaries, Havocs, Chosen, Raptors, Helbrute.
 
 ---
 
@@ -94,6 +106,29 @@ Ascension Tactics features **10 distinct battlefields** plus a **Random World** 
     * *Atmosphere*: Rising fiery embers, warp purple energy auras, and bubbling molten veins.
 11. **Random World (Dynamic Mystery Theater)**
     * *Visuals*: Unpredictable planetary theater with dynamic terrain generation and atmospheric hazards.
+
+---
+
+## ⚔️ Universal Multi-Weapon Equipment Architecture
+
+Ascension Tactics employs an authoritative, data-driven multi-weapon architecture:
+
+```mermaid
+flowchart LR
+    A["Unit Definition (weaponIds)"] --> B["Authoritative WEAPON_REGISTRY"]
+    B --> C["Resolved Unit Profile (weapons)"]
+    C --> D["Combat Engine"]
+    C --> E["AI Decision Engine"]
+    C --> F["Interactive Unit Frame UI"]
+```
+
+### Key Architectural Principles:
+* **Authoritative Weapon Registry**: `WEAPON_REGISTRY` in `src/data/equipment.ts` defines all weapons with single sources of truth for stats (Attacks, Damage, AP, Accuracy, Range), category (`melee` vs `ranged`), visual/audio effects, and codex lore.
+* **Declarative Unit Loadouts**: Every unit declares `weaponIds: string[]`. Units sharing the same weapon reference the exact same definition.
+* **Universal Multi-Weapon Support**: Every unit in the game is architecturally capable of carrying $0..N$ weapons with zero hardcoded special cases.
+* **Smart Combat Selection**: `resolveAttack()` evaluates all equipped weapons dynamically—selecting the best melee weapon in close combat ($dist \le 1.5$) and the best in-range ranged weapon at distance.
+* **Isolated UI Inspection**: The Unit Frame dynamically renders interactive buttons for each equipped weapon with isolated popups and zero cross-talk.
+* **Defensive Integrity Validation**: `validateUnitEquipment()` ensures every equipped weapon exists and complies with faction allowance rules.
 
 ---
 
