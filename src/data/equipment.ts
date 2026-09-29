@@ -1044,180 +1044,1118 @@ export const WEAPON_REGISTRY: Record<string, WeaponProfileDetail> = {
     allowedFactions: ['ghar', 'orcs']
   },
 
-  // ==========================================
-  // 6. THE DEVOURERS (Tyranids / Hive Fleet)
-  // ==========================================
-  ty_stranglethorn_cannon: {
-    id: 'ty_stranglethorn_cannon',
-    name: 'STRANGLETHORN CANNON',
-    type: 'ranged',
-    category: 'Bio-Organic Siege Spore Launcher',
-    icon: '🌿',
-    range: 24,
-    rangeDisplay: '24"',
-    strength: 7,
-    penetration: 3,
-    ap: 3,
-    damage: 4,
-    attacks: 3,
-    damageType: 'Barbed Bio-Seed Blast',
-    effectiveAgainst: ['Infantry Formations', 'Light Vehicles', 'Concentrated Squads'],
-    weakAgainst: ['Heavy Refractor Barriers', 'Void Shields'],
-    special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_crushing_claws: {
-    id: 'ty_crushing_claws',
-    name: 'CRUSHING CLAWS',
-    type: 'melee',
-    category: 'Diamond-Hard Pincer Claws',
-    icon: '🦀',
-    range: 0,
-    rangeDisplay: 'Melee',
-    strength: 6,
-    penetration: 4,
-    ap: 4,
-    damage: 6,
-    attacks: 2,
-    damageType: 'Bio-Organic Rending',
-    effectiveAgainst: ['Heavy Armour', 'Tanks', 'Fortified Exoskeletons'],
-    weakAgainst: ['Displacement Phase Fields'],
-    special: 'Rending Strike: Wound rolls of 6 inflict critical armor penetration.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_scything_talons: {
-    id: 'ty_scything_talons',
-    name: 'SCYTHING TALONS',
-    type: 'melee',
-    category: 'Bio-Organic Monomolecular Scythes',
-    icon: '🦞',
-    range: 0,
-    rangeDisplay: 'Melee',
-    strength: 5,
-    penetration: 3,
-    ap: 3,
-    damage: 5,
-    attacks: 4,
-    damageType: 'Bio-Organic Slicing',
-    effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Swarm Units'],
-    weakAgainst: ['Reinforced Ceramite Bunkers'],
-    special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_heavy_venom_cannon: {
-    id: 'ty_heavy_venom_cannon',
-    name: 'HEAVY VENOM CANNON',
-    type: 'ranged',
-    category: 'Bio-Organic Acid Slag Projector',
-    icon: '👾',
-    range: 28,
-    rangeDisplay: '28"',
-    strength: 6,
-    penetration: 3,
-    ap: 3,
-    damage: 4,
-    attacks: 3,
-    damageType: 'Corrosive Bio-Acid Crystals',
-    effectiveAgainst: ['Armored Constructs', 'Elite Infantry'],
-    weakAgainst: ['Energy Shields'],
-    special: 'Corrosive Slag: Melts enemy armor saves on impact.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_deathspitter: {
-    id: 'ty_deathspitter',
-    name: 'DEATHSPITTER',
-    type: 'ranged',
-    category: 'Corrosive Parasite Projector',
-    icon: '👾',
-    range: 26,
-    rangeDisplay: '26"',
-    strength: 5,
-    penetration: 2,
-    ap: 2,
-    damage: 2,
-    attacks: 3,
-    damageType: 'Corrosive Parasitic Maggots',
-    effectiveAgainst: ['Medium Infantry', 'Organic Cohorts'],
-    weakAgainst: ['Vehicle Armor'],
-    special: 'Flesh Maggots: Ongoing corrosive damage.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_flesh_hooks: {
-    id: 'ty_flesh_hooks',
-    name: 'FLESH HOOKS',
-    type: 'ranged',
-    category: 'Bio-Organic Harpoon Organs',
-    icon: '🪝',
-    range: 14,
-    rangeDisplay: '14"',
-    strength: 4,
-    penetration: 2,
-    ap: 2,
-    damage: 2,
-    attacks: 2,
-    damageType: 'Chitinous Harpoon Barb',
-    effectiveAgainst: ['Light Infantry'],
-    weakAgainst: ['Vehicles'],
-    special: 'Bio-Grapple: Pulls user towards target or target towards user.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_rending_claws: {
-    id: 'ty_rending_claws',
-    name: 'RENDING CLAWS',
-    type: 'melee',
-    category: 'Diamond-Hard Pincer Claws',
-    icon: '🦀',
-    range: 0,
-    rangeDisplay: 'Melee',
-    strength: 4,
-    penetration: 4,
-    ap: 4,
-    damage: 2,
-    attacks: 3,
-    damageType: 'Bio-Organic Rending',
-    effectiveAgainst: ['Organic Targets', 'Armoured Infantry'],
-    weakAgainst: ['Energy Barriers'],
-    special: 'Rending Flurry: Penetrates all non-invulnerable armour on wound rolls of 6.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_fleshborer: {
-    id: 'ty_fleshborer',
-    name: 'FLESHBORER SWARM',
-    type: 'ranged',
-    category: 'Bio-Munition Beetle Colony',
-    icon: '🐛',
-    range: 20,
-    rangeDisplay: '20"',
-    strength: 3,
-    penetration: 1,
-    ap: 1,
-    damage: 1,
-    attacks: 2,
-    damageType: 'Boring Beetle Organisms',
-    effectiveAgainst: ['Unarmored Swarms', 'Light Infantry'],
-    weakAgainst: ['Heavy Carapace'],
-    special: 'Chittering Swarm: Large attack volumes overwhelm unarmoured foes.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
-  ty_spore_mine_cannon: {
-    id: 'ty_spore_mine_cannon',
-    name: 'SPORE MINE CANNON',
-    type: 'ranged',
-    category: 'Biological Mortar Organ',
-    icon: '🍄',
-    range: 44,
-    rangeDisplay: '44"',
-    strength: 5,
-    penetration: 3,
-    ap: 3,
-    damage: 3,
-    attacks: 2,
-    damageType: 'Volatile Spore Detonation',
-    effectiveAgainst: ['Massed Battalions', 'Cover Targets'],
-    weakAgainst: ['Dispersal Fields'],
-    special: 'Spore Burst: Bypasses line of sight and cover.',
-    allowedFactions: ['devourers', 'tyranids']
-  },
+// ============================================================================
+// 6. THE DEVOURERS — Tyranids / Hive Fleet
+// ============================================================================
+//
+// Tyranid weapons are biological organisms, living weapons, or specialised
+// bio-organs evolved for specific battlefield roles.
+//
+// Both faction IDs are supported:
+//   - devourers
+//   - tyranids
+//
+// Keep weapon IDs stable. Unit definitions reference them through `weaponIds`.
+// ============================================================================
+
+// ------------------------------------------
+// RANGED WEAPONS
+// ------------------------------------------
+
+ty_stranglethorn_cannon: {
+  id: 'ty_stranglethorn_cannon',
+  name: 'STRANGLETHORN CANNON',
+  type: 'ranged',
+  category: 'Bio-Organic Siege Spore Launcher',
+  icon: '🌿',
+  range: 36,
+  rangeDisplay: '36"',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 4,
+  attacks: 3,
+  damageType: 'Barbed Bio-Seed Blast',
+  effectiveAgainst: ['Infantry Formations', 'Light Vehicles', 'Concentrated Squads'],
+  weakAgainst: ['Heavy Refractor Barriers', 'Void Shields'],
+  special: 'Barbed Seed Blast: Entangles targets, reducing target Movement by 2 on hit.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_zootrope_psychic_blast: {
+  id: 'ty_zootrope_psychic_blast',
+  name: 'ZOETROPE PSYCHIC BLAST',
+  type: 'ranged',
+  category: 'Warp-Bioelectric Synaptic Projection',
+  icon: '🧠',
+  range: 24,
+  rangeDisplay: '24"',
+  strength: 5,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 2,
+  damageType: 'Psychic Bio-Energy',
+  effectiveAgainst: [
+    'Elite Infantry',
+    'Medium Armour',
+    'Psychic Constructs',
+    'Synaptic Targets'
+  ],
+  weakAgainst: [
+    'Psychic Wards',
+    'Void Shields',
+    'Disruption Fields'
+  ],
+  special: 'Warp Lance: Ignores cover and invulnerable protection is reduced by 1 against this attack.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_heavy_venom_cannon: {
+  id: 'ty_heavy_venom_cannon',
+  name: 'HEAVY VENOM CANNON',
+  type: 'ranged',
+  category: 'Bio-Organic Acid Slag Projector',
+  icon: '👾',
+  range: 28,
+  rangeDisplay: '28"',
+  strength: 6,
+  penetration: 3,
+  ap: 3,
+  damage: 4,
+  attacks: 3,
+  damageType: 'Corrosive Bio-Acid Crystals',
+  effectiveAgainst: ['Armored Constructs', 'Elite Infantry'],
+  weakAgainst: ['Energy Shields'],
+  special: 'Corrosive Slag: Melts enemy armor saves on impact.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_deathspitter: {
+  id: 'ty_deathspitter',
+  name: 'DEATHSPITTER',
+  type: 'ranged',
+  category: 'Corrosive Parasite Projector',
+  icon: '👾',
+  range: 26,
+  rangeDisplay: '26"',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 3,
+  damageType: 'Corrosive Parasitic Maggots',
+  effectiveAgainst: ['Medium Infantry', 'Organic Cohorts'],
+  weakAgainst: ['Vehicle Armor'],
+  special: 'Flesh Maggots: Ongoing corrosive damage.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_flesh_hooks: {
+  id: 'ty_flesh_hooks',
+  name: 'FLESH HOOKS',
+  type: 'ranged',
+  category: 'Bio-Organic Harpoon Organs',
+  icon: '🪝',
+  range: 14,
+  rangeDisplay: '14"',
+  strength: 4,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 2,
+  damageType: 'Chitinous Harpoon Barb',
+  effectiveAgainst: ['Light Infantry'],
+  weakAgainst: ['Vehicles'],
+  special: 'Bio-Grapple: Pulls user towards target or target towards user.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_fleshborer: {
+  id: 'ty_fleshborer',
+  name: 'FLESHBORER SWARM',
+  type: 'ranged',
+  category: 'Bio-Munition Beetle Colony',
+  icon: '🐛',
+  range: 20,
+  rangeDisplay: '20"',
+  strength: 3,
+  penetration: 1,
+  ap: 1,
+  damage: 1,
+  attacks: 2,
+  damageType: 'Boring Beetle Organisms',
+  effectiveAgainst: ['Unarmored Swarms', 'Light Infantry'],
+  weakAgainst: ['Heavy Carapace'],
+  special: 'Chittering Swarm: Large attack volumes overwhelm unarmoured foes.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_spore_mine_cannon: {
+  id: 'ty_spore_mine_cannon',
+  name: 'SPORE MINE CANNON',
+  type: 'ranged',
+  category: 'Biological Mortar Organ',
+  icon: '🍄',
+  range: 44,
+  rangeDisplay: '44"',
+  strength: 5,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 2,
+  damageType: 'Volatile Spore Detonation',
+  effectiveAgainst: ['Massed Battalions', 'Cover Targets'],
+  weakAgainst: ['Dispersal Fields'],
+  special: 'Spore Burst: Bypasses line of sight and cover.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_impaler_cannon: {
+  id: 'ty_impaler_cannon',
+  name: 'IMPALER CANNON',
+  type: 'ranged',
+  category: 'Bio-Organic Impaling Siege Cannon',
+  icon: '🏹',
+  range: 38,
+  rangeDisplay: '38"',
+  strength: 7,
+  penetration: 4,
+  ap: 4,
+  damage: 4,
+  attacks: 2,
+  damageType: 'Impaling Bio-Spike',
+  effectiveAgainst: ['Heavy Infantry', 'Light Vehicles', 'Armoured Targets'],
+  weakAgainst: ['Displacement Fields', 'Fast Skirmishers'],
+  special: 'Impaling Shot: Ignores light cover and deals increased damage against stationary targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_gargoyle_bio_weapons: {
+  id: 'ty_gargoyle_bio_weapons',
+  name: 'GARGOYLE BIO-WEAPONS',
+  type: 'ranged',
+  category: 'Winged Bio-Weapon Organ',
+  icon: '🦇',
+  range: 18,
+  rangeDisplay: '18"',
+  strength: 3,
+  penetration: 1,
+  ap: 1,
+  damage: 1,
+  attacks: 3,
+  damageType: 'Bio-Acid Projectile',
+  effectiveAgainst: ['Light Infantry', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour', 'Fortifications'],
+  special: 'Strafing Fire: Can fire after moving without penalty.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_tyrannofex_cannon: {
+  id: 'ty_tyrannofex_cannon',
+  name: 'TYRANNOFEX BIO-CANNON',
+  type: 'ranged',
+  category: 'Living Heavy Bio-Cannon',
+  icon: '🧬',
+  range: 48,
+  rangeDisplay: '48"',
+  strength: 8,
+  penetration: 5,
+  ap: 5,
+  damage: 6,
+  attacks: 2,
+  damageType: 'Compressed Bio-Plasma',
+  effectiveAgainst: ['Heavy Vehicles', 'Monsters', 'Fortifications'],
+  weakAgainst: ['Fast Skirmishers', 'Displacement Fields'],
+  special: 'Siege Bio-Cannon: Heavy impact can stagger large targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_barblauncher: {
+  id: 'ty_barblauncher',
+  name: 'BARBLAUNCHER',
+  type: 'ranged',
+  category: 'Living Barbed Projectile Organ',
+  icon: '🪲',
+  range: 24,
+  rangeDisplay: '24"',
+  strength: 4,
+  penetration: 1,
+  ap: 1,
+  damage: 2,
+  attacks: 5,
+  damageType: 'Bio-Organic Barbs',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Disruptive Barbs: Targets hit suffer reduced movement and combat effectiveness.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_pyrovore_bio_flame: {
+  id: 'ty_pyrovore_bio_flame',
+  name: 'BIO-FLAME',
+  type: 'ranged',
+  category: 'Living Incendiary Organ',
+  icon: '🔥',
+  range: 12,
+  rangeDisplay: '12"',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 3,
+  damageType: 'Bio-Acid Flame',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Immolation: Ignores cover and can affect multiple models in close formations.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_exocrine_bio_plasmic_cannon: {
+  id: 'ty_exocrine_bio_plasmic_cannon',
+  name: 'BIO-PLASMIC CANNON',
+  type: 'ranged',
+  category: 'Heavy Bio-Plasma Artillery Organ',
+  icon: '🟣',
+  range: 48,
+  rangeDisplay: '48"',
+  strength: 8,
+  penetration: 4,
+  ap: 4,
+  damage: 6,
+  attacks: 3,
+  damageType: 'Bio-Plasma',
+  effectiveAgainst: ['Heavy Infantry', 'Heavy Armour', 'Monstrous Creatures'],
+  weakAgainst: ['Swarm Units', 'Fast Skirmishers'],
+  special: 'Bio-Plasma Blast: Devastating plasma impacts capable of punching through heavy armour.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_psychophage_acid_spray: {
+  id: 'ty_psychophage_acid_spray',
+  name: 'ACID SPRAY',
+  type: 'ranged',
+  category: 'Corrosive Digestive Organ',
+  icon: '🧪',
+  range: 12,
+  rangeDisplay: '12"',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 4,
+  damageType: 'Corrosive Acid',
+  effectiveAgainst: ['Infantry Formations', 'Psychic Units', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Psychic Scourge: Particularly effective against organisms saturated with psychic energy.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_spore_mine_detonation: {
+  id: 'ty_spore_mine_detonation',
+  name: 'SPORE MINE DETONATION',
+  type: 'ranged',
+  category: 'Bio-Explosive Organism',
+  icon: '💥',
+  range: 3,
+  rangeDisplay: '3"',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 3,
+  damageType: 'Bio-Explosive',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Living Bomb: Detonates on contact, damaging nearby enemies.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_mucolid_spore_burst: {
+  id: 'ty_mucolid_spore_burst',
+  name: 'MUCOLID SPORE BURST',
+  type: 'ranged',
+  category: 'Volatile Bio-Explosive Organism',
+  icon: '💥',
+  range: 6,
+  rangeDisplay: '6"',
+  strength: 8,
+  penetration: 3,
+  ap: 3,
+  damage: 5,
+  attacks: 4,
+  damageType: 'Bio-Explosive',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Armour', 'Light Armour'],
+  weakAgainst: ['Fast Skirmishers'],
+  special: 'Volatile Detonation: Explodes in a devastating bio-organic blast.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_tervigon_stinger_salvo: {
+  id: 'ty_tervigon_stinger_salvo',
+  name: 'STINGER SALVO',
+  type: 'ranged',
+  category: 'Bio-Organic Projectile Weapon',
+  icon: '🦂',
+  range: 18,
+  rangeDisplay: '18"',
+  strength: 4,
+  penetration: 1,
+  ap: 1,
+  damage: 1,
+  attacks: 5,
+  damageType: 'Bio-Acid',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Stinger Volley: Fires a spread of toxin-coated projectiles.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_harpy_tentaclids: {
+  id: 'ty_harpy_tentaclids',
+  name: 'TENTACLIDS',
+  type: 'ranged',
+  category: 'Living Bio-Torpedoes',
+  icon: '🐙',
+  range: 36,
+  rangeDisplay: '36"',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 2,
+  damageType: 'Bio-Electric',
+  effectiveAgainst: ['Heavy Armour', 'Vehicles', 'Monsters'],
+  weakAgainst: ['Infantry Swarms'],
+  special: 'Bio-Torpedoes: Living projectiles designed to pursue and pierce armoured targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_harpy_drool_cannon: {
+  id: 'ty_harpy_drool_cannon',
+  name: 'DROOL CANNON',
+  type: 'ranged',
+  category: 'Bio-Acid Artillery',
+  icon: '🧪',
+  range: 18,
+  rangeDisplay: '18"',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 4,
+  damageType: 'Bio-Acid',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Acidic Spray: Saturates an area with corrosive bio-acid.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_sporocyst_spore_node: {
+  id: 'ty_sporocyst_spore_node',
+  name: 'SPORE NODE',
+  type: 'ranged',
+  category: 'Bio-Organic Spore Launcher',
+  icon: '🍄',
+  range: 24,
+  rangeDisplay: '24"',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 5,
+  damageType: 'Bio-Explosive',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units', 'Light Armour'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Spore Dispersal: Launches explosive spores into nearby enemy formations.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_sporocyst_barbed_strangler: {
+  id: 'ty_sporocyst_barbed_strangler',
+  name: 'BARBED STRANGLER',
+  type: 'ranged',
+  category: 'Bio-Organic Thorn Cannon',
+  icon: '🌿',
+  range: 36,
+  rangeDisplay: '36"',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 4,
+  damageType: 'Bio-Organic Piercing',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Barbed Volley: Fires clusters of razor-sharp living projectiles.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_neurotyrant_psychic_scream: {
+  id: 'ty_neurotyrant_psychic_scream',
+  name: 'PSYCHIC SCREAM',
+  type: 'ranged',
+  category: 'Synaptic Psychic Blast',
+  icon: '🧠',
+  range: 24,
+  rangeDisplay: '24"',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 4,
+  damageType: 'Psychic',
+  effectiveAgainst: ['Infantry Formations', 'Psychic Units', 'Monsters'],
+  weakAgainst: ['Psychic Wards'],
+  special: 'Synaptic Rupture: Unleashes a focused psychic assault against enemy minds.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_norn_assimilator_harpoon: {
+  id: 'ty_norn_assimilator_harpoon',
+  name: 'HARPOON',
+  type: 'ranged',
+  category: 'Bio-Organic Harpoon',
+  icon: '🪝',
+  range: 24,
+  rangeDisplay: '24"',
+  strength: 10,
+  penetration: 4,
+  ap: 4,
+  damage: 4,
+  attacks: 1,
+  damageType: 'Bio-Organic Piercing',
+  effectiveAgainst: ['Heavy Armour', 'Monsters', 'Vehicles'],
+  weakAgainst: ['Infantry Swarms'],
+  special: 'Impaling Harpoon: Launches a massive bio-organic projectile to pierce heavy targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ==========================================
+// MELEE WEAPONS
+// ==========================================
+
+ty_neurogaunt_claws: {
+  id: 'ty_neurogaunt_claws',
+  name: 'NEUROGAUNT CLAWS',
+  type: 'melee',
+  category: 'Bio-Organic Claws',
+  icon: '🦀',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 3,
+  penetration: 1,
+  ap: 1,
+  damage: 1,
+  attacks: 2,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Swarm Assault: Neurogaunts attack in coordinated groups.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_von_ryan_leaper_talons: {
+  id: 'ty_von_ryan_leaper_talons',
+  name: "VON RYAN'S LEAPER TALONS",
+  type: 'melee',
+  category: 'Bio-Organic Scything Talons',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 5,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Skirmishers'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Ambush Predator: Specializes in rapid close-quarters strikes.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_maleceptor_massive_talons: {
+  id: 'ty_maleceptor_massive_talons',
+  name: 'MALECEPTOR MASSIVE TALONS',
+  type: 'melee',
+  category: 'Monstrous Bio-Organic Talons',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 4,
+  attacks: 4,
+  damageType: 'Bio-Organic Crushing',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Armour', 'Monsters'],
+  weakAgainst: ['Fast Skirmishers'],
+  special: 'Monstrous Talons: Heavy bio-organic strikes capable of tearing through armour.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_neurotyrant_claws: {
+  id: 'ty_neurotyrant_claws',
+  name: 'NEUROTYRANT CLAWS',
+  type: 'melee',
+  category: 'Synaptic Bio-Organic Claws',
+  icon: '🧠',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 2,
+  attacks: 3,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Psychic Units'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Synaptic Strike: Bio-organic claws reinforced by psychic energy.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_norn_emissary_psychic_tendrils: {
+  id: 'ty_norn_emissary_psychic_tendrils',
+  name: 'PSYCHIC TENDRILS',
+  type: 'melee',
+  category: 'Psychically Charged Bio-Tendrils',
+  icon: '🧠',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 4,
+  damageType: 'Psychic',
+  effectiveAgainst: ['Infantry Formations', 'Psychic Units', 'Monsters'],
+  weakAgainst: ['Psychic Wards'],
+  special: 'Psychic Siphon: Bio-tendrils channel synaptic energy into their target.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+// ------------------------------------------
+ty_norn_assimilator_talons: {
+  id: 'ty_norn_assimilator_talons',
+  name: 'NORN ASSIMILATOR TALONS',
+  type: 'melee',
+  category: 'Monstrous Bio-Organic Talons',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 9,
+  penetration: 4,
+  ap: 4,
+  damage: 5,
+  attacks: 5,
+  damageType: 'Bio-Organic Crushing',
+  effectiveAgainst: ['Heavy Armour', 'Monsters', 'Vehicles'],
+  weakAgainst: ['Infantry Swarms'],
+  special: 'Assimilator Strike: Massive talons designed to rip apart large prey.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_pyrovore_claws: {
+  id: 'ty_pyrovore_claws',
+  name: 'CHITINOUS CLAWS',
+  type: 'melee',
+  category: 'Heavy Chitinous Claws',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 3,
+  damageType: 'Chitinous Rending',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Monstrous Creatures'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Scouring Claws: Rending claws tear through lighter armour and biological plating.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_venomthrope_toxic_tendrils: {
+  id: 'ty_venomthrope_toxic_tendrils',
+  name: 'TOXIC TENDRILS',
+  type: 'melee',
+  category: 'Poisoned Tentacular Limbs',
+  icon: '🌿',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 4,
+  penetration: 1,
+  ap: 1,
+  damage: 2,
+  attacks: 4,
+  damageType: 'Toxic Bio-Acid',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Toxic Venom: Wounds inflicted by the tendrils can continue to weaken surviving enemies.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_haruspex_grasping_tongue: {
+  id: 'ty_haruspex_grasping_tongue',
+  name: 'GRASPING TONGUE',
+  type: 'melee',
+  category: 'Prehensile Feeding Organ',
+  icon: '👅',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 3,
+  damageType: 'Bio-Organic Crushing',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Infantry'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Grasping Maw: Pulls prey toward the Haruspex before it is devoured.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_haruspex_ravenous_maw: {
+  id: 'ty_haruspex_ravenous_maw',
+  name: 'RAVENOUS MAW',
+  type: 'melee',
+  category: 'Massive Digestive Maw',
+  icon: '🦷',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 5,
+  attacks: 5,
+  damageType: 'Bio-Organic Devouring',
+  effectiveAgainst: ['Heavy Infantry', 'Monstrous Creatures', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Fast Skirmishers'],
+  special: 'Feeding Frenzy: Gains increased effectiveness after successfully destroying enemy models.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_screamer_killer_bio_plasmic_scream: {
+  id: 'ty_screamer_killer_bio_plasmic_scream',
+  name: 'BIO-PLASMIC SCREAM',
+  type: 'melee',
+  category: 'Bio-Plasmic Vocal Organ',
+  icon: '🟣',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 4,
+  damageType: 'Bio-Plasma',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Infantry', 'Monstrous Creatures'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Screaming Blast: A concentrated bio-plasmic discharge devastates nearby enemies.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_screamer_killer_talons: {
+  id: 'ty_screamer_killer_talons',
+  name: 'SCREAMER-KILLER TALONS',
+  type: 'melee',
+  category: 'Massive Killing Talons',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 3,
+  ap: 3,
+  damage: 4,
+  attacks: 5,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Infantry', 'Monstrous Creatures', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Killing Sweep: Sweeping talons can strike several nearby enemies in a single assault.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_trygon_massive_scything_talons: {
+  id: 'ty_trygon_massive_scything_talons',
+  name: 'MASSIVE SCYTHING TALONS',
+  type: 'melee',
+  category: 'Titanic Scything Talons',
+  icon: '🦂',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 8,
+  penetration: 4,
+  ap: 4,
+  damage: 6,
+  attacks: 6,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Heavy Infantry', 'Monstrous Creatures', 'Heavy Armour'],
+  weakAgainst: ['Swarm Units', 'Fast Skirmishers'],
+  special: 'Titanic Sweep: Devastating sweeping strikes can tear through multiple enemies.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_mawloc_massive_scything_talons: {
+  id: 'ty_mawloc_massive_scything_talons',
+  name: 'MASSIVE SCYTHING TALONS',
+  type: 'melee',
+  category: 'Titanic Scything Talons',
+  icon: '🦂',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 7,
+  penetration: 3,
+  ap: 3,
+  damage: 5,
+  attacks: 5,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Heavy Infantry', 'Monstrous Creatures'],
+  weakAgainst: ['Heavy Armour', 'Fast Skirmishers'],
+  special: 'Ambush Talons: Particularly effective when striking enemies immediately after emerging from underground.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_toxicrene_toxic_lashes: {
+  id: 'ty_toxicrene_toxic_lashes',
+  name: 'TOXIC LASHES',
+  type: 'melee',
+  category: 'Toxic Tentacle Lashes',
+  icon: '🌿',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 2,
+  ap: 2,
+  damage: 3,
+  attacks: 6,
+  damageType: 'Toxic Bio-Acid',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Toxic Barrage: Multiple venomous lashes can strike several nearby targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_toxicrene_massive_scything_talons: {
+  id: 'ty_toxicrene_massive_scything_talons',
+  name: 'MASSIVE SCYTHING TALONS',
+  type: 'melee',
+  category: 'Heavy Scything Talons',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 3,
+  ap: 3,
+  damage: 4,
+  attacks: 4,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Heavy Infantry', 'Monstrous Creatures', 'Light Armour'],
+  weakAgainst: ['Heavy Armour', 'Fast Skirmishers'],
+  special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_psychophage_talons_and_jaws: {
+  id: 'ty_psychophage_talons_and_jaws',
+  name: 'TALONS AND CHITINOUS JAWS',
+  type: 'melee',
+  category: 'Feeding Talons and Crushing Jaws',
+  icon: '🦷',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 2,
+  ap: 2,
+  damage: 4,
+  attacks: 5,
+  damageType: 'Bio-Organic Devouring',
+  effectiveAgainst: ['Infantry Formations', 'Psychic Units', 'Monstrous Creatures'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Psychophage: Gains additional effectiveness against psychic organisms.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_crushing_claws: {
+  id: 'ty_crushing_claws',
+  name: 'CRUSHING CLAWS',
+  type: 'melee',
+  category: 'Diamond-Hard Pincer Claws',
+  icon: '🦀',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 4,
+  ap: 4,
+  damage: 6,
+  attacks: 2,
+  damageType: 'Bio-Organic Rending',
+  effectiveAgainst: ['Heavy Armour', 'Tanks', 'Fortified Exoskeletons'],
+  weakAgainst: ['Displacement Phase Fields'],
+  special: 'Rending Strike: Wound rolls of 6 inflict critical armor penetration.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_scything_talons: {
+  id: 'ty_scything_talons',
+  name: 'SCYTHING TALONS',
+  type: 'melee',
+  category: 'Bio-Organic Monomolecular Scythes',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 3,
+  ap: 3,
+  damage: 5,
+  attacks: 4,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Light Armour', 'Swarm Units'],
+  weakAgainst: ['Reinforced Ceramite Bunkers'],
+  special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_minor_scything_talons: {
+  id: 'ty_minor_scything_talons',
+  name: 'MINOR SCYTHING TALONS',
+  type: 'melee',
+  category: 'Bio-Organic Monomolecular Scythes',
+  icon: '🦞',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 3,
+  penetration: 0,
+  ap: 0,
+  damage: 1,
+  attacks: 2,
+  damageType: 'Bio-Organic Slicing',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Scything Sweep: Re-rolls wound rolls of 1 in melee combat.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_ripper_claws: {
+  id: 'ty_ripper_claws',
+  name: 'RIPPER CLAWS AND FANGS',
+  type: 'melee',
+  category: 'Swarming Claws and Voracious Fangs',
+  icon: '🦷',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 2,
+  penetration: 0,
+  ap: 0,
+  damage: 1,
+  attacks: 4,
+  damageType: 'Bio-Organic Rending',
+  effectiveAgainst: ['Infantry Formations', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour', 'Reinforced Ceramite Bunkers'],
+  special: 'Swarm Assault: Ripper Swarms gain additional attacks when engaging heavily outnumbered enemy units.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_rending_claws: {
+  id: 'ty_rending_claws',
+  name: 'RENDING CLAWS',
+  type: 'melee',
+  category: 'Diamond-Hard Pincer Claws',
+  icon: '🦀',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 4,
+  penetration: 4,
+  ap: 4,
+  damage: 2,
+  attacks: 3,
+  damageType: 'Bio-Organic Rending',
+  effectiveAgainst: ['Organic Targets', 'Armoured Infantry'],
+  weakAgainst: ['Energy Barriers'],
+  special: 'Rending Flurry: Penetrates all non-invulnerable armour on wound rolls of 6.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_lictor_claws: {
+  id: 'ty_lictor_claws',
+  name: 'LICTOR CLAWS',
+  type: 'melee',
+  category: 'Lictor Scything Talons',
+  icon: '🦂',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 4,
+  ap: 4,
+  damage: 5,
+  attacks: 4,
+  damageType: 'Bio-Organic Rending',
+  effectiveAgainst: ['Elite Infantry', 'Armoured Infantry', 'Monstrous Targets'],
+  weakAgainst: ['Heavy Fortifications'],
+  special: 'Lictor Ambush: Gains increased penetration when attacking from concealment.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_guard_claws: {
+  id: 'ty_guard_claws',
+  name: 'HIVE GUARD CLAWS',
+  type: 'melee',
+  category: 'Heavy Chitinous Claws',
+  icon: '🦀',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 6,
+  penetration: 3,
+  ap: 3,
+  damage: 3,
+  attacks: 2,
+  damageType: 'Chitinous Crushing Strike',
+  effectiveAgainst: ['Infantry', 'Light Armour'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Guarding Talons: Defensive melee strikes can disrupt attackers.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_ravener_claws: {
+  id: 'ty_ravener_claws',
+  name: 'RAVENER CLAWS',
+  type: 'melee',
+  category: 'Burrowing Rending Claws',
+  icon: '🐍',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 5,
+  penetration: 4,
+  ap: 4,
+  damage: 3,
+  attacks: 4,
+  damageType: 'Rending Bio-Organic Strike',
+  effectiveAgainst: ['Infantry', 'Elite Infantry'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Burrow Strike: Gains increased damage when attacking after emerging from underground.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_gargoyle_claws: {
+  id: 'ty_gargoyle_claws',
+  name: 'GARGOYLE CLAWS',
+  type: 'melee',
+  category: 'Winged Raking Claws',
+  icon: '🦇',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 3,
+  penetration: 2,
+  ap: 2,
+  damage: 1,
+  attacks: 3,
+  damageType: 'Raking Bio-Organic Strike',
+  effectiveAgainst: ['Light Infantry', 'Swarm Units'],
+  weakAgainst: ['Heavy Armour'],
+  special: 'Dive Attack: Gains increased accuracy when charging from the air.',
+  allowedFactions: ['devourers', 'tyranids']
+},
+
+// ------------------------------------------
+
+ty_tyrannofex_claws: {
+  id: 'ty_tyrannofex_claws',
+  name: 'TYRANNOFEX CRUSHING CLAWS',
+  type: 'melee',
+  category: 'Titanic Crushing Claws',
+  icon: '🦖',
+  range: 0,
+  rangeDisplay: 'Melee',
+  strength: 8,
+  penetration: 5,
+  ap: 5,
+  damage: 7,
+  attacks: 3,
+  damageType: 'Titanic Bio-Organic Crush',
+  effectiveAgainst: ['Heavy Armour', 'Monsters', 'Fortifications'],
+  weakAgainst: ['Displacement Fields'],
+  special: 'Titanic Crush: Heavy blows can stagger large targets.',
+  allowedFactions: ['devourers', 'tyranids']
+},
 
   // ==========================================
   // 7. THE REVENANT (Necrons / Undying)

@@ -1,3 +1,4 @@
+import { LearnPageController, LearnSection } from './learn-page';
 import { FACTIONS, PLAYABLE_FACTIONS, resolveRandomFaction } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { MISSIONS, MISSION_CYCLE, getDefaultMissionSettings } from '../data/missions';
@@ -55,10 +56,11 @@ export class DOMManager {
   // Screens & Modals
   public homeScreen: HTMLElement | null;
   public raceModal: HTMLElement | null;
-  public learnModal: HTMLElement | null;
+  public learnPage: LearnPageController;
   public uiLayer: HTMLElement | null;
   public missionHudBar: HTMLElement | null;
   public gameOverModal: HTMLElement | null;
+  public inGameHeaderBar: HTMLElement | null;
 
   // Selections
   public selectedP1Faction: string = 'random';
@@ -89,14 +91,15 @@ export class DOMManager {
   constructor() {
     this.homeScreen = document.getElementById('home-screen');
     this.raceModal = document.getElementById('race-modal');
-    this.learnModal = document.getElementById('learn-modal');
     this.uiLayer = document.getElementById('ui-layer');
     this.missionHudBar = document.getElementById('mission-hud-bar');
     this.gameOverModal = document.getElementById('game-over-modal');
+    this.inGameHeaderBar = document.getElementById('in-game-header-bar') || document.querySelector('.header-bar');
 
     this.initHomeScreen();
     this.initRaceModal();
-    this.initLearnModal();
+    this.learnPage = new LearnPageController(() => this.showHomeScreen());
+    this.learnPage.init();
   }
 
   private initHomeScreen(): void {
@@ -112,7 +115,7 @@ export class DOMManager {
     if (btnLearnMore) {
       btnLearnMore.addEventListener('click', () => {
         sfx('click');
-        this.showLearnModal();
+        this.showLearnPage('rules');
       });
     }
 
@@ -139,17 +142,19 @@ export class DOMManager {
   public showHomeScreen(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'flex';
     if (this.raceModal) this.raceModal.style.display = 'none';
-    if (this.learnModal) this.learnModal.style.display = 'none';
+    this.learnPage.hide();
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
+    if (this.inGameHeaderBar) this.inGameHeaderBar.style.display = 'none';
   }
 
   public showRaceModal(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'none';
     if (this.raceModal) this.raceModal.style.display = 'flex';
-    if (this.learnModal) this.learnModal.style.display = 'none';
+    this.learnPage.hide();
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
+    if (this.inGameHeaderBar) this.inGameHeaderBar.style.display = 'none';
 
     this.resolvedP1Faction = null;
     this.resolvedP2Faction = null;
@@ -168,214 +173,26 @@ export class DOMManager {
     }, 50);
   }
 
-  public showLearnModal(): void {
+  public showLearnPage(section: LearnSection = 'rules', subId?: string): void {
     if (this.homeScreen) this.homeScreen.style.display = 'none';
     if (this.raceModal) this.raceModal.style.display = 'none';
-    if (this.learnModal) this.learnModal.style.display = 'flex';
     if (this.uiLayer) this.uiLayer.style.display = 'none';
     if (this.missionHudBar) this.missionHudBar.style.display = 'none';
+    if (this.inGameHeaderBar) this.inGameHeaderBar.style.display = 'none';
+    this.learnPage.show(section, subId);
+  }
 
-    // Default to rules tab and render initial faction dossier
-    this.switchLearnTab('rules');
-    this.renderFactionDossier('space_marines');
+  public showLearnModal(): void {
+    this.showLearnPage('rules');
   }
 
   public showGameUI(): void {
     if (this.homeScreen) this.homeScreen.style.display = 'none';
     if (this.raceModal) this.raceModal.style.display = 'none';
-    if (this.learnModal) this.learnModal.style.display = 'none';
+    this.learnPage.hide();
     if (this.uiLayer) this.uiLayer.style.display = 'flex';
     if (this.missionHudBar) this.missionHudBar.style.display = 'flex';
-  }
-
-  private initLearnModal(): void {
-    const btnTabRules = document.getElementById('btn-tab-rules');
-    const btnTabFactions = document.getElementById('btn-tab-factions');
-    const btnLearnBack = document.getElementById('btn-learn-back');
-
-    if (btnTabRules) {
-      btnTabRules.addEventListener('click', () => this.switchLearnTab('rules'));
-    }
-    if (btnTabFactions) {
-      btnTabFactions.addEventListener('click', () => this.switchLearnTab('factions'));
-    }
-    if (btnLearnBack) {
-      btnLearnBack.addEventListener('click', () => this.showHomeScreen());
-    }
-
-    // Faction Pills
-    const pills = document.querySelectorAll('.faction-pill');
-    pills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        pills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        const fKey = pill.getAttribute('data-fkey') || 'space_marines';
-        this.renderFactionDossier(fKey);
-      });
-    });
-  }
-
-  public switchLearnTab(tab: 'rules' | 'factions'): void {
-    const btnTabRules = document.getElementById('btn-tab-rules');
-    const btnTabFactions = document.getElementById('btn-tab-factions');
-    const rulesContent = document.getElementById('learn-tab-rules-content');
-    const factionsContent = document.getElementById('learn-tab-factions-content');
-
-    if (tab === 'rules') {
-      btnTabRules?.classList.add('active');
-      btnTabFactions?.classList.remove('active');
-      if (rulesContent) rulesContent.style.display = 'flex';
-      if (factionsContent) factionsContent.style.display = 'none';
-    } else {
-      btnTabRules?.classList.remove('active');
-      btnTabFactions?.classList.add('active');
-      if (rulesContent) rulesContent.style.display = 'none';
-      if (factionsContent) factionsContent.style.display = 'flex';
-    }
-  }
-
-  public renderFactionDossier(fKey: string): void {
-    const container = document.getElementById('learn-faction-dossier');
-    if (!container) return;
-
-    const faction = FACTIONS[fKey] || FACTIONS.ascendants || FACTIONS.space_marines;
-    
-    // Map any alias to the factionId stored on unit definitions
-    let targetFactionId = fKey;
-    if (fKey === 'ascendants' || fKey === 'space_marines' || fKey === 'marines') targetFactionId = 'marines';
-    else if (fKey === 'directorate' || fKey === 'guard' || fKey === 'astra_militarum') targetFactionId = 'directorate';
-    else if (fKey === 'elyri' || fKey === 'eldar' || fKey === 'aeldari') targetFactionId = 'eldar';
-    else if (fKey === 'veykari' || fKey === 'dark_eldar' || fKey === 'drukhari') targetFactionId = 'dark_eldar';
-    else if (fKey === 'ghar' || fKey === 'orcs' || fKey === 'orks') targetFactionId = 'orcs';
-    else if (fKey === 'devourers' || fKey === 'tyranids') targetFactionId = 'tyranids';
-    else if (fKey === 'revenant' || fKey === 'necrons' || fKey === 'necros') targetFactionId = 'necros';
-    else if (fKey === 'concordat' || fKey === 'tau') targetFactionId = 'tau';
-    else if (fKey === 'riftborn' || fKey === 'daemons' || fKey === 'chaos_daemons') targetFactionId = 'riftborn';
-    else if (fKey === 'forsaken' || fKey === 'chaos' || fKey === 'chaos_marines') targetFactionId = 'chaos';
-
-    const factionUnits = Object.values(UNIT_DEFS).filter(u => u.factionId === targetFactionId);
-
-    let unitsHtml = '';
-    factionUnits.forEach(u => {
-      const role = u.role ? u.role.toUpperCase() : (u.isCharacter ? 'COMMANDER' : 'INFANTRY');
-      unitsHtml += `
-        <div class="dossier-unit-card">
-          <div class="dossier-unit-header">
-            <span class="dossier-unit-name">${u.icon || '⚔️'} ${u.name}</span>
-            <span class="dossier-unit-role">${role}</span>
-          </div>
-          <div class="dossier-unit-weapon">${formatUnitWeaponHtml(u)}</div>
-          <div class="dossier-stats-row">
-            <div class="dossier-stat-badge">
-              <div class="dossier-stat-lbl">Move</div>
-              <div class="dossier-stat-val">${u.m || 6}"</div>
-            </div>
-            <div class="dossier-stat-badge">
-              <div class="dossier-stat-lbl">Range</div>
-              <div class="dossier-stat-val">${u.range || 18}"</div>
-            </div>
-            <div class="dossier-stat-badge">
-              <div class="dossier-stat-lbl">Dmg</div>
-              <div class="dossier-stat-val">${u.dmg || 2}</div>
-            </div>
-            <div class="dossier-stat-badge">
-              <div class="dossier-stat-lbl">Wounds</div>
-              <div class="dossier-stat-val">${u.hp || 5}</div>
-            </div>
-            <div class="dossier-stat-badge">
-              <div class="dossier-stat-lbl">Save</div>
-              <div class="dossier-stat-val">${u.sv || 3}+</div>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-
-    const quoteHtml = faction.quote ? `<div class="dossier-quote">“${faction.quote}”</div>` : '';
-    
-    const identityHtml = faction.battlefieldIdentity ? `
-      <div class="dossier-card-box">
-        <div class="dossier-box-title">⚔️ BATTLEFIELD IDENTITY</div>
-        <div style="font-size:13.5px; color:#f1f5f9; line-height:1.5;">${faction.battlefieldIdentity}</div>
-        ${faction.doctrine ? `<div class="dossier-doctrine" style="margin-top:6px;"><strong>DOCTRINE:</strong> ${faction.doctrine}</div>` : ''}
-      </div>
-    ` : '';
-
-    const strengthsHtml = faction.strengths && faction.strengths.length > 0 ? `
-      <div class="dossier-card-box">
-        <div class="dossier-box-title strengths">✔ STRENGTHS</div>
-        <ul class="dossier-list">
-          ${faction.strengths.map(s => `<li>${s}</li>`).join('')}
-        </ul>
-      </div>
-    ` : '';
-
-    const weaknessesHtml = faction.weaknesses && faction.weaknesses.length > 0 ? `
-      <div class="dossier-card-box">
-        <div class="dossier-box-title weaknesses">✖ WEAKNESSES</div>
-        <ul class="dossier-list">
-          ${faction.weaknesses.map(w => `<li>${w}</li>`).join('')}
-        </ul>
-      </div>
-    ` : '';
-
-    const metaGridHtml = (strengthsHtml || weaknessesHtml) ? `
-      <div class="dossier-meta-grid">
-        ${strengthsHtml}
-        ${weaknessesHtml}
-      </div>
-    ` : '';
-
-    const mechanicHtml = faction.uniqueMechanic ? `
-      <div class="dossier-card-box mechanic">
-        <div class="dossier-box-title mechanic">⚡ UNIQUE MECHANIC — ${faction.uniqueMechanic.name.toUpperCase()}</div>
-        <div style="font-size:13px; color:#e0f2fe; line-height:1.5;">${faction.uniqueMechanic.desc}</div>
-      </div>
-    ` : '';
-
-    const emblemHtml = faction.emblem
-      ? `<img src="${faction.emblem}" alt="${faction.name}" style="width:36px;height:36px;object-fit:contain;border-radius:4px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));" />`
-      : faction.icon;
-
-    const heroSectionHtml = faction.image ? `
-      <div class="dossier-hero-row">
-        <div class="dossier-image-container">
-          <img src="${faction.image}" alt="${faction.name}" class="dossier-faction-img" />
-        </div>
-        <div class="dossier-info-col">
-          <div class="dossier-header">
-            <div class="dossier-icon">${emblemHtml}</div>
-            <div class="dossier-title-box">
-              <h3>${faction.name.toUpperCase()}</h3>
-              <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>
-            </div>
-          </div>
-          ${quoteHtml}
-          <div class="dossier-lore">${faction.desc || ''}</div>
-        </div>
-      </div>
-    ` : `
-      <div class="dossier-header">
-        <div class="dossier-icon">${emblemHtml}</div>
-        <div class="dossier-title-box">
-          <h3>${faction.name.toUpperCase()}</h3>
-          <div class="dossier-sub">${faction.sub || 'Warzone Battleforce'}</div>
-        </div>
-      </div>
-      ${quoteHtml}
-      <div class="dossier-lore">${faction.desc || ''}</div>
-    `;
-
-    container.innerHTML = `
-      ${heroSectionHtml}
-      ${identityHtml}
-      ${mechanicHtml}
-      ${metaGridHtml}
-      <div class="dossier-roster-title">&#9876; AUTHORITATIVE SQUAD ROSTER & COMBAT DATASHEETS</div>
-      <div class="dossier-roster-grid">
-        ${unitsHtml}
-      </div>
-    `;
+    if (this.inGameHeaderBar) this.inGameHeaderBar.style.display = 'flex';
   }
 
   public setSinglePlayerStage(stage: 1 | 2 | 3 | 4 | 5): void {
