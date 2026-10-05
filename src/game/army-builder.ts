@@ -1,4 +1,4 @@
-import { UNIT_DEFS } from '../data/units';
+import { UNIT_DEFS } from '../data/registry';
 import type { ArmyComposition, ArmyUnitSelection, DeploymentCard, EnemyRosterItem, PointLimit, UnitDef } from '../data/types';
 
 /**

@@ -1,5 +1,5 @@
 import type { DeploymentCard, EnemyRosterItem } from './types';
-import { UNIT_DEFS } from './units';
+import { UNIT_DEFS } from './registry';
 
 export interface FactionSquadConfig {
   key: string;

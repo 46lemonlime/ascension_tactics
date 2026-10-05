@@ -1,5 +1,5 @@
 import type { DeploymentCard, Faction } from '../data/types';
-import { UNIT_ROSTER } from '../data/units';
+import { UNIT_ROSTER } from '../data/registry';
 
 export class DeploymentUI {
   private panel: HTMLElement | null;

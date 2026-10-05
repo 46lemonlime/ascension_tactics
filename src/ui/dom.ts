@@ -2,7 +2,7 @@ import { LearnPageController, LearnSection } from './learn-page';
 import { FACTIONS, PLAYABLE_FACTIONS, resolveRandomFaction } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { MISSIONS, MISSION_CYCLE, getDefaultMissionSettings } from '../data/missions';
-import { UNIT_DEFS } from '../data/units';
+import { UNIT_DEFS } from '../data/registry';
 import type { MissionType, PointLimit, ArmyComposition, MatchSetup, ArmyUnitSelection, UnitDef, BattleSettings, MissionSettings } from '../data/types';
 import { DEFAULT_BATTLE_SETTINGS } from '../data/settings';
 import { sfx } from '../audio/synth';

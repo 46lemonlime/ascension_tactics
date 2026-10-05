@@ -3690,6 +3690,289 @@ export function buildTyranidFigure(
 
     bioPart([0, 0.92, -0.88], [0.2, 0.2, 0.5], armorMat);
     bioPart([0, 1.05, 1.08], [0.22, 0.16, 0.18], bioWeaponMat);
+  
+  // ===========================================================================
+  // BROODLORD
+  // ===========================================================================
+  } else if (uType === 'ty_broodlord') {
+    // Tall, hunched Genestealer alpha with an enlarged head crest and
+    // oversized forelimbs built around its signature killing claws.
+    bioPart([0, 0.85, 0], [0.8, 0.95, 0.65], fleshJointMat);
+    bioPart([0, 1.65, 0.02], [0.5, 0.55, 0.45], armorMat);
+    bioPart([0, 2.15, 0.05], [0.42, 0.3, 0.38], armorMat);
+
+    // Head crest.
+    bioPart([0, 2.45, 0.02], [0.28, 0.5, 0.18], boneMat, 'cone');
+
+    // Eyes.
+    bioPart([-0.17, 2.23, 0.34], [0.08, 0.08, 0.08], eyeGlowMat);
+    bioPart([0.17, 2.23, 0.34], [0.08, 0.08, 0.08], eyeGlowMat);
+
+    // Large Genestealer arms and claws.
+    bioPart([-0.48, 1.65, 0], [0.2, 0.85, 0.2], fleshJointMat, 'cylinder');
+    bioPart([0.48, 1.65, 0], [0.2, 0.85, 0.2], fleshJointMat, 'cylinder');
+    bioPart([-0.62, 1.15, 0.02], [0.18, 0.65, 0.18], boneMat, 'cone');
+    bioPart([0.62, 1.15, 0.02], [0.18, 0.65, 0.18], boneMat, 'cone');
+
+    // Secondary limbs.
+    bioPart([-0.42, 1.0, -0.15], [0.14, 0.55, 0.14], armorMat, 'cylinder');
+    bioPart([0.42, 1.0, -0.15], [0.14, 0.55, 0.14], armorMat, 'cylinder');
+
+    // Long balancing tail.
+    bioPart([0, 0.35, -0.65], [0.2, 1.15, 0.2], fleshJointMat, 'cone');
+
+    // Forearm talon tips.
+    bioPart([-0.65, 0.85, 0.12], [0.09, 0.45, 0.09], boneMat, 'cone');
+    bioPart([0.65, 0.85, 0.12], [0.09, 0.45, 0.09], boneMat, 'cone');
+
+  // ===========================================================================
+  // NEUROLICTOR
+  // ===========================================================================
+  } else if (uType === 'ty_neurolictor') {
+    // Slender Lictor-derived assassin with an elongated neurotoxic head
+    // and a deliberately asymmetric psychic/tendril silhouette.
+    bioPart([0, 1.0, 0], [0.48, 1.15, 0.4], fleshJointMat);
+    bioPart([0, 1.85, 0], [0.36, 0.8, 0.32], armorMat);
+    bioPart([0, 2.45, 0.05], [0.3, 0.6, 0.28], armorMat);
+
+    // Elongated neurolictor head.
+    bioPart([0, 2.82, 0.18], [0.22, 0.5, 0.22], boneMat, 'cone');
+    bioPart([-0.12, 2.65, 0.32], [0.07, 0.07, 0.07], eyeGlowMat);
+    bioPart([0.12, 2.65, 0.32], [0.07, 0.07, 0.07], eyeGlowMat);
+
+    // Long upper limbs.
+    bioPart([-0.42, 2.0, 0], [0.13, 1.0, 0.13], fleshJointMat, 'cylinder');
+    bioPart([0.42, 2.0, 0], [0.13, 1.0, 0.13], fleshJointMat, 'cylinder');
+
+    // Talons.
+    bioPart([-0.48, 1.35, 0.12], [0.1, 0.55, 0.1], boneMat, 'cone');
+    bioPart([0.48, 1.35, 0.12], [0.1, 0.55, 0.1], boneMat, 'cone');
+
+    // Neurotoxin tendrils.
+    bioPart([-0.22, 2.45, 0.2], [0.07, 0.75, 0.07], bioWeaponMat, 'cylinder');
+    bioPart([0.22, 2.45, 0.2], [0.07, 0.75, 0.07], bioWeaponMat, 'cylinder');
+    bioPart([0, 2.3, 0.28], [0.08, 0.65, 0.08], bioWeaponMat, 'cone');
+
+    // Long tail.
+    bioPart([0, 0.35, -0.7], [0.14, 1.25, 0.14], fleshJointMat, 'cone');
+
+  // ===========================================================================
+  // TYRANID PRIME
+  // ===========================================================================
+  } else if (uType === 'ty_tyranid_prime') {
+    // Heavier Warrior-like frame with an enlarged synaptic carapace,
+    // Prime bone sword, scything talon and ranged weapon organ.
+    bioPart([0, 1.05, 0], [0.58, 1.0, 0.48], fleshJointMat);
+    bioPart([0, 1.8, 0], [0.52, 0.75, 0.45], armorMat);
+    bioPart([0, 2.45, 0], [0.38, 0.48, 0.34], armorMat);
+
+    // Synaptic crest.
+    bioPart([0, 2.85, 0], [0.25, 0.55, 0.18], boneMat, 'cone');
+
+    // Eyes.
+    bioPart([-0.13, 2.48, 0.3], [0.07, 0.07, 0.07], eyeGlowMat);
+    bioPart([0.13, 2.48, 0.3], [0.07, 0.07, 0.07], eyeGlowMat);
+
+    // Warrior arms.
+    bioPart([-0.5, 1.95, 0], [0.16, 0.85, 0.16], fleshJointMat, 'cylinder');
+    bioPart([0.5, 1.95, 0], [0.16, 0.85, 0.16], fleshJointMat, 'cylinder');
+
+    // Prime bone sword.
+    bioPart([-0.62, 1.2, 0.12], [0.1, 0.85, 0.1], boneMat, 'cone');
+
+    // Scything talon.
+    bioPart([0.63, 1.25, 0.12], [0.12, 0.8, 0.12], boneMat, 'cone');
+
+    // Deathspitter organ.
+    bioPart([0, 1.85, 0.48], [0.22, 0.38, 0.2], bioWeaponMat, 'cylinder');
+
+    // Lower limbs.
+    bioPart([-0.3, 0.45, 0], [0.18, 0.65, 0.18], fleshJointMat, 'cylinder');
+    bioPart([0.3, 0.45, 0], [0.18, 0.65, 0.18], fleshJointMat, 'cylinder');
+
+  // ===========================================================================
+  // TYRANNOCYTE
+  // ===========================================================================
+  } else if (uType === 'ty_tyrannocyte') {
+    // Large living drop pod built around a swollen central bio-chamber,
+    // reinforced shell plates and multiple weapon/tentacle appendages.
+    bioPart([0, 1.35, 0], [1.65, 1.55, 1.45], fleshJointMat);
+    bioPart([0, 2.15, 0], [1.25, 0.9, 1.15], armorMat);
+
+    // Upper pod crown.
+    bioPart([0, 2.85, 0], [0.65, 0.75, 0.65], armorMat, 'cone');
+
+    // Bio-weapon sacs.
+    bioPart([-0.95, 1.75, 0.35], [0.32, 0.55, 0.32], bioWeaponMat);
+    bioPart([0.95, 1.75, 0.35], [0.32, 0.55, 0.32], bioWeaponMat);
+    bioPart([-0.55, 1.25, 0.85], [0.28, 0.48, 0.28], bioWeaponMat);
+    bioPart([0.55, 1.25, 0.85], [0.28, 0.48, 0.28], bioWeaponMat);
+
+    // Hanging tentacles.
+    bioPart([-0.85, 0.45, 0], [0.15, 1.15, 0.15], fleshJointMat, 'cone');
+    bioPart([0.85, 0.45, 0], [0.15, 1.15, 0.15], fleshJointMat, 'cone');
+    bioPart([0, 0.3, -0.9], [0.14, 1.2, 0.14], fleshJointMat, 'cone');
+    bioPart([0, 0.25, 0.9], [0.14, 1.15, 0.14], fleshJointMat, 'cone');
+
+    // Central vent / opening.
+    bioPart([0, 1.65, 1.2], [0.35, 0.35, 0.18], bioWeaponMat);
+
+  // ===========================================================================
+  // HARRIDAN
+  // ===========================================================================
+  } else if (uType === 'ty_harridan') {
+    // Massive airborne Tyranid with elongated body, broad wings and
+    // prominent forward bio-cannons.
+    bioPart([0, 2.0, 0], [0.75, 1.6, 1.25], fleshJointMat);
+    bioPart([0, 3.15, 0.15], [0.48, 0.8, 0.55], armorMat);
+    bioPart([0, 3.75, 0.35], [0.34, 0.55, 0.4], armorMat);
+
+    // Head.
+    bioPart([0, 4.05, 0.5], [0.26, 0.4, 0.3], boneMat, 'cone');
+    bioPart([-0.12, 3.92, 0.72], [0.07, 0.07, 0.07], eyeGlowMat);
+    bioPart([0.12, 3.92, 0.72], [0.07, 0.07, 0.07], eyeGlowMat);
+
+    // Broad wings.
+    bioPart([-1.5, 3.0, 0], [1.5, 0.16, 0.7], armorMat);
+    bioPart([1.5, 3.0, 0], [1.5, 0.16, 0.7], armorMat);
+
+    // Wing bone spars.
+    bioPart([-1.65, 3.05, 0.1], [0.12, 0.18, 1.1], boneMat, 'cylinder');
+    bioPart([1.65, 3.05, 0.1], [0.12, 0.18, 1.1], boneMat, 'cylinder');
+
+    // Bio-cannons.
+    bioPart([-0.55, 3.2, 0.75], [0.25, 0.3, 0.65], bioWeaponMat, 'cylinder');
+    bioPart([0.55, 3.2, 0.75], [0.25, 0.3, 0.65], bioWeaponMat, 'cylinder');
+
+    // Hanging talons.
+    bioPart([-0.65, 1.2, 0.1], [0.16, 0.95, 0.16], boneMat, 'cone');
+    bioPart([0.65, 1.2, 0.1], [0.16, 0.95, 0.16], boneMat, 'cone');
+
+    // Long tail.
+    bioPart([0, 0.65, -1.0], [0.18, 1.8, 0.18], fleshJointMat, 'cone');
+
+  // ===========================================================================
+  // HIEROPHANT
+  // ===========================================================================
+  } else if (uType === 'ty_hierophant') {
+    // Enormous upright bio-titan with a heavily armoured torso, long legs,
+    // massive talons and twin bio-cannon structures.
+    bioPart([0, 2.8, 0], [1.5, 2.1, 1.15], fleshJointMat);
+    bioPart([0, 4.2, 0.05], [1.15, 1.35, 0.95], armorMat);
+    bioPart([0, 5.35, 0.15], [0.7, 0.85, 0.65], armorMat);
+
+    // Titan head.
+    bioPart([0, 5.85, 0.35], [0.42, 0.55, 0.4], boneMat, 'cone');
+    bioPart([-0.18, 5.7, 0.65], [0.1, 0.1, 0.1], eyeGlowMat);
+    bioPart([0.18, 5.7, 0.65], [0.1, 0.1, 0.1], eyeGlowMat);
+
+    // Massive legs.
+    bioPart([-0.9, 1.3, 0], [0.42, 2.0, 0.42], fleshJointMat, 'cylinder');
+    bioPart([0.9, 1.3, 0], [0.42, 2.0, 0.42], fleshJointMat, 'cylinder');
+
+    // Bio-cannons.
+    bioPart([-1.15, 4.2, 0.65], [0.38, 0.55, 1.0], bioWeaponMat, 'cylinder');
+    bioPart([1.15, 4.2, 0.65], [0.38, 0.55, 1.0], bioWeaponMat, 'cylinder');
+
+    // Massive scything talons.
+    bioPart([-1.5, 2.8, 0.2], [0.3, 1.65, 0.3], boneMat, 'cone');
+    bioPart([1.5, 2.8, 0.2], [0.3, 1.65, 0.3], boneMat, 'cone');
+
+    // Rear tail.
+    bioPart([0, 0.9, -1.25], [0.3, 2.0, 0.3], fleshJointMat, 'cone');
+
+  // ===========================================================================
+  // DIMACHAERON
+  // ===========================================================================
+  } else if (uType === 'ty_dimachaeron') {
+    // Extremely aggressive close-combat bioform with a tall hunched frame,
+    // enlarged thoracic organ and oversized grasping/scything limbs.
+    bioPart([0, 1.45, 0], [0.75, 1.35, 0.65], fleshJointMat);
+    bioPart([0, 2.55, 0.05], [0.58, 1.05, 0.5], armorMat);
+    bioPart([0, 3.35, 0.2], [0.42, 0.65, 0.38], armorMat);
+
+    // Head.
+    bioPart([0, 3.75, 0.35], [0.28, 0.4, 0.28], boneMat, 'cone');
+    bioPart([-0.12, 3.62, 0.6], [0.07, 0.07, 0.07], eyeGlowMat);
+    bioPart([0.12, 3.62, 0.6], [0.07, 0.07, 0.07], eyeGlowMat);
+
+    // Large thoracic bio-weapon.
+    bioPart([0, 2.55, 0.55], [0.48, 0.7, 0.25], bioWeaponMat);
+
+    // Grasping forelimbs.
+    bioPart([-0.65, 2.4, 0], [0.22, 1.1, 0.22], fleshJointMat, 'cylinder');
+    bioPart([0.65, 2.4, 0], [0.22, 1.1, 0.22], fleshJointMat, 'cylinder');
+
+    // Scything limbs.
+    bioPart([-0.82, 1.55, 0.15], [0.18, 1.0, 0.18], boneMat, 'cone');
+    bioPart([0.82, 1.55, 0.15], [0.18, 1.0, 0.18], boneMat, 'cone');
+
+    // Lower limbs.
+    bioPart([-0.35, 0.55, 0], [0.2, 0.75, 0.2], fleshJointMat, 'cylinder');
+    bioPart([0.35, 0.55, 0], [0.2, 0.75, 0.2], fleshJointMat, 'cylinder');
+
+    // Heavy tail.
+    bioPart([0, 0.35, -0.9], [0.2, 1.4, 0.2], fleshJointMat, 'cone');
+
+  // ===========================================================================
+  // MALANTHROPE
+  // ===========================================================================
+  } else if (uType === 'ty_malanthrope') {
+    // Floating toxic support organism with a large swollen gas sac,
+    // small central head and trailing poisonous tendrils.
+    bioPart([0, 1.8, 0], [1.05, 1.35, 0.95], fleshJointMat);
+    bioPart([0, 2.35, 0], [0.85, 0.9, 0.75], armorMat);
+
+    // Small central head.
+    bioPart([0, 2.75, 0.25], [0.3, 0.38, 0.28], armorMat);
+    bioPart([-0.1, 2.7, 0.48], [0.07, 0.07, 0.07], eyeGlowMat);
+    bioPart([0.1, 2.7, 0.48], [0.07, 0.07, 0.07], eyeGlowMat);
+
+    // Toxic gas sac.
+    bioPart([0, 1.85, 0.65], [0.65, 0.7, 0.3], bioWeaponMat);
+
+    // Toxic tendrils.
+    bioPart([-0.65, 1.0, 0], [0.12, 1.3, 0.12], bioWeaponMat, 'cone');
+    bioPart([0.65, 1.0, 0], [0.12, 1.3, 0.12], bioWeaponMat, 'cone');
+    bioPart([-0.35, 0.7, -0.4], [0.1, 1.1, 0.1], bioWeaponMat, 'cone');
+    bioPart([0.35, 0.7, -0.4], [0.1, 1.1, 0.1], bioWeaponMat, 'cone');
+
+    // Small lower support appendages.
+    bioPart([-0.45, 0.45, 0], [0.14, 0.55, 0.14], fleshJointMat, 'cylinder');
+    bioPart([0.45, 0.45, 0], [0.14, 0.55, 0.14], fleshJointMat, 'cylinder');
+
+  // ===========================================================================
+  // SCYTHED HIERODULE
+  // ===========================================================================
+  } else if (uType === 'ty_hierodule') {
+    // Baseline Hierodule is the Scythed Hierodule: a huge quadrupedal
+    // assault bioform with enormous scything forelimbs and an acid weapon sac.
+    // The Barbed Hierodule will later be represented through customization.
+    bioPart([0, 1.45, 0], [1.4, 1.45, 1.05], fleshJointMat);
+    bioPart([0, 2.35, 0.15], [1.05, 0.85, 0.8], armorMat);
+
+    // Armoured head.
+    bioPart([0, 2.9, 0.35], [0.45, 0.5, 0.42], armorMat);
+    bioPart([0, 3.15, 0.5], [0.28, 0.38, 0.28], boneMat, 'cone');
+    bioPart([-0.14, 3.0, 0.72], [0.08, 0.08, 0.08], eyeGlowMat);
+    bioPart([0.14, 3.0, 0.72], [0.08, 0.08, 0.08], eyeGlowMat);
+
+    // Four heavy supporting limbs.
+    bioPart([-0.9, 0.65, 0.55], [0.3, 1.05, 0.3], fleshJointMat, 'cylinder');
+    bioPart([0.9, 0.65, 0.55], [0.3, 1.05, 0.3], fleshJointMat, 'cylinder');
+    bioPart([-0.85, 0.65, -0.55], [0.28, 1.0, 0.28], fleshJointMat, 'cylinder');
+    bioPart([0.85, 0.65, -0.55], [0.28, 1.0, 0.28], fleshJointMat, 'cylinder');
+
+    // Huge scything forelimbs.
+    bioPart([-1.15, 1.55, 0.35], [0.3, 1.35, 0.3], boneMat, 'cone');
+    bioPart([1.15, 1.55, 0.35], [0.3, 1.35, 0.3], boneMat, 'cone');
+
+    // Bio-acid weapon organ.
+    bioPart([0, 2.05, 0.78], [0.48, 0.42, 0.3], bioWeaponMat);
+
+    // Rear armour and tail.
+    bioPart([0, 1.3, -0.9], [0.75, 0.65, 0.5], armorMat);
+    bioPart([0, 0.75, -1.55], [0.25, 1.2, 0.25], fleshJointMat, 'cone');
 
   // ===========================================================================
   // NORN ASSIMILATOR

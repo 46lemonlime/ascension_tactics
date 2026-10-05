@@ -1,7 +1,7 @@
 import { GRID_COLS, GRID_ROWS, DEPLOYMENT_ZONES, chebyshevDist, gridToWorld, unitWorldX, unitWorldZ, key, TILE_SIZE } from '../data/constants';
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
-import { UNIT_ROSTER } from '../data/units';
+import { UNIT_ROSTER } from '../data/registry';
 import { MISSIONS, getDefaultMissionSettings } from '../data/missions';
 import { buildFactionRosters } from '../data/rosters';
 import { convertArmyToPlayerRoster, convertArmyToEnemyRoster, buildAIArmy, getDefaultArmyComposition } from './army-builder';

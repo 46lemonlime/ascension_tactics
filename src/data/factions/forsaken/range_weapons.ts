@@ -1,0 +1,103 @@
+import type { WeaponProfileDetail } from '../../types';
+
+export const forsakenRangeWeapons: Record<string, WeaponProfileDetail> = {
+  c_warp_pistol: {
+    id: 'c_warp_pistol',
+    name: 'WARP PISTOL',
+    type: 'ranged',
+    category: 'Corrupted Plasma Pistol',
+    icon: '🔥',
+    range: 16,
+    rangeDisplay: '16"',
+    strength: 5,
+    penetration: 3,
+    ap: 3,
+    damage: 2,
+    attacks: 2,
+    damageType: 'Unholy Plasma Flame',
+    effectiveAgainst: ['Close Assault Cohorts', 'Armoured Infantry'],
+    weakAgainst: ['Aura Shields'],
+    special: 'Hellfire Blast: Ignores cover within 8".',
+    allowedFactions: ['forsaken', 'chaos']
+  },
+
+  c_corrupted_bolter: {
+    id: 'c_corrupted_bolter',
+    name: 'CORRUPTED BOLTER',
+    type: 'ranged',
+    category: 'Infernal Chaos Ballistics',
+    icon: '💀',
+    range: 26,
+    rangeDisplay: '26"',
+    strength: 4,
+    penetration: 3,
+    ap: 3,
+    damage: 2,
+    attacks: 2,
+    damageType: 'Unholy Warp-Tainted Shot',
+    effectiveAgainst: ['Armoured Infantry', 'Light Fortifications'],
+    weakAgainst: ['Consecrated Armor', 'Aura Shields'],
+    special: 'Malicious Volley: Hits trigger an immediate morale roll on the targeted squad.',
+    allowedFactions: ['forsaken', 'chaos']
+  },
+
+  c_scavenged_autogun: {
+    id: 'c_scavenged_autogun',
+    name: 'SCAVENGED AUTOGUN',
+    type: 'ranged',
+    category: 'Improvised Rapid Ballistics',
+    icon: '🔫',
+    range: 20,
+    rangeDisplay: '20"',
+    strength: 3,
+    penetration: 1,
+    ap: 1,
+    damage: 1,
+    attacks: 2,
+    damageType: 'Crude Kinetic Lead',
+    effectiveAgainst: ['Unarmored Targets'],
+    weakAgainst: ['Ceramite Plating'],
+    special: 'Frenzied Burst: Inaccurate high-volume fire.',
+    allowedFactions: ['forsaken', 'chaos']
+  },
+
+  c_fleshmetal_heavy_cannon: {
+    id: 'c_fleshmetal_heavy_cannon',
+    name: 'FLESHMETAL HEAVY CANNON',
+    type: 'ranged',
+    category: 'Bio-Mechanical Mutating Cannon',
+    icon: '💥',
+    range: 36,
+    rangeDisplay: '36"',
+    strength: 6,
+    penetration: 4,
+    ap: 4,
+    damage: 4,
+    attacks: 3,
+    damageType: 'Mutating Plasma / Solid Shot',
+    effectiveAgainst: ['Heavy Tanks', 'Walkers', 'Fortifications'],
+    weakAgainst: ['Sanctified Fields'],
+    special: 'Fleshmetal Mutation: Randomizes between high AP and high damage each volley.',
+    allowedFactions: ['forsaken', 'chaos']
+  },
+
+  c_defiler_battle_cannon: {
+    id: 'c_defiler_battle_cannon',
+    name: 'DEFILER BATTLE CANNON',
+    type: 'ranged',
+    category: 'Daemon Engine Ordnance',
+    icon: '💥',
+    range: 36,
+    rangeDisplay: '36"',
+    strength: 7,
+    penetration: 4,
+    ap: 4,
+    damage: 4,
+    attacks: 2,
+    damageType: 'Corrupted High Explosive',
+    effectiveAgainst: ['Mass Formations', 'Vehicles'],
+    weakAgainst: ['Sanctified Barriers'],
+    special: 'Daemon Fire Burst: Shatters morale and infantry cover.',
+    allowedFactions: ['forsaken', 'chaos']
+  }
+};

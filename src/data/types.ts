@@ -32,6 +32,52 @@ export interface WeaponProfile {
   allowedFactions?: string[];
 }
 
+export interface WeaponProfileDetail extends WeaponProfile {
+  id: string;
+  name: string;
+  type: 'ranged' | 'melee';
+  category: string;
+  icon: string;
+  image?: string;
+  range: number;
+  rangeDisplay: string;
+  strength: number;
+  penetration: number;
+  ap: number;
+  damage: number;
+  attacks: number;
+  damageType: string;
+  effectiveAgainst: string[];
+  weakAgainst: string[];
+  special: string;
+  allowedFactions: string[];
+}
+
+export interface ArmourProfileDetail {
+  name: string;
+  category: string;
+  icon: string;
+  image?: string;
+  armour: number;
+  toughness: number;
+  resistance: number;
+  coverage: number;
+  protectionAgainst: string[];
+  vulnerableTo: string[];
+  special: string;
+}
+
+export interface UtilityProfileDetail {
+  movement: number;
+  awareness: number;
+  morale: number;
+  movementType: MovementType;
+  awarenessType: AwarenessType;
+  movementTypeDisplay: string;
+  awarenessTypeDisplay: string;
+  icon: string;
+}
+
 export interface UnitPhysicalProfile {
   radius: number;
   sepRadius: number;

@@ -12,7 +12,7 @@ import { updateTweens } from './game/effects';
 import { PhysicsEngine } from './game/physics';
 import { sfx } from './audio/synth';
 import { hasLineOfSight } from './game/awareness';
-import { UNIT_ROSTER } from './data/units';
+import { UNIT_ROSTER } from './data/registry';
 import * as THREE from 'three';
 
 // Initialize core systems

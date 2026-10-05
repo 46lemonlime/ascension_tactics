@@ -1,5 +1,5 @@
 import type { Faction } from './types';
-import { UNIT_DEFS } from './units';
+import { UNIT_DEFS } from './registry';
 
 const allUnits = Object.values(UNIT_DEFS);
 

@@ -1,11 +1,10 @@
 import { FACTIONS } from '../data/factions';
 import { THEMES } from '../data/themes';
 import { MISSIONS } from '../data/missions';
-import { UNIT_DEFS } from '../data/units';
-import { WEAPON_REGISTRY, WeaponProfileDetail } from '../data/equipment';
+import { UNIT_DEFS, WEAPON_REGISTRY } from '../data/registry';
 import { sfx } from '../audio/synth';
 import { getBiomeArtwork, getMissionArtwork } from './landscape-art';
-import type { Faction, UnitDef } from '../data/types';
+import type { Faction, UnitDef, WeaponProfileDetail } from '../data/types';
 
 export type LearnSection = 'rules' | 'maps' | 'missions' | 'factions';
 export type FactionCodexTab = 'overview' | 'stats' | 'units' | 'weapons';
@@ -650,6 +649,7 @@ export class LearnPageController {
 
     const f: Faction = FACTIONS[factionId] || FACTIONS.ascendants;
     const emblemImg = f.emblem || `/assets/emblems/${factionId}.jpg`;
+    const factionImg = f.image || `/assets/factions/${factionId}.jpg`;
 
     // Map factionId to unit factionId in UNIT_DEFS
     let targetFactionId = factionId;
@@ -717,7 +717,7 @@ export class LearnPageController {
 
       <!-- ACTIVE TAB CONTENT WRAPPER -->
       <div id="faction-tab-content" class="faction-tab-content-area">
-        ${this.renderFactionTabContent(f, units, factionWeapons, emblemImg, tab)}
+        ${this.renderFactionTabContent(f, units, factionWeapons, emblemImg, factionImg, tab)}
       </div>
     `;
 
@@ -758,42 +758,76 @@ export class LearnPageController {
     units: UnitDef[],
     factionWeapons: WeaponProfileDetail[],
     emblemImg: string,
+    factionImg: string,
     tab: FactionCodexTab
   ): string {
     switch (tab) {
-      case 'overview':
+                  case 'overview':
         return `
           <div class="faction-overview-layout">
-            <!-- LARGE FACTION PORTRAIT & IDENTITY HERO -->
-            <div class="learn-faction-large-hero">
-              <div class="faction-large-portrait-container">
-                <img src="${emblemImg}" alt="${f.name} Large Emblem" class="faction-large-emblem-art" />
-                <div class="faction-portrait-glow"></div>
-              </div>
-              <div class="faction-large-hero-details">
-                <div class="faction-hero-header-badge-row">
-                  <span class="faction-hero-main-title">${f.icon} ${f.name}</span>
-                  <span class="faction-hero-archetype-tag">${f.sub}</span>
+            <!-- TOP TWO-COLUMN MAIN COMPOSITION: LEFT PORTRAIT (38%) + RIGHT IDENTITY & ORIGINS (62%) -->
+            <div class="faction-overview-main-grid">
+              
+              <!-- LEFT COLUMN: VERTICAL FULL FACTION PORTRAIT / ARTWORK -->
+              <div class="faction-overview-portrait-col">
+                <div class="faction-vertical-portrait-frame">
+                  <img src="${factionImg}" alt="${f.name} Portrait" class="faction-vertical-portrait-img" />
+                  <div class="faction-portrait-bottom-overlay">
+                    <span class="portrait-caption-tag">FACTION ARTWORK // ${f.name.toUpperCase()}</span>
+                  </div>
                 </div>
-                <blockquote class="faction-hero-quote-block">
-                  "${f.quote || 'Victory through superior strength.'}"
+              </div>
+
+              <!-- RIGHT COLUMN: FACTION IDENTITY, EMBLEM, MOTTO, BATTLEFIELD IDENTITY & ORIGINS -->
+              <div class="faction-overview-identity-col">
+                <!-- HEADER & EMBLEM ROW -->
+                <div class="faction-identity-header-block">
+                  <div class="faction-identity-emblem-wrap">
+                    <img src="${emblemImg}" alt="${f.name} Emblem" class="faction-identity-emblem-img" />
+                  </div>
+                  <div class="faction-identity-title-stack">
+                    <div class="faction-identity-badge-row">
+                      <span class="faction-identity-name">${f.icon} ${f.name}</span>
+                    </div>
+                    <span class="faction-identity-archetype-tag">${f.sub}</span>
+                  </div>
+                </div>
+
+                <!-- MOTTO / QUOTE -->
+                <blockquote class="faction-identity-quote">
+                  "${f.quote || 'Victory through superior strength and iron resolve.'}"
                 </blockquote>
-                <div class="faction-hero-identity-card">
-                  <span class="identity-tag">BATTLEFIELD IDENTITY</span>
-                  <p class="identity-text">${f.battlefieldIdentity || 'Standard Military Force'}</p>
+
+                <!-- BATTLEFIELD IDENTITY -->
+                <div class="faction-identity-card">
+                  <div class="faction-identity-card-header">
+                    <span class="identity-icon">🎯</span>
+                    <span class="identity-card-label">BATTLEFIELD IDENTITY</span>
+                  </div>
+                  <p class="identity-card-text">${f.battlefieldIdentity || 'Standard Military Force'}</p>
+                </div>
+
+                <!-- ORIGINS -->
+                <div class="faction-origins-card">
+                  <div class="faction-origins-card-header">
+                    <span class="origins-icon">📜</span>
+                    <span class="origins-card-label">ORIGINS</span>
+                  </div>
+                  <p class="origins-card-text readable-lore-body">${f.desc}</p>
                 </div>
               </div>
             </div>
 
-            <!-- ORIGINS & LORE SECTION -->
-            <div class="faction-codex-text-panels">
+            <!-- LOWER FULL-WIDTH SECTION: LORE & COMBAT DOCTRINE -->
+            <div class="faction-lower-lore-section">
               <div class="learn-detail-card highlight-card">
-                <div class="learn-detail-card-title"><span>📜</span> ORIGINS &amp; HISTORY</div>
-                <p class="learn-detail-card-text readable-lore-body">${f.desc}</p>
-              </div>
-              <div class="learn-detail-card">
-                <div class="learn-detail-card-title"><span>⚔️</span> COMBAT PHILOSOPHY &amp; DOCTRINE</div>
-                <p class="learn-detail-card-text readable-lore-body">${f.doctrine || 'Balanced tactical discipline.'}</p>
+                <div class="learn-detail-card-title">
+                  <span>⚔️</span> LORE &amp; COMBAT DOCTRINE
+                </div>
+                <div class="faction-lower-lore-content">
+                  <p class="readable-lore-body lore-doctrine-lead">${f.doctrine || 'Balanced tactical discipline across all operational theaters.'}</p>
+                  <p class="readable-lore-body">${f.desc}</p>
+                </div>
               </div>
             </div>
           </div>

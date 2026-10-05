@@ -5612,125 +5612,259 @@ body,
   gap: 20px;
 }
 
-/* PAGE 1: OVERVIEW WITH LARGE FACTION PORTRAIT */
+/* PAGE 1: OVERVIEW WITH VERTICAL PORTRAIT LEFT & IDENTITY/ORIGINS RIGHT + FULL-WIDTH LOWER LORE */
 .faction-overview-layout {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.learn-faction-large-hero {
-  background: linear-gradient(135deg, rgba(18, 24, 36, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
-  border: 2px solid var(--gold);
-  border-radius: 12px;
-  padding: 28px 32px;
-  display: flex;
-  align-items: center;
-  gap: 36px;
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.85), 0 0 24px rgba(212, 175, 55, 0.25);
+/* TOP TWO-COLUMN MAIN COMPOSITION */
+.faction-overview-main-grid {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  gap: 24px;
+  align-items: stretch;
 }
 
-.faction-large-portrait-container {
-  width: 200px;
-  min-width: 200px;
-  height: 200px;
-  background: radial-gradient(circle at center, #1e293b 0%, #080c14 100%);
-  border: 2px solid var(--gold-bright);
+/* LEFT COLUMN: VERTICAL FULL FACTION PORTRAIT */
+.faction-overview-portrait-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.faction-vertical-portrait-frame {
+  border: 2px solid var(--gold);
   border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.25);
+  background: radial-gradient(circle at center, #182232 0%, #080c14 100%);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px;
-  box-sizing: border-box;
-  position: relative;
-  box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.faction-large-emblem-art {
-  max-width: 175px;
-  max-height: 175px;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.95));
+.faction-vertical-portrait-frame:hover {
+  border-color: var(--gold-bright);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.9), 0 0 28px rgba(212, 175, 55, 0.4);
 }
 
-.faction-large-hero-details {
-  flex: 1;
+.faction-vertical-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.faction-vertical-portrait-frame:hover .faction-vertical-portrait-img {
+  transform: scale(1.025);
+}
+
+.faction-portrait-bottom-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(8, 12, 20, 0.95) 0%, rgba(8, 12, 20, 0.5) 60%, transparent 100%);
+  padding: 12px 16px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.faction-hero-header-badge-row {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
 }
 
-.faction-hero-main-title {
-  font-family: 'Cinzel', serif;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  color: var(--gold-bright);
-}
-
-.faction-hero-archetype-tag {
+.portrait-caption-tag {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 2px;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  border-radius: 4px;
+  color: var(--gold-bright);
+  background: rgba(10, 14, 20, 0.85);
+  border: 1px solid var(--gold-dim);
   padding: 4px 10px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
   text-transform: uppercase;
 }
 
-.faction-hero-quote-block {
-  font-style: italic;
-  font-size: 14px;
-  color: #cbd5e1;
-  border-left: 3px solid var(--gold);
-  padding-left: 14px;
-  margin: 4px 0;
-  line-height: 1.5;
-}
-
-.faction-hero-identity-card {
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  border-radius: 6px;
-  padding: 10px 14px;
+/* RIGHT COLUMN: FACTION IDENTITY & ORIGINS */
+.faction-overview-identity-col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
+  justify-content: space-between;
 }
 
-.identity-tag {
+.faction-identity-header-block {
+  background: #141b26;
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.faction-identity-emblem-wrap {
+  width: 80px;
+  min-width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+.faction-identity-emblem-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
+}
+
+.faction-identity-title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.faction-identity-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.faction-identity-name {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold-bright);
+}
+
+.faction-identity-archetype-tag {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
+  font-size: 11.5px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
   letter-spacing: 1.5px;
-  color: var(--gold-light);
+  text-transform: uppercase;
+  display: inline-block;
+  align-self: flex-start;
 }
 
-.identity-text {
+.faction-identity-quote {
+  margin: 0;
+  font-style: italic;
   font-size: 13.5px;
-  color: #e2e8f0;
   line-height: 1.5;
+  color: var(--gold-light);
+  background: rgba(10, 14, 20, 0.6);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+}
+
+.faction-identity-card,
+.faction-origins-card {
+  background: #141b26;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.faction-origins-card {
+  border-color: rgba(56, 189, 248, 0.3);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(20, 27, 38, 0.95) 100%);
+  flex: 1;
+}
+
+.faction-identity-card-header,
+.faction-origins-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  padding-bottom: 6px;
+}
+
+.identity-icon,
+.origins-icon {
+  font-size: 14px;
+}
+
+.identity-card-label,
+.origins-card-label {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold-bright);
+}
+
+.identity-card-text,
+.origins-card-text {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #e2e8f0;
   margin: 0;
 }
 
-.faction-codex-text-panels {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 20px;
+/* LOWER FULL-WIDTH LORE SECTION */
+.faction-lower-lore-section {
+  width: 100%;
+}
+
+.faction-lower-lore-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.lore-doctrine-lead {
+  font-size: 14px;
+  color: var(--gold-light);
+  border-left: 2px solid var(--gold-dim);
+  padding-left: 10px;
+  margin: 0;
+  font-style: italic;
 }
 
 .readable-lore-body {
   font-size: 14.5px;
   line-height: 1.7;
   color: #e2e8f0;
+}
+
+@media (max-width: 960px) {
+  .faction-overview-main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .faction-vertical-portrait-frame {
+    min-height: 360px;
+    max-height: 480px;
+  }
 }
 
 /* PAGE 2: STATS */
@@ -5964,3 +6098,6 @@ body,
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
 }
+
+
+

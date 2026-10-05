@@ -1,5 +1,5 @@
-import type { Unit, UnitDef } from '../data/types';
-import { getUnitWeaponProfile, getUnitWeaponProfiles, getUnitArmourProfile, getUnitUtilityProfile, WeaponProfileDetail, ArmourProfileDetail, UtilityProfileDetail } from '../data/equipment';
+import type { Unit, UnitDef, WeaponProfileDetail, ArmourProfileDetail, UtilityProfileDetail } from '../data/types';
+import { getUnitWeaponProfile, getUnitWeaponProfiles, getUnitArmourProfile, getUnitUtilityProfile } from '../data/registry';
 
 export class DatasheetUI {
   private panel: HTMLElement | null;
